@@ -2,7 +2,7 @@ import { useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { ArrowRight, ChevronDown, Sparkles } from "lucide-react";
 import { BrandMark, WhatsAppButton } from "@/components/common";
-import { SPACE_IMAGE, VIDEO_URL } from "@/lib/gym-content";
+import { VIDEO_URL } from "@/lib/gym-content";
 
 export default function Hero() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -15,7 +15,7 @@ export default function Hero() {
   return (
     <section id="inicio" className="hero-section" ref={sectionRef}>
       <motion.div className="hero-section__media" style={{ y: mediaY }}>
-        <video autoPlay muted loop playsInline poster={SPACE_IMAGE} aria-label="Entrenamiento funcional en Plaza Fitness">
+        <video autoPlay muted loop playsInline aria-label="Animación del emblema de Plaza Fitness">
           <source src={VIDEO_URL} type="video/mp4" />
         </video>
       </motion.div>

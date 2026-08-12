@@ -1,5 +1,5 @@
-export const VIDEO_URL = "/manus-storage/plaza-fitness-hero_d9cbc2e5.mp4";
-export const MARK_URL = "/manus-storage/plaza-fitness-original-logo_078d76fa.png";
+export const VIDEO_URL = "/media/plaza-fitness-logo-animation.mp4";
+export const MARK_URL = "/media/plaza-fitness-logo.png";
 export const SPACE_IMAGE =
   "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=1800&q=88";
 export const COACHING_IMAGE =
