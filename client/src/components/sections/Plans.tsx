@@ -24,6 +24,8 @@ function PlanCard({ plan }: { plan: (typeof plans)[number] }) {
   );
 }
 
+const SCROLL_DWELL_MULTIPLIER = 2.4;
+
 function PlansHorizontal() {
   const wrapRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
@@ -33,20 +35,32 @@ function PlansHorizontal() {
   const x = useTransform(scrollYProgress, [0, 1], [0, -shift]);
 
   useEffect(() => {
+    const track = trackRef.current;
+    if (!track) return;
+
     function measure() {
-      const track = trackRef.current;
-      if (!track) return;
-      const trackWidth = track.scrollWidth;
-      const viewportWidth = track.parentElement?.clientWidth ?? window.innerWidth;
+      const trackWidth = track!.scrollWidth;
+      const viewportWidth = track!.parentElement?.clientWidth ?? window.innerWidth;
       setShift(Math.max(trackWidth - viewportWidth, 0));
     }
+
     measure();
+    const resizeObserver = new ResizeObserver(measure);
+    resizeObserver.observe(track);
+    if (track.parentElement) resizeObserver.observe(track.parentElement);
     window.addEventListener("resize", measure);
-    return () => window.removeEventListener("resize", measure);
+    document.fonts?.ready?.then(measure).catch(() => {});
+
+    return () => {
+      resizeObserver.disconnect();
+      window.removeEventListener("resize", measure);
+    };
   }, []);
 
+  const scrollDistance = shift * SCROLL_DWELL_MULTIPLIER;
+
   return (
-    <div className="plans-pin-wrap" ref={wrapRef} style={{ height: `calc(100vh + ${shift}px)` }}>
+    <div className="plans-pin-wrap" ref={wrapRef} style={{ height: `calc(100vh + ${scrollDistance}px)` }}>
       <div className="plans-pin-sticky">
         <motion.div className="plans-track-h" ref={trackRef} style={{ x }}>
           {plans.map((plan) => <PlanCard plan={plan} key={plan.number} />)}
