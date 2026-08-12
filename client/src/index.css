@@ -3,7 +3,7 @@
  * Graphite #0E1110 is the stage, pure white gives daylight, and electric
  * signal red #D92D20 is the sole signature action color. Motion stays physical and brief.
  */
-@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500;1,9..144,600&family=Manrope:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=Barlow+Condensed:wght@500;600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap');
 @import "tailwindcss";
 @import "tw-animate-css";
 
@@ -114,8 +114,8 @@ img, video { display: block; max-width: 100%; }
 .hero-content__topline-rule { width: 54px; height: 1px; background: var(--cobalt); }
 .hero-content__main { max-width: 580px; margin-top: clamp(42px, 7vh, 90px); }
 .hero-content__eyebrow { display: inline-flex; align-items: center; gap: 8px; margin-bottom: 16px; color: #ffd0cc; font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; font-family: 'Barlow Condensed', sans-serif; }
-.hero-content h1 { max-width: 780px; margin: 0; color: #fff; font-family: 'Fraunces', serif; font-optical-sizing: auto; font-size: clamp(52px, 7.4vw, 108px); font-weight: 500; letter-spacing: -.02em; line-height: .98; }
-.hero-content h1 em { display: block; margin-left: 6vw; font-family: 'Fraunces', serif; font-style: italic; font-weight: 500; color: var(--cobalt); }
+.hero-content h1 { max-width: 780px; margin: 0; color: #fff; font-family: 'Archivo Black', sans-serif; text-transform: uppercase; font-size: clamp(44px, 6.2vw, 92px); font-weight: 400; letter-spacing: -.01em; line-height: .96; }
+.hero-content h1 em { display: block; margin-left: 6vw; font-family: 'Archivo Black', sans-serif; font-style: normal; color: var(--cobalt); }
 .hero-content__lede { max-width: 390px; margin: 30px 0 0 5vw; color: rgba(255,255,255,.75); font-size: 15px; line-height: 1.75; }
 .hero-content__actions { display: flex; align-items: center; gap: 24px; margin: 30px 0 0 5vw; }
 .text-link { display: inline-flex; align-items: center; gap: 9px; padding-bottom: 5px; border-bottom: 1px solid currentColor; font-size: 11px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; font-family: 'Barlow Condensed', sans-serif; transition: gap .2s var(--ease-out), opacity .2s var(--ease-out); }
@@ -149,18 +149,17 @@ img, video { display: block; max-width: 100%; }
 .manifesto-layout__content { max-width: 820px; }
 .manifesto-layout h2, .space-layout h2, .coaching-layout h2, .plans-section h2, .contact-layout h2 {
   margin: 0;
-  font-family: 'Fraunces', serif;
-  font-optical-sizing: auto;
-  font-size: clamp(42px, 5.4vw, 78px);
-  font-weight: 500;
-  letter-spacing: -.015em;
-  line-height: 1.04;
+  font-family: 'Archivo Black', sans-serif;
+  text-transform: uppercase;
+  font-size: clamp(34px, 4.4vw, 64px);
+  font-weight: 400;
+  letter-spacing: -.005em;
+  line-height: 1.06;
 }
 .manifesto-layout h2 em, .space-layout h2 em, .coaching-layout h2 em, .plans-section h2 em, .contact-layout h2 em {
   display: block;
-  font-family: 'Fraunces', serif;
-  font-style: italic;
-  font-weight: 500;
+  font-family: 'Archivo Black', sans-serif;
+  font-style: normal;
   color: var(--cobalt);
 }
 .manifesto-layout h2 em { margin-left: 12%; }
@@ -169,7 +168,7 @@ img, video { display: block; max-width: 100%; }
 .method-item { display: grid; grid-template-columns: 48px 1fr 26px; align-items: center; gap: 24px; min-height: 98px; border-bottom: 1px solid rgba(255,255,255,.17); transition: padding .25s var(--ease-out), background-color .25s var(--ease-out); }
 .method-item:hover { padding-left: 10px; background: rgba(255,255,255,.03); }
 .method-item__number { color: var(--cobalt); font-family: 'Barlow Condensed', sans-serif; font-size: 26px; }
-.method-item h3 { margin: 0 0 4px; font-family: 'Fraunces', serif; font-size: 26px; font-weight: 600; letter-spacing: -.01em; }
+.method-item h3 { margin: 0 0 4px; font-family: 'Archivo Black', sans-serif; text-transform: uppercase; font-size: 21px; font-weight: 400; letter-spacing: -.005em; }
 .method-item p { max-width: 440px; margin: 0; color: rgba(234,231,223,.52); font-size: 12px; line-height: 1.6; }
 .method-item svg { color: var(--cobalt); }
 
@@ -195,7 +194,7 @@ img, video { display: block; max-width: 100%; }
 .glass-card--bone { backdrop-filter: blur(16px); }
 .image-note svg { color: var(--cobalt); }
 .image-note span { font-size: 10px; font-weight: 700; letter-spacing: .1em; line-height: 1.35; text-transform: uppercase; font-family: 'Barlow Condensed', sans-serif; }
-.image-note strong { font-size: 16px; font-family: 'Fraunces', serif; font-weight: 600; }
+.image-note strong { font-size: 14px; font-family: 'Archivo Black', sans-serif; text-transform: uppercase; font-weight: 400; }
 
 .coaching-section { position: relative; padding: 155px 0; }
 .coaching-layout { position: relative; display: grid; grid-template-columns: 1fr .88fr; align-items: center; gap: 13%; }
@@ -208,8 +207,8 @@ img, video { display: block; max-width: 100%; }
 .coaching-layout h2 { margin: 30px 0; }
 .coaching-layout__copy > p { max-width: 430px; color: rgba(234,231,223,.64); font-size: 15px; line-height: 1.8; }
 .coaching-quote { display: flex; align-items: center; gap: 12px; max-width: 365px; margin-top: 45px; padding: 17px 19px; }
-.coaching-quote__mark { color: var(--cobalt); font-family: 'Fraunces', serif; font-size: 44px; line-height: .55; }
-.coaching-quote p { margin: 0; font-family: 'Fraunces', serif; font-style: italic; font-size: 21px; font-weight: 500; letter-spacing: -.005em; }
+.coaching-quote__mark { color: var(--cobalt); font-family: 'Archivo Black', sans-serif; font-size: 40px; line-height: .55; }
+.coaching-quote p { margin: 0; font-family: 'Archivo Black', sans-serif; text-transform: uppercase; font-style: normal; font-size: 17px; font-weight: 400; letter-spacing: -.005em; }
 
 /* ---------- plans: pinned horizontal scroll-jack (desktop), stacked (mobile) ---------- */
 .plans-section { position: relative; padding: 145px 0 0; }
@@ -223,14 +222,14 @@ img, video { display: block; max-width: 100%; }
 
 .plan-card-h { position: relative; display: flex; flex-direction: column; flex: 0 0 auto; width: min(420px, 78vw); min-height: 490px; padding: 24px 26px 25px; background: rgba(14,17,16,.94); color: #fff; box-shadow: 12px 12px 0 rgba(14,17,16,.14); }
 .plan-card-h--featured { width: min(480px, 82vw); background: var(--graphite); }
-.plan-card-h--featured h3 { font-size: clamp(38px, 5vw, 54px); }
+.plan-card-h--featured h3 { font-size: clamp(28px, 3.4vw, 40px); }
 .plan-card__badge { position: absolute; top: 25px; right: 25px; padding: 7px 9px; background: var(--cobalt); color: #fff; font-size: 9px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; font-family: 'Barlow Condensed', sans-serif; }
 .plan-card__top { display: flex; align-items: center; justify-content: space-between; color: rgba(255,255,255,.56); border-bottom: 1px solid rgba(255,255,255,.16); padding-bottom: 20px; }
 .plan-card__top span { color: var(--cobalt); font-family: 'Barlow Condensed', sans-serif; font-size: 26px; }
 .plan-card__top svg { color: rgba(255,255,255,.5); }
 .plan-card__body { padding-top: 28px; flex: 1; }
 .plan-card__kicker { color: #ff8d84; font-size: 10px; font-weight: 800; letter-spacing: .17em; text-transform: uppercase; font-family: 'Barlow Condensed', sans-serif; }
-.plan-card-h h3 { margin: 13px 0 20px; font-family: 'Fraunces', serif; font-size: clamp(32px, 4vw, 44px); font-weight: 500; letter-spacing: -.01em; line-height: 1.05; }
+.plan-card-h h3 { margin: 13px 0 20px; font-family: 'Archivo Black', sans-serif; text-transform: uppercase; font-size: clamp(24px, 2.8vw, 34px); font-weight: 400; letter-spacing: -.005em; line-height: 1.08; }
 .plan-card-h p { max-width: 310px; color: rgba(255,255,255,.62); font-size: 13px; line-height: 1.7; }
 .plan-card-h ul { display: grid; gap: 10px; margin: 24px 0 0; padding: 0; list-style: none; color: rgba(255,255,255,.78); font-size: 11px; font-weight: 700; letter-spacing: .04em; }
 .plan-card-h li { display: flex; align-items: center; gap: 8px; }
@@ -243,7 +242,7 @@ img, video { display: block; max-width: 100%; }
 .plans-track-h__accent::after { content: ''; position: absolute; inset: 0; background: linear-gradient(0deg, rgba(14,17,16,.82), transparent 65%); }
 .plans-grid__accent-copy { position: absolute; right: 18px; bottom: 16px; left: 18px; z-index: 1; display: grid; gap: 8px; }
 .plans-grid__accent-copy span { color: var(--cobalt); font-family: 'Barlow Condensed', sans-serif; font-size: 20px; }
-.plans-grid__accent-copy strong { font-family: 'Fraunces', serif; font-style: italic; font-weight: 500; font-size: 26px; color: #fff; line-height: 1.05; }
+.plans-grid__accent-copy strong { font-family: 'Archivo Black', sans-serif; text-transform: uppercase; font-style: normal; font-weight: 400; font-size: 21px; color: #fff; line-height: 1.08; }
 
 .plans-stack { display: grid; gap: 18px; padding-bottom: 40px; }
 .plan-card-h-wrap .plan-card-h { width: 100%; min-height: 300px; }
@@ -265,7 +264,7 @@ img, video { display: block; max-width: 100%; }
 .contact-detail div { display: grid; gap: 5px; }
 .contact-detail span { color: rgba(14,17,16,.48); font-size: 10px; font-weight: 800; letter-spacing: .15em; text-transform: uppercase; font-family: 'Barlow Condensed', sans-serif; }
 .contact-detail strong { font-size: 14px; line-height: 1.5; }
-.contact-section__marquee { display: flex; width: max-content; gap: 40px; margin-top: 125px; color: rgba(14,17,16,.09); font-family: 'Fraunces', serif; font-size: clamp(40px, 6vw, 84px); font-weight: 500; letter-spacing: -.01em; line-height: .95; white-space: nowrap; animation: marquee 26s linear infinite; }
+.contact-section__marquee { display: flex; width: max-content; gap: 40px; margin-top: 125px; color: rgba(14,17,16,.09); font-family: 'Archivo Black', sans-serif; text-transform: uppercase; font-size: clamp(32px, 4.6vw, 68px); font-weight: 400; letter-spacing: -.005em; line-height: .95; white-space: nowrap; animation: marquee 26s linear infinite; }
 @keyframes marquee { to { transform: translateX(-50%); } }
 
 .site-footer { padding: 28px 0; border-top: 1px solid rgba(255,255,255,.12); }
@@ -288,7 +287,7 @@ img, video { display: block; max-width: 100%; }
   .menu-toggle { display: block; }
   .hero-content { padding-top: 140px; }
   .hero-content__topline { font-size: 8px; }
-  .hero-content h1 { font-size: clamp(46px, 12vw, 84px); }
+  .hero-content h1 { font-size: clamp(38px, 10vw, 68px); }
   .hero-content h1 em { margin-left: 5vw; }
   .hero-content__lede, .hero-content__actions { margin-left: 0; }
   .hero-content__bottomline { align-items: end; }
@@ -312,7 +311,7 @@ img, video { display: block; max-width: 100%; }
   .hero-section__media video { width: min(88vw, 680px); height: 238px; }
   .hero-content { padding-top: 392px; }
   .hero-content__main { max-width: 100%; margin-top: 42px; }
-  .hero-content h1 { max-width: 650px; font-size: clamp(50px, 10vw, 80px); }
+  .hero-content h1 { max-width: 650px; font-size: clamp(42px, 8vw, 66px); }
 }
 
 @media (max-width: 600px) {
@@ -326,7 +325,7 @@ img, video { display: block; max-width: 100%; }
   .hero-content__topline { flex-wrap: wrap; gap: 8px; }
   .hero-content__topline-rule { width: 28px; }
   .hero-content__main { max-width: 100%; margin-top: 42px; }
-  .hero-content h1 { font-size: clamp(42px, 14vw, 64px); line-height: 1; }
+  .hero-content h1 { font-size: clamp(34px, 11vw, 50px); line-height: 1; }
   .hero-content h1 em { margin-left: 4vw; }
   .hero-content__lede { max-width: 315px; margin-top: 22px; font-size: 13px; line-height: 1.65; }
   .hero-content__actions { align-items: flex-start; flex-direction: column; gap: 18px; margin-top: 24px; }
@@ -338,10 +337,10 @@ img, video { display: block; max-width: 100%; }
   .manifesto-section__blueprint { top: 60px; left: 8%; right: 8%; }
   .section-meter { top: 39px; right: 17px; left: 17px; gap: 7px; font-size: 7px; }
   .section-meter i { width: 42px; }
-  .manifesto-layout h2, .space-layout h2, .coaching-layout h2, .plans-section h2, .contact-layout h2 { font-size: clamp(36px, 11vw, 54px); }
+  .manifesto-layout h2, .space-layout h2, .coaching-layout h2, .plans-section h2, .contact-layout h2 { font-size: clamp(28px, 9vw, 42px); }
   .manifesto-lede { margin-top: 28px; margin-bottom: 40px; font-size: 14px; }
   .method-item { grid-template-columns: 32px 1fr 20px; gap: 12px; min-height: 105px; }
-  .method-item h3 { font-size: 21px; }
+  .method-item h3 { font-size: 17px; }
   .method-item p { font-size: 11px; }
   .space-layout { gap: 45px; }
   .space-layout__copy > p, .coaching-layout__copy > p, .contact-layout__main > p { font-size: 14px; }
@@ -355,7 +354,7 @@ img, video { display: block; max-width: 100%; }
   .plans-section__top h2 { margin-top: 20px; }
   .plan-card-h-wrap .plan-card-h { min-height: 250px; padding-inline: 21px; }
   .plan-card-h-wrap .plan-card-h--featured { min-height: 330px; }
-  .plan-card-h h3 { font-size: clamp(28px, 9vw, 38px); }
+  .plan-card-h h3 { font-size: clamp(22px, 7.5vw, 30px); }
   .plans-section__foot { align-items: flex-start; flex-direction: column; gap: 14px; }
   .contact-section__mark .brand-mark { width: 280px; height: 280px; }
   .contact-section__mark { top: 4px; right: -62px; }
