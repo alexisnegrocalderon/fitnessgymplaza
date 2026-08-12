@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
-import { Menu, Phone, X } from "lucide-react";
+import { Instagram, Menu, Phone, X } from "lucide-react";
 import { BrandMark, WhatsAppButton } from "@/components/common";
+import { INSTAGRAM_URL } from "@/lib/gym-content";
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -34,12 +35,20 @@ export default function Header() {
         <a href="#espacio" onClick={closeMenu}>Espacio</a>
         <a href="#planes" onClick={closeMenu}>Planes</a>
         <a href="#contacto" onClick={closeMenu}>Contacto</a>
-        <div className="site-nav__mobile-cta"><WhatsAppButton compact /></div>
+        <div className="site-nav__mobile-cta">
+          <a className="header-instagram header-instagram--mobile" href={INSTAGRAM_URL} target="_blank" rel="noreferrer" aria-label="Instagram de Plaza Fitness">
+            <Instagram size={17} />
+          </a>
+          <WhatsAppButton compact />
+        </div>
       </nav>
 
       <div className="site-header__actions">
         <a className="header-phone" href="tel:+56952254029">
           <Phone size={15} /> <span>9 5225 4029</span>
+        </a>
+        <a className="header-instagram" href={INSTAGRAM_URL} target="_blank" rel="noreferrer" aria-label="Instagram de Plaza Fitness">
+          <Instagram size={16} />
         </a>
         <WhatsAppButton compact />
         <button

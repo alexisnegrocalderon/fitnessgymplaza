@@ -8,6 +8,7 @@ export const GRIP_IMAGE =
   "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&w=1400&q=88";
 export const WHATSAPP_URL =
   "https://wa.me/56952254029?text=Hola%20Plaza%20Fitness%2C%20quiero%20conocer%20los%20planes%20y%20horarios.";
+export const INSTAGRAM_URL = "https://www.instagram.com/plazafitnessvina";
 
 export const plans = [
   {
