@@ -65,7 +65,7 @@ function PlansHorizontal() {
         <motion.div className="plans-track-h" ref={trackRef} style={{ x }}>
           {plans.map((plan) => <PlanCard plan={plan} key={plan.number} />)}
           <div className="plans-track-h__accent">
-            <img src={GRIP_IMAGE} alt="Manos sujetando una cuerda de entrenamiento" loading="lazy" />
+            <img src={GRIP_IMAGE} alt="Piso de entrenamiento de Plaza Fitness con el mezzanine y la instalación de luces al fondo" loading="lazy" />
             <div className="plans-grid__accent-copy"><span>04</span><strong>El plan es moverte.</strong></div>
           </div>
         </motion.div>
