@@ -34,7 +34,7 @@ export default function Space() {
         </div>
         <Reveal kind="scale" delay={0.1} className="space-layout__visual">
           <div className="image-frame image-frame--large">
-            <img src={SPACE_IMAGE} alt="Interior remodelado de Plaza Fitness con equipamiento funcional" loading="lazy" />
+            <img src={SPACE_IMAGE} alt="Instalación de luces LED hexagonales sobre el piso de entrenamiento de Plaza Fitness" loading="lazy" />
             <div className="image-frame__caption"><span>08 Nte. 855</span><span>Viña del Mar</span></div>
           </div>
           <div className="image-note glass-card glass-card--bone">

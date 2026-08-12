@@ -1,6 +1,7 @@
 import { Clock3, MapPin, Phone } from "lucide-react";
 import { BrandMark, SectionTag, WhatsAppButton } from "@/components/common";
 import { Reveal } from "@/components/Reveal";
+import { STOREFRONT_IMAGE } from "@/lib/gym-content";
 
 export default function Contact() {
   return (
@@ -23,9 +24,14 @@ export default function Contact() {
           </Reveal>
         </div>
         <Reveal delay={0.1} className="contact-layout__details">
-          <div className="contact-detail"><MapPin size={20} /><div><span>Encuéntranos</span><strong>8 Nte. 855<br />Viña del Mar, Valparaíso</strong></div></div>
-          <div className="contact-detail"><Clock3 size={20} /><div><span>Horarios</span><strong>Consulta disponibilidad<br />por WhatsApp</strong></div></div>
-          <div className="contact-detail"><Phone size={20} /><div><span>WhatsApp</span><strong>+56 9 5225 4029</strong></div></div>
+          <div className="image-frame contact-storefront">
+            <img src={STOREFRONT_IMAGE} alt="Fachada de Plaza Fitness en Viña del Mar" loading="lazy" />
+          </div>
+          <div className="contact-details-rows">
+            <div className="contact-detail"><MapPin size={20} /><div><span>Encuéntranos</span><strong>8 Nte. 855<br />Viña del Mar, Valparaíso</strong></div></div>
+            <div className="contact-detail"><Clock3 size={20} /><div><span>Horarios</span><strong>Consulta disponibilidad<br />por WhatsApp</strong></div></div>
+            <div className="contact-detail"><Phone size={20} /><div><span>WhatsApp</span><strong>+56 9 5225 4029</strong></div></div>
+          </div>
         </Reveal>
       </div>
       <div className="contact-section__marquee" aria-hidden="true"><span>Plaza Fitness · Functional Training · Viña del Mar · </span><span>Plaza Fitness · Functional Training · Viña del Mar · </span></div>

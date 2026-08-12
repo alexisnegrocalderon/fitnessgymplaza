@@ -185,7 +185,7 @@ img, video { display: block; max-width: 100%; }
 .space-details strong { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; }
 .space-layout__visual { position: relative; padding: 6% 8% 9% 0; }
 .image-frame { position: relative; overflow: hidden; background: #e4e3e0; }
-.image-frame img { width: 100%; height: 100%; object-fit: cover; transition: transform .7s var(--ease-out); filter: saturate(.88) contrast(1.03); }
+.image-frame img { width: 100%; height: 100%; object-fit: cover; object-position: top; transition: transform .7s var(--ease-out); filter: saturate(.88) contrast(1.03); }
 .image-frame:hover img { transform: scale(1.04); }
 .image-frame--large { aspect-ratio: 1.05 / 1; }
 .image-frame--large::before { content: ''; position: absolute; z-index: 1; inset: 14px; border: 1px solid rgba(255,255,255,.48); pointer-events: none; }
@@ -238,7 +238,7 @@ img, video { display: block; max-width: 100%; }
 .plan-card__link svg { color: var(--cobalt); }
 
 .plans-track-h__accent { position: relative; flex: 0 0 auto; width: min(340px, 62vw); overflow: hidden; margin-right: max(24px, calc((100vw - 1240px) / 2)); transform: rotate(-1.4deg); box-shadow: 0 24px 50px rgba(14,17,16,.18); }
-.plans-track-h__accent img { width: 100%; height: 100%; object-fit: cover; filter: saturate(.82) contrast(1.08); }
+.plans-track-h__accent img { width: 100%; height: 100%; object-fit: cover; object-position: top; filter: saturate(.82) contrast(1.08); }
 .plans-track-h__accent::after { content: ''; position: absolute; inset: 0; background: linear-gradient(0deg, rgba(14,17,16,.82), transparent 65%); }
 .plans-grid__accent-copy { position: absolute; right: 18px; bottom: 16px; left: 18px; z-index: 1; display: grid; gap: 8px; }
 .plans-grid__accent-copy span { color: var(--cobalt); font-family: 'Barlow Condensed', sans-serif; font-size: 20px; }
@@ -258,6 +258,8 @@ img, video { display: block; max-width: 100%; }
 .contact-layout h2 { margin: 32px 0 27px; }
 .contact-layout__main > p { max-width: 420px; margin: 0 0 34px; color: rgba(14,17,16,.66); font-size: 15px; line-height: 1.8; }
 .contact-layout__details { display: grid; align-content: center; gap: 0; }
+.contact-storefront { width: min(220px, 46%); aspect-ratio: 4 / 5; margin-bottom: 28px; box-shadow: 0 18px 40px rgba(14,17,16,.1); }
+.contact-details-rows { display: grid; gap: 0; }
 .contact-detail { display: flex; align-items: flex-start; gap: 17px; padding: 24px 0; border-bottom: 1px solid var(--bone-line); }
 .contact-detail:first-child { border-top: 1px solid var(--bone-line); }
 .contact-detail svg { flex: 0 0 auto; color: var(--cobalt); }

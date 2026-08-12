@@ -9,7 +9,7 @@ export default function Coaching() {
       <div className="container coaching-layout">
         <Reveal kind="scale" className="coaching-layout__visual">
           <div className="image-frame image-frame--portrait">
-            <img src={COACHING_IMAGE} alt="Coach guiando un entrenamiento personalizado" loading="lazy" />
+            <img src={COACHING_IMAGE} alt="Personas entrenando en Plaza Fitness bajo la instalación de luces hexagonales" loading="lazy" />
           </div>
           <div className="coaching-layout__index">02<span>/</span>03</div>
         </Reveal>

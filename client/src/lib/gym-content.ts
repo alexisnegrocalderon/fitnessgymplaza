@@ -1,11 +1,9 @@
 export const VIDEO_URL = "/media/plaza-fitness-logo-animation.mp4";
 export const MARK_URL = "/media/plaza-fitness-logo.png";
-export const SPACE_IMAGE =
-  "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=1800&q=88";
-export const COACHING_IMAGE =
-  "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=1400&q=88";
-export const GRIP_IMAGE =
-  "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&w=1400&q=88";
+export const SPACE_IMAGE = "/media/plaza-fitness-space.jpg";
+export const COACHING_IMAGE = "/media/plaza-fitness-coaching.jpg";
+export const GRIP_IMAGE = "/media/plaza-fitness-plans-accent.jpg";
+export const STOREFRONT_IMAGE = "/media/plaza-fitness-storefront.jpg";
 export const WHATSAPP_URL =
   "https://wa.me/56952254029?text=Hola%20Plaza%20Fitness%2C%20quiero%20conocer%20los%20planes%20y%20horarios.";
 export const INSTAGRAM_URL = "https://www.instagram.com/plazafitnessvina";
