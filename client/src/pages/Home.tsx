@@ -27,8 +27,8 @@ function Home() {
         <Hero />
         <Method />
         <Space />
-        <Coaching />
         <Plans />
+        <Coaching />
         <Contact />
       </main>
       <Footer />
