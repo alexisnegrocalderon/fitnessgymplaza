@@ -1,38 +1,5 @@
 # Revisión Plaza Fitness
 
-## Revisión de reloj, horarios y planes
-
-- [x] Reemplazar el simulador circular por un reloj horizontal de 60 segundos con audio opt-in.
-- [x] Sustituir el Circuito Semanal por un Tablero de sesiones exclusivamente informativo.
-- [x] Implementar Selector de atleta y marcar Progresión 12 de $60.000 como más elegido.
-- [x] Corregir reglas de cancelación y cupos del sábado; eliminar la gráfica informativa descartada.
-- [x] Verificar desktop, tablet y celular; guardar checkpoint y sincronizar la rama de código.
-
-## Rediseño funcional interactivo
-
-- [x] Renovar hero y metodología con los nuevos titulares y siete características de entrenamiento guiado.
-- [x] Retirar la sección de espacio y sustituir horarios por Circuito Semanal sin créditos visibles.
-- [x] Mejorar las tarjetas de planes e implementar el modal glassmorphism de inscripción.
-- [x] Convertir las reglas en un panel abierto y legible.
-- [x] Añadir mini simulador de intervalos accesible, con audio opcional y movimiento controlado.
-- [x] Verificar desktop, tablet y celular; guardar checkpoint y sincronizar la actualización de código.
-
-## Despliegue en Vercel
-
-- [ ] Comprobar acceso a Vercel y decidir la rama de despliegue.
-- [ ] Vincular o configurar el proyecto Vercel con el repositorio de Plaza Fitness.
-- [ ] Desplegar la versión seleccionada y verificar la URL pública.
-
-## Actualización Performance Command
-
-- [x] Integrar la nueva propuesta de valor de entrenamiento funcional guiado y adaptado.
-- [x] Construir el Pulse Grid de horarios con selector semanal, sesiones y CTA contextual.
-- [x] Reemplazar los planes por tarjetas Perspective Reveal conectadas a créditos y beneficios de sábado.
-- [x] Añadir el recorrido de inscripción, datos de transferencia y reglas operativas.
-- [x] Actualizar toda la ubicación pública a Calle Quillota 656, Viña del Mar.
-- [x] Usar las gráficas aportadas como referencia visual expandible y verificar desktop, tablet y celular.
-- [ ] Validar build, guardar checkpoint y sincronizar la actualización con GitHub.
-
 ## Sincronización con GitHub
 
 - [ ] Revisar el remoto, la rama y el estado local del repositorio seleccionado.
