@@ -4,6 +4,8 @@
  */
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import Admin from "@/pages/Admin";
+import Inauguracion from "@/pages/Inauguracion";
 import NotFound from "@/pages/NotFound";
 import { MotionConfig } from "framer-motion";
 import { Route, Switch } from "wouter";
@@ -12,10 +14,11 @@ import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
 
 function Router() {
-  // make sure to consider if you need authentication for certain routes
   return (
     <Switch>
       <Route path="/" component={Home} />
+      <Route path="/inauguracion" component={Inauguracion} />
+      <Route path="/admin" component={Admin} />
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />
     </Switch>
