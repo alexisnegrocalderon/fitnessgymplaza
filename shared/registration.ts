@@ -25,3 +25,6 @@ export const EVENT_DETAILS = {
   time: "20:00 hrs",
   address: "Calle Quillota 656, Viña del Mar",
 } as const;
+
+/** Cupos internos. Nunca se muestra al público, solo cierra el formulario. */
+export const EVENT_CAPACITY = 100;

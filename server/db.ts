@@ -8,6 +8,9 @@ import {
   users,
 } from "../drizzle/schema";
 import { ENV } from "./_core/env";
+import { EVENT_CAPACITY } from "../shared/registration";
+
+export { EVENT_CAPACITY };
 
 let _db: ReturnType<typeof drizzle> | null = null;
 
@@ -81,9 +84,6 @@ export async function getUserByOpenId(openId: string) {
 // ---------------------------------------------------------------------------
 // Inscripciones — Gran Inauguración
 // ---------------------------------------------------------------------------
-
-/** Cupos internos. Nunca se muestra al público, solo cierra el formulario. */
-export const EVENT_CAPACITY = 100;
 
 /** pending + approved cuentan contra el cupo; rejected libera el lugar. */
 export async function countActiveRegistrations(): Promise<number> {
