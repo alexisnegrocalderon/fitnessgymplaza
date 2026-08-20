@@ -1,12 +1,26 @@
-const isVercelRuntime =
-  typeof window !== "undefined" && window.location.hostname.endsWith(".vercel.app");
+// Los videos viven en client/public/media en todos lados excepto dentro del
+// propio entorno de desarrollo de Manus, donde se sirven vía su proxy
+// /manus-storage/. Detectar "es Manus dev" (no "es Vercel") es lo correcto:
+// cualquier otro host —Vercel, un dominio propio como plazafitness.cl, etc.—
+// debe usar /media/. La lista de hosts es la misma que vite.config.ts permite
+// para el server de desarrollo.
+const MANUS_DEV_HOSTS = [
+  ".manuspre.computer",
+  ".manus.computer",
+  ".manus-asia.computer",
+  ".manuscomputer.ai",
+  ".manusvm.computer",
+];
+const isManusDevRuntime =
+  typeof window !== "undefined" &&
+  MANUS_DEV_HOSTS.some(host => window.location.hostname.endsWith(host));
 
-export const VIDEO_URL = isVercelRuntime
-  ? "/media/plaza-fitness-hero-desktop.mp4"
-  : "/manus-storage/plaza-fitness-hero-desktop_deedf91e.mp4";
-export const MOBILE_VIDEO_URL = isVercelRuntime
-  ? "/media/plaza-fitness-hero-mobile-3x4.mp4"
-  : "/manus-storage/plaza-fitness-hero-mobile-3x4_e0a54070.mp4";
+export const VIDEO_URL = isManusDevRuntime
+  ? "/manus-storage/plaza-fitness-hero-desktop_deedf91e.mp4"
+  : "/media/plaza-fitness-hero-desktop.mp4";
+export const MOBILE_VIDEO_URL = isManusDevRuntime
+  ? "/manus-storage/plaza-fitness-hero-mobile-3x4_e0a54070.mp4"
+  : "/media/plaza-fitness-hero-mobile-3x4.mp4";
 export const MARK_URL = "/media/plaza-fitness-logo.png";
 export const SPACE_IMAGE = "/media/plaza-fitness-space.jpg";
 export const COACHING_IMAGE = "/media/plaza-fitness-coaching.jpg";
