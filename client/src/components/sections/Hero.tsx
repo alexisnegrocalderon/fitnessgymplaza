@@ -151,7 +151,7 @@ export default function Hero() {
             animate={{ opacity: 1, y: 0 }}
             transition={reduced ? calm : { ...spring.reveal, delay: 0.42 }}
           >
-            <WhatsAppButton />
+            <WhatsAppButton label="Comienza Hoy!" />
             <a href="#metodo" className="text-link text-link--light">
               Conoce el método <ArrowRight size={16} />
             </a>

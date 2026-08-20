@@ -49,7 +49,13 @@ const MAGNET_PULL = 7;
  * feedback en el pointer-down (no al soltar) y una atracción magnética local
  * en escritorio, que reemplaza al cursor personalizado que se eliminó.
  */
-export function WhatsAppButton({ compact = false }: { compact?: boolean }) {
+export function WhatsAppButton({
+  compact = false,
+  label = "Conversemos",
+}: {
+  compact?: boolean;
+  label?: string;
+}) {
   const ref = useRef<HTMLAnchorElement>(null);
   const reduced = useReducedMotion();
 
@@ -91,7 +97,7 @@ export function WhatsAppButton({ compact = false }: { compact?: boolean }) {
       onPointerCancel={release}
     >
       <MessageCircle size={compact ? 16 : 18} strokeWidth={2.2} />
-      <span>Conversemos</span>
+      <span>{label}</span>
       <ArrowUpRight size={16} />
     </motion.a>
   );
