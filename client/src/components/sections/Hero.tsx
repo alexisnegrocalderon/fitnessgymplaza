@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import {
   motion,
   useReducedMotion,
@@ -52,8 +52,26 @@ function Words({ text, className }: { text: string; className?: string }) {
 
 export default function Hero() {
   const sectionRef = useRef<HTMLElement>(null);
+  const mobileVideoRef = useRef<HTMLVideoElement>(null);
   const isDesktop = useIsDesktop();
   const reduced = useReducedMotion();
+
+  useEffect(() => {
+    const video = mobileVideoRef.current;
+    if (!video) return;
+
+    const startPlayback = () => {
+      video.muted = true;
+      void video.play().catch(() => {
+        // Los navegadores móviles permiten el intento porque el video es mudo;
+        // si el modo ahorro lo bloquea, el primer toque del usuario lo reanuda.
+      });
+    };
+
+    startPlayback();
+    video.addEventListener("canplay", startPlayback);
+    return () => video.removeEventListener("canplay", startPlayback);
+  }, []);
 
   const { scrollYProgress } = useScroll({
     target: sectionRef,
@@ -101,13 +119,13 @@ export default function Hero() {
           <source src={VIDEO_URL} type="video/mp4" />
         </video>
         <video
+          ref={mobileVideoRef}
           className="hero-video hero-video--mobile"
           autoPlay
           muted
           loop
           playsInline
-          preload="metadata"
-          poster={MARK_URL}
+          preload="auto"
           aria-label="Video vertical de Plaza Fitness para celulares"
         >
           <source src={MOBILE_VIDEO_URL} type="video/mp4" />
