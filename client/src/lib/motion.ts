@@ -18,6 +18,8 @@ export const spring = {
   momentum: { type: "spring", bounce: 0.18, duration: 0.45 },
   /** Feedback de presión. Tiene que sentirse instantáneo. */
   press: { type: "spring", bounce: 0, duration: 0.18 },
+  /** Hojas y modales: Apple usa damping ~0.8 / response 0.3. */
+  sheet: { type: "spring", bounce: 0.2, duration: 0.3 },
 } satisfies Record<string, Transition>;
 
 /** Equivalente con movimiento reducido: cross-fade, sin viaje ni rebote. */

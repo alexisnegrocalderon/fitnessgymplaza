@@ -6,14 +6,14 @@ import {
   useTransform,
   type Variants,
 } from "framer-motion";
-import { ArrowRight, ChevronDown, Sparkles } from "lucide-react";
+import { ArrowRight, ChevronDown, ShieldCheck } from "lucide-react";
 import { BrandMark, WhatsAppButton } from "@/components/common";
-import { VIDEO_URL, MARK_URL } from "@/lib/gym-content";
+import { ADDRESS_LINE, VIDEO_URL, MARK_URL } from "@/lib/gym-content";
 import { useIsDesktop } from "@/lib/useIsDesktop";
 import { calm, spring } from "@/lib/motion";
 
-const HEADLINE = "Entrena como si";
-const HEADLINE_ACCENT = "importara.";
+const HEADLINE = "Fuerza que se";
+const HEADLINE_ACCENT = "adapta a ti.";
 
 /** Cada palabra entra por su cuenta: el titular se construye, no aparece. */
 const word: Variants = {
@@ -119,7 +119,7 @@ export default function Hero() {
         >
           <span>Viña del Mar · Chile</span>
           <span className="hero-content__topline-rule" />
-          <span>Est. 2018 / Reopened 2026</span>
+          <span>{ADDRESS_LINE}</span>
         </motion.div>
         <div className="hero-content__main">
           <motion.div
@@ -128,7 +128,7 @@ export default function Hero() {
             animate={{ opacity: 1, y: 0 }}
             transition={reduced ? calm : { ...spring.ui, delay: 0.06 }}
           >
-            <Sparkles size={14} /> Nuevo espacio. Misma energía.
+            <ShieldCheck size={14} /> Entrenamiento funcional guiado.
           </motion.div>
           <motion.h1 variants={headline} initial="hidden" animate="visible">
             <Words text={HEADLINE} />
@@ -142,8 +142,8 @@ export default function Hero() {
             animate={{ opacity: 1, y: 0 }}
             transition={reduced ? calm : { ...spring.reveal, delay: 0.34 }}
           >
-            Entrenamiento funcional y personalizado para moverte con más
-            potencia, precisión y constancia.
+            Clases dinámicas con profesores en cada estación para cuidar tu
+            técnica, adaptar el desafío y convertir el movimiento en salud real.
           </motion.p>
           <motion.div
             className="hero-content__actions"
@@ -174,11 +174,11 @@ export default function Hero() {
             }
             transition={reduced ? calm : { ...spring.reveal, delay: 0.5 }}
           >
-            <span className="hero-stat__value">5.0</span>
+            <span className="hero-stat__value">01</span>
             <span className="hero-stat__label">
-              Google rating
+              Guía real
               <br />
-              <small>Viña del Mar</small>
+              <small>Nivel adaptado</small>
             </span>
           </motion.div>
           <div className="hero-scroll">

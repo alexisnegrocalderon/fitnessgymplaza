@@ -7,7 +7,7 @@ import {
   useTransform,
 } from "framer-motion";
 import { ArrowUpRight, Check, Plus } from "lucide-react";
-import { GRIP_IMAGE, WHATSAPP_URL, plans } from "@/lib/gym-content";
+import { GRIP_IMAGE, type Plan } from "@/lib/gym-content";
 import {
   calm,
   nearestSnap,
@@ -28,36 +28,56 @@ function clamp(value: number, min: number, max: number) {
   return Math.min(Math.max(value, min), max);
 }
 
-function PlanCard({ plan }: { plan: (typeof plans)[number] }) {
+const BASE_CHECKS = [
+  "Entrenamiento funcional guiado",
+  "Profesores presentes por estación",
+  "Horarios para elegir según tu rutina",
+];
+
+function PlanCard({
+  plan,
+  onSelect,
+}: {
+  plan: Plan;
+  onSelect: (plan: Plan, origin: HTMLElement) => void;
+}) {
+  const cardRef = useRef<HTMLButtonElement>(null);
+
   return (
     <article
       className={`plan-card-h ${plan.featured ? "plan-card-h--featured" : ""}`}
     >
       <div className="plan-card__top">
-        <span>{plan.number}</span>
+        <span>{plan.label.match(/\d+/)?.[0] ?? "01"}</span>
         <Plus size={17} />
       </div>
       <div className="plan-card__body">
-        <span className="plan-card__kicker">{plan.kicker}</span>
-        <h3>{plan.title}</h3>
-        <p>{plan.description}</p>
+        <span className="plan-card__kicker">{plan.tagline}</span>
+        <h3>{plan.label}</h3>
+        <strong className="plan-card__price">{plan.price}</strong>
+        <p>{plan.note}</p>
         <ul>
-          {plan.features.map(feature => (
+          {BASE_CHECKS.map(feature => (
             <li key={feature}>
               <Check size={15} /> {feature}
             </li>
           ))}
+          {plan.studentRequirement && (
+            <li>
+              <Check size={15} /> Presenta certificado de alumno regular
+            </li>
+          )}
         </ul>
       </div>
-      <a
-        href={WHATSAPP_URL}
-        target="_blank"
-        rel="noreferrer"
+      <button
+        ref={cardRef}
+        type="button"
         className="plan-card__link"
+        onClick={() => cardRef.current && onSelect(plan, cardRef.current)}
       >
-        Consultar disponibilidad <ArrowUpRight size={16} />
-      </a>
-      {plan.featured && <span className="plan-card__badge">Recomendado</span>}
+        Continuar inscripción <ArrowUpRight size={16} />
+      </button>
+      {plan.featured && <span className="plan-card__badge">Más elegido</span>}
     </article>
   );
 }
@@ -65,13 +85,18 @@ function PlanCard({ plan }: { plan: (typeof plans)[number] }) {
 /**
  * Carrusel de planes conducido por gesto.
  *
- * Reemplaza el scroll-jack de escritorio y la pila estática de móvil por una
- * sola pieza que sigue al dedo 1:1, proyecta el momentum al soltar, entrega la
- * velocidad al resorte y resiste en los extremos en vez de frenar en seco.
- * Cualquier animación en curso puede interrumpirse: un nuevo pointerdown lee
- * el valor en pantalla y toma el control desde ahí.
+ * Sigue al dedo 1:1, proyecta el momentum al soltar, entrega la velocidad al
+ * resorte y resiste en los extremos en vez de frenar en seco. Cualquier
+ * animación en curso puede interrumpirse: un nuevo pointerdown lee el valor
+ * en pantalla y toma el control desde ahí.
  */
-export default function PlansCarousel() {
+export default function PlansCarousel({
+  plans,
+  onSelectPlan,
+}: {
+  plans: Plan[];
+  onSelectPlan: (plan: Plan, origin: HTMLElement) => void;
+}) {
   const viewportRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
 
@@ -123,16 +148,21 @@ export default function PlansCarousel() {
     setMaxShift(shift);
     setSnapPoints(Array.from(new Set(points)).sort((a, b) => b - a));
     x.set(clamp(x.get(), -shift, 0));
+    setIndex(0);
   }, [x]);
 
   useEffect(() => {
+    // Al cambiar de audiencia el set de tarjetas cambia entero: vuelve al inicio.
+    x.stop();
+    x.set(0);
     measure();
     const observer = new ResizeObserver(measure);
     if (trackRef.current) observer.observe(trackRef.current);
     if (viewportRef.current) observer.observe(viewportRef.current);
     document.fonts?.ready?.then(measure).catch(() => {});
     return () => observer.disconnect();
-  }, [measure]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [measure, plans]);
 
   const settleTo = useCallback(
     (target: number, velocity = 0) => {
@@ -206,7 +236,7 @@ export default function PlansCarousel() {
   }
 
   function onClickCapture(event: React.MouseEvent<HTMLDivElement>) {
-    // Un arrastre no debe disparar el enlace de la tarjeta.
+    // Un arrastre no debe disparar el botón de la tarjeta.
     if (drag.current.committed) {
       event.preventDefault();
       event.stopPropagation();
@@ -256,8 +286,8 @@ export default function PlansCarousel() {
           style={{ x }}
         >
           {plans.map(plan => (
-            <div className="plans-carousel__slide" data-snap key={plan.number}>
-              <PlanCard plan={plan} />
+            <div className="plans-carousel__slide" data-snap key={plan.id}>
+              <PlanCard plan={plan} onSelect={onSelectPlan} />
             </div>
           ))}
           <div

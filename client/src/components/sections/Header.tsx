@@ -64,6 +64,12 @@ export default function Header() {
         <a href="#planes" onClick={closeMenu}>
           Planes
         </a>
+        <a href="#horarios" onClick={closeMenu}>
+          Horarios
+        </a>
+        <a href="#reglas" onClick={closeMenu}>
+          Reglas
+        </a>
         <a href="#contacto" onClick={closeMenu}>
           Contacto
         </a>
