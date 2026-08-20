@@ -3,7 +3,6 @@
  * for Plaza Fitness. Use asymmetry, hard contrast, red markers, smoky glass cards,
  * scroll choreography. No invented testimonials or pricing.
  */
-import Cursor from "@/components/Cursor";
 import ScrollProgress from "@/components/ScrollProgress";
 import Header from "@/components/sections/Header";
 import Hero from "@/components/sections/Hero";
@@ -20,7 +19,6 @@ function Home() {
 
   return (
     <div className="site-shell">
-      <Cursor />
       <ScrollProgress />
       <Header />
       <main>

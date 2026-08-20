@@ -5,6 +5,7 @@
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/NotFound";
+import { MotionConfig } from "framer-motion";
 import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
@@ -25,8 +26,10 @@ export default function App() {
     <ErrorBoundary>
       <ThemeProvider defaultTheme="dark">
         <TooltipProvider>
-          <Toaster />
-          <Router />
+          <MotionConfig reducedMotion="user">
+            <Toaster />
+            <Router />
+          </MotionConfig>
         </TooltipProvider>
       </ThemeProvider>
     </ErrorBoundary>
