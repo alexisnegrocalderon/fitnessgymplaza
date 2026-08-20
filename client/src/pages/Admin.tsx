@@ -48,9 +48,22 @@ function LoginForm({ onLoggedIn }: { onLoggedIn: () => void }) {
         body: JSON.stringify({ email, password }),
       });
       if (!res.ok) {
+        if (res.status === 429) {
+          setError("Demasiados intentos. Espera un minuto.");
+          return;
+        }
+        const data = await res.json().catch(() => null);
+        const debug = data?.debug as
+          | {
+              emailMatches: boolean;
+              passwordMatches: boolean;
+              emailLengthDiff: number;
+              passwordLengthDiff: number;
+            }
+          | undefined;
         setError(
-          res.status === 429
-            ? "Demasiados intentos. Espera un minuto."
+          debug
+            ? `Credenciales incorrectas. [debug] email coincide: ${debug.emailMatches} (diff largo: ${debug.emailLengthDiff}) · contraseña coincide: ${debug.passwordMatches} (diff largo: ${debug.passwordLengthDiff})`
             : "Credenciales incorrectas."
         );
         return;

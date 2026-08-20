@@ -331,11 +331,11 @@ main > section[id] {
   background:
     linear-gradient(
       90deg,
-      rgba(7, 10, 9, 0.78) 0%,
-      rgba(7, 10, 9, 0.46) 42%,
-      rgba(7, 10, 9, 0.08) 100%
+      rgba(7, 10, 9, 0.62) 0%,
+      rgba(7, 10, 9, 0.34) 42%,
+      rgba(7, 10, 9, 0.04) 100%
     ),
-    linear-gradient(0deg, rgba(7, 10, 9, 0.42), transparent 50%);
+    linear-gradient(0deg, rgba(7, 10, 9, 0.3) 0%, transparent 50%);
 }
 .hero-section__grid {
   position: absolute;
@@ -2196,12 +2196,12 @@ main > section[id] {
     background:
       linear-gradient(
         180deg,
-        rgba(7, 10, 9, 0.5) 0%,
-        rgba(7, 10, 9, 0.1) 28%,
-        rgba(7, 10, 9, 0.28) 54%,
-        rgba(7, 10, 9, 0.92) 100%
+        rgba(7, 10, 9, 0.36) 0%,
+        rgba(7, 10, 9, 0.06) 28%,
+        rgba(7, 10, 9, 0.18) 54%,
+        rgba(7, 10, 9, 0.78) 100%
       ),
-      linear-gradient(90deg, rgba(7, 10, 9, 0.4) 0%, transparent 76%);
+      linear-gradient(90deg, rgba(7, 10, 9, 0.28) 0%, transparent 76%);
   }
   .hero-content {
     min-height: 100svh;

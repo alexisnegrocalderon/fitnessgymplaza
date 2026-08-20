@@ -31,12 +31,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return;
   }
 
-  const { email, password } = (req.body ?? {}) as {
-    email?: string;
-    password?: string;
-  };
-  const adminEmail = process.env.ADMIN_EMAIL;
-  const adminPassword = process.env.ADMIN_PASSWORD;
+  const body = (req.body ?? {}) as { email?: string; password?: string };
+  // Trim en ambos lados: un espacio o salto de línea de más al pegar el
+  // valor en Vercel (bulk .env import) es la causa más común de un
+  // "credenciales incorrectas" que en verdad son idénticas a simple vista.
+  // El email además es case-insensitive, como cualquier login normal.
+  const email = (body.email ?? "").trim().toLowerCase();
+  const password = (body.password ?? "").trim();
+  const adminEmail = (process.env.ADMIN_EMAIL ?? "").trim().toLowerCase();
+  const adminPassword = (process.env.ADMIN_PASSWORD ?? "").trim();
 
   if (!adminEmail || !adminPassword) {
     res.status(500).json({ error: "admin_not_configured" });
@@ -44,7 +47,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   if (email !== adminEmail || password !== adminPassword) {
-    res.status(401).json({ error: "invalid_credentials" });
+    res.status(401).json({
+      error: "invalid_credentials",
+      // Diagnóstico temporal, sin exponer los valores reales: solo dice
+      // qué campo no coincide y si el largo es distinto (indicio típico
+      // de un espacio de más). Se retira una vez resuelto.
+      debug: {
+        emailMatches: email === adminEmail,
+        passwordMatches: password === adminPassword,
+        emailLengthDiff: email.length - adminEmail.length,
+        passwordLengthDiff: password.length - adminPassword.length,
+      },
+    });
     return;
   }
 
