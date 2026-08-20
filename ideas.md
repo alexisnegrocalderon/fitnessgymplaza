@@ -73,3 +73,6 @@ El logotipo oficial aportado por Plaza Fitness es la pieza principal de identida
 - **Color update:** La firma visual cambia de Electric Cobalt a Signal Red por decisión del negocio; los tokens y estados interactivos deben conservar el mismo rol de precisión, guía y conversión.
 - **Mobile logo rule:** En pantallas pequeñas el símbolo y el wordmark completo “PLAZA FITNESS” deben permanecer visibles; el micro-sello secundario se oculta para proteger la legibilidad.
 - **Original logo rule:** El PNG original de calavera y wordmark es la fuente única para todas las apariciones de marca; el favicon usa el mismo archivo para asegurar reconocimiento consistente.
+- **Performance Command:** Horarios, planes, créditos e inscripción se organizan como un circuito de rendimiento. Signal Red se limita a estados activos, créditos, CTA y medición; las superficies principales siguen siendo graphite y hueso mineral.
+- **Pulse Grid:** El horario no usa una tabla fija. Cada patrón semanal es una ruta seleccionable con sesiones sobre un rail temporal, conectada al plan activo y a sus créditos.
+- **Perspective Reveal:** Las tarjetas de planes revelan créditos, sábados de regalo, condiciones y CTA desde un segundo plano 3D; en móvil se activan también por toque, nunca solo por hover.

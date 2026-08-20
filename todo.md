@@ -1,5 +1,15 @@
 # Revisión Plaza Fitness
 
+## Actualización Performance Command
+
+- [x] Integrar la nueva propuesta de valor de entrenamiento funcional guiado y adaptado.
+- [x] Construir el Pulse Grid de horarios con selector semanal, sesiones y CTA contextual.
+- [x] Reemplazar los planes por tarjetas Perspective Reveal conectadas a créditos y beneficios de sábado.
+- [x] Añadir el recorrido de inscripción, datos de transferencia y reglas operativas.
+- [x] Actualizar toda la ubicación pública a Calle Quillota 656, Viña del Mar.
+- [x] Usar las gráficas aportadas como referencia visual expandible y verificar desktop, tablet y celular.
+- [ ] Validar build, guardar checkpoint y sincronizar la actualización con GitHub.
+
 ## Sincronización con GitHub
 
 - [ ] Revisar el remoto, la rama y el estado local del repositorio seleccionado.
