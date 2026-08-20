@@ -76,3 +76,7 @@ El logotipo oficial aportado por Plaza Fitness es la pieza principal de identida
 - **Performance Command:** Horarios, planes, créditos e inscripción se organizan como un circuito de rendimiento. Signal Red se limita a estados activos, créditos, CTA y medición; las superficies principales siguen siendo graphite y hueso mineral.
 - **Pulse Grid:** El horario no usa una tabla fija. Cada patrón semanal es una ruta seleccionable con sesiones sobre un rail temporal, conectada al plan activo y a sus créditos.
 - **Perspective Reveal:** Las tarjetas de planes revelan créditos, sábados de regalo, condiciones y CTA desde un segundo plano 3D; en móvil se activan también por toque, nunca solo por hover.
+- **Functional Pulse:** La web se comporta como una sesión guiada: el hero incorpora un mini simulador `READY / MOVE / RESET`, con audio opcional solo después de interacción; el movimiento de página se limita a revelados de scroll, numerales y líneas de medición.
+- **Circuito Semanal:** Los horarios se presentan como rutas expandibles de L/M/V, M/J y sábado, sin créditos públicos ni promesa de reserva automática.
+- **Inscripción contextual:** La información de pago se muestra únicamente al iniciar un plan, dentro de un modal de glassmorphism oscuro y de alto contraste.
+- **Reglas visibles:** La operación cotidiana de Plaza Fitness se presenta en tarjetas de lectura directa, sin esconder descripciones detrás de controles.

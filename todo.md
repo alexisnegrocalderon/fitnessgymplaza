@@ -1,5 +1,20 @@
 # Revisión Plaza Fitness
 
+## Rediseño funcional interactivo
+
+- [x] Renovar hero y metodología con los nuevos titulares y siete características de entrenamiento guiado.
+- [x] Retirar la sección de espacio y sustituir horarios por Circuito Semanal sin créditos visibles.
+- [x] Mejorar las tarjetas de planes e implementar el modal glassmorphism de inscripción.
+- [x] Convertir las reglas en un panel abierto y legible.
+- [x] Añadir mini simulador de intervalos accesible, con audio opcional y movimiento controlado.
+- [x] Verificar desktop, tablet y celular; guardar checkpoint y sincronizar la actualización de código.
+
+## Despliegue en Vercel
+
+- [ ] Comprobar acceso a Vercel y decidir la rama de despliegue.
+- [ ] Vincular o configurar el proyecto Vercel con el repositorio de Plaza Fitness.
+- [ ] Desplegar la versión seleccionada y verificar la URL pública.
+
 ## Actualización Performance Command
 
 - [x] Integrar la nueva propuesta de valor de entrenamiento funcional guiado y adaptado.
