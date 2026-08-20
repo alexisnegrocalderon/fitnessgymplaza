@@ -1,5 +1,13 @@
 # Revisión Plaza Fitness
 
+## Revisión de reloj, horarios y planes
+
+- [x] Reemplazar el simulador circular por un reloj horizontal de 60 segundos con audio opt-in.
+- [x] Sustituir el Circuito Semanal por un Tablero de sesiones exclusivamente informativo.
+- [x] Implementar Selector de atleta y marcar Progresión 12 de $60.000 como más elegido.
+- [x] Corregir reglas de cancelación y cupos del sábado; eliminar la gráfica informativa descartada.
+- [x] Verificar desktop, tablet y celular; guardar checkpoint y sincronizar la rama de código.
+
 ## Rediseño funcional interactivo
 
 - [x] Renovar hero y metodología con los nuevos titulares y siete características de entrenamiento guiado.

@@ -38,9 +38,7 @@ import {
 const VIDEO_URL = "/manus-storage/plaza-fitness-hero_d9cbc2e5.mp4";
 const MARK_URL = "/manus-storage/plaza-fitness-original-logo_078d76fa.png";
 const SPACE_IMAGE = "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=1800&q=88";
-const SCHEDULE_SOURCE = "/manus-storage/plaza-horarios-oficiales_8bea71ad.jpeg";
 const ENROLLMENT_SOURCE = "/manus-storage/plaza-inscripcion-paso-a-paso_6156b6f1.jpeg";
-const POLICIES_SOURCE = "/manus-storage/plaza-reglas-importantes_f8370ed9.jpeg";
 const BASE_WHATSAPP = "https://wa.me/56952254029";
 
 type Audience = "general" | "student";
@@ -89,10 +87,10 @@ const scheduleGroups = [
 
 const plans: Plan[] = [
   { id: "general-single", audience: "general", label: "Clase única", price: "$8.000", tagline: "Conoce el circuito", note: "Una sesión para probar el ritmo, la guía técnica y el formato de Plaza Fitness.", cadence: "Ideal para una primera experiencia." },
-  { id: "general-8", audience: "general", label: "Base 8", price: "$45.000", tagline: "Construye constancia", note: "Un formato pensado para convertir el entrenamiento en una práctica semanal sostenible.", cadence: "Frecuencia sugerida: 2 veces por semana.", featured: true },
-  { id: "general-12", audience: "general", label: "Progresión 12", price: "$60.000", tagline: "Más pulso, más progreso", note: "Mayor presencia en la semana para profundizar técnica, capacidad y consistencia.", cadence: "Frecuencia sugerida: 3 veces por semana." },
+  { id: "general-8", audience: "general", label: "Base 8", price: "$45.000", tagline: "Construye constancia", note: "Un formato pensado para convertir el entrenamiento en una práctica semanal sostenible.", cadence: "Frecuencia sugerida: 2 veces por semana." },
+  { id: "general-12", audience: "general", label: "Progresión 12", price: "$60.000", tagline: "Más pulso, más progreso", note: "Mayor presencia en la semana para profundizar técnica, capacidad y consistencia.", cadence: "Frecuencia sugerida: 3 veces por semana.", featured: true },
   { id: "student-single", audience: "student", label: "Clase única", price: "$6.000", tagline: "Acceso estudiante", note: "Una sesión con tarifa estudiante para conocer la dinámica del gimnasio.", cadence: "Requiere certificado de alumno regular.", studentRequirement: true },
-  { id: "student-8", audience: "student", label: "Base 8", price: "$36.000", tagline: "Ritmo estudiante", note: "Una alternativa diseñada para sostener movimiento, estudio y bienestar en paralelo.", cadence: "Requiere certificado de alumno regular.", featured: true, studentRequirement: true },
+  { id: "student-8", audience: "student", label: "Base 8", price: "$36.000", tagline: "Ritmo estudiante", note: "Una alternativa diseñada para sostener movimiento, estudio y bienestar en paralelo.", cadence: "Requiere certificado de alumno regular.", studentRequirement: true },
   { id: "student-12", audience: "student", label: "Progresión 12", price: "$46.000", tagline: "Sostén el hábito", note: "Más presencia para acompañar tu condición física durante el semestre.", cadence: "Requiere certificado de alumno regular.", studentRequirement: true },
 ];
 
@@ -109,8 +107,8 @@ const method = [
 const policies = [
   { metric: "30 días", title: "Planifica con tiempo", text: "Puedes organizar tus clases con hasta 30 días de anticipación.", icon: CalendarDays },
   { metric: "30 min", title: "Cierre de reserva", text: "La inscripción para una clase permanece disponible hasta 30 minutos antes de comenzar.", icon: Clock3 },
-  { metric: "2 horas", title: "Cancela con margen", text: "Cancela con dos horas de anticipación para que otro alumno pueda tomar ese espacio.", icon: TimerReset },
-  { metric: "Jueves 22:30", title: "Actualización semanal", text: "Revisa el horario de fin de semana desde el jueves a las 22:30 horas.", icon: BellRing },
+  { metric: "2 horas", title: "Cuida tu crédito", text: "Cancela con dos horas de anticipación para no perder el crédito de tu clase.", icon: TimerReset },
+  { metric: "Jueves 22:30", title: "Cupos de sábado", text: "A las 22:30 del jueves se activan los cupos de las clases del sábado: el momento perfecto para organizar tu entrenamiento del fin de semana.", icon: BellRing },
   { metric: "Sábados", title: "Sesiones especiales", text: "Consulta directamente con el equipo la programación vigente para los sábados.", icon: Gift },
   { metric: "Certificado", title: "Pausa tu plan", text: "Si necesitas una pausa, el equipo evalúa tu solicitud con certificado médico.", icon: Stethoscope },
 ];
@@ -124,11 +122,7 @@ const transferData = [
   ["Comprobante", "plazafitnesschile@gmail.com"],
 ];
 
-const timerSegments = [
-  { label: "READY", caption: "Prepara tu estación", seconds: 5, tone: "ready" },
-  { label: "MOVE", caption: "Trabajo en marcha", seconds: 20, tone: "move" },
-  { label: "RESET", caption: "Recupera y respira", seconds: 10, tone: "reset" },
-];
+const TIMER_START_SECONDS = 60;
 
 function buildWhatsappLink(message: string) {
   return `${BASE_WHATSAPP}?text=${encodeURIComponent(message)}`;
@@ -199,14 +193,12 @@ export default function Home() {
   const [scrolled, setScrolled] = useState(false);
   const [scrollY, setScrollY] = useState(0);
   const [audience, setAudience] = useState<Audience>("general");
-  const [activeSchedule, setActiveSchedule] = useState("lwmf");
   const [revealedPlan, setRevealedPlan] = useState<string | null>(null);
   const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null);
   const [copied, setCopied] = useState<string | null>(null);
   const [timerRunning, setTimerRunning] = useState(false);
   const [timerSound, setTimerSound] = useState(false);
-  const [timerIndex, setTimerIndex] = useState(0);
-  const [timerRemaining, setTimerRemaining] = useState(timerSegments[0].seconds);
+  const [timerRemaining, setTimerRemaining] = useState(TIMER_START_SECONDS);
   const audioContextRef = useRef<AudioContext | null>(null);
 
   useEffect(() => {
@@ -246,29 +238,24 @@ export default function Home() {
 
   useEffect(() => {
     if (!timerRunning) return;
-    const interval = window.setInterval(() => {
-      setTimerRemaining((remaining) => {
-        if (remaining > 1) return remaining - 1;
-        const nextIndex = (timerIndex + 1) % timerSegments.length;
-        setTimerIndex(nextIndex);
-        cue();
-        return timerSegments[nextIndex].seconds;
-      });
-    }, 1000);
+    const interval = window.setInterval(() => setTimerRemaining((remaining) => {
+      if (remaining <= 1) { cue(); setTimerRunning(false); return 0; }
+      cue();
+      return remaining - 1;
+    }), 1000);
     return () => window.clearInterval(interval);
-  }, [timerRunning, timerIndex, timerSound]);
+  }, [timerRunning, timerSound]);
 
-  const currentSchedule = scheduleGroups.find((group) => group.id === activeSchedule) ?? scheduleGroups[0];
   const audiencePlans = useMemo(() => plans.filter((plan) => plan.audience === audience), [audience]);
-  const timerSegment = timerSegments[timerIndex];
-  const timerProgress = ((timerSegment.seconds - timerRemaining) / timerSegment.seconds) * 100;
+  const timerMinutes = String(Math.floor(timerRemaining / 60)).padStart(2, "0");
+  const timerSeconds = String(timerRemaining % 60).padStart(2, "0");
 
   const copyValue = async (label: string, value: string) => {
     try { await navigator.clipboard.writeText(value); setCopied(label); window.setTimeout(() => setCopied(null), 1600); } catch { setCopied("Revisa el dato"); }
   };
   const closeMenu = () => setMenuOpen(false);
   const openEnrollment = (plan: Plan) => { setSelectedPlan(plan); setRevealedPlan(null); };
-  const resetTimer = () => { setTimerRunning(false); setTimerIndex(0); setTimerRemaining(timerSegments[0].seconds); };
+  const resetTimer = () => { setTimerRunning(false); setTimerRemaining(TIMER_START_SECONDS); };
 
   return (
     <div className="site-shell">
@@ -282,16 +269,16 @@ export default function Home() {
         <section id="inicio" className="hero-section">
           <div className="hero-section__media" style={{ transform: `translateY(${scrollY * 0.08}px)` }}><video autoPlay muted loop playsInline poster={SPACE_IMAGE} aria-label="Entrenamiento funcional en Plaza Fitness"><source src={VIDEO_URL} type="video/mp4" /></video></div><div className="hero-section__veil" /><div className="hero-section__grid" aria-hidden="true" /><div className="hero-section__orb hero-section__orb--one" style={{ transform: `translate3d(0, ${scrollY * -0.1}px, 0)` }} />
           <div className="hero-content container"><div className="hero-content__topline"><span>VIÑA DEL MAR · CHILE</span><span className="hero-content__topline-rule" /><span>CALLE QUILLOTA 656</span></div><div className="hero-content__main reveal-on-scroll"><div className="hero-content__eyebrow"><ShieldCheck size={14} /> Entrenamiento funcional guiado.</div><h1>Fuerza que se<span>adapta a ti.</span></h1><p className="hero-content__lede">Clases dinámicas con profesores en cada estación para cuidar tu técnica, adaptar el desafío y convertir el movimiento en salud real.</p><div className="hero-content__actions"><WhatsAppButton /><a href="#horarios" className="text-link text-link--light">Ver horarios <ArrowRight size={16} /></a></div></div><div className="hero-content__bottomline"><div className="hero-stat glass-card"><span className="hero-stat__value">01</span><span className="hero-stat__label">GUÍA REAL<br /><small>NIVEL ADAPTADO</small></span></div><div className="hero-scroll"><span>SCROLL TO TRAIN</span><ChevronDown size={16} /></div><div className="hero-stamp"><BrandMark className="brand-mark--stamp" /></div></div></div>
-          <aside className={`interval-sim interval-sim--${timerSegment.tone}`} aria-label="Simulador de intervalo de entrenamiento"><div className="interval-sim__top"><span>SESSION / 01</span><button type="button" onClick={() => setTimerSound((value) => !value)} aria-label={timerSound ? "Silenciar pitido" : "Activar pitido suave"}>{timerSound ? <Volume2 size={15} /> : <VolumeX size={15} />}</button></div><div className="interval-sim__dial" style={{ "--progress": `${timerProgress}%` } as React.CSSProperties}><strong>{String(timerRemaining).padStart(2, "0")}</strong><span>SEG</span></div><div className="interval-sim__copy"><b>{timerSegment.label}</b><span>{timerSegment.caption}</span></div><div className="interval-sim__controls"><button type="button" onClick={() => { if (!timerRunning && timerSound) cue(); setTimerRunning((value) => !value); }}><span>{timerRunning ? <Pause size={15} /> : <Play size={15} />}</span>{timerRunning ? "Pausar" : "Iniciar"}</button><button type="button" onClick={resetTimer} aria-label="Reiniciar simulador"><RotateCcw size={15} /></button></div><small>Audio opcional · se activa solo al tocar</small></aside>
+          <aside className="horizontal-timer" aria-label="Cronómetro de entrenamiento de 60 segundos"><div className="horizontal-timer__label"><span>INTERVALO / 01</span><button type="button" onClick={() => setTimerSound((value) => !value)} aria-label={timerSound ? "Silenciar pitido" : "Activar pitido suave"}>{timerSound ? <Volume2 size={15} /> : <VolumeX size={15} />} {timerSound ? "Sonido activo" : "Sonido apagado"}</button></div><div className="horizontal-timer__time"><strong>{timerMinutes}</strong><i>:</i><strong>{timerSeconds}</strong></div><div className="horizontal-timer__track"><span style={{ width: `${((TIMER_START_SECONDS - timerRemaining) / TIMER_START_SECONDS) * 100}%` }} /></div><div className="horizontal-timer__controls"><button type="button" onClick={() => { if (!timerRunning && timerRemaining === 0) setTimerRemaining(TIMER_START_SECONDS); if (!timerRunning && timerSound) cue(); setTimerRunning((value) => !value); }}><span>{timerRunning ? <Pause size={15} /> : <Play size={15} />}</span>{timerRunning ? "Pausar" : timerRemaining === TIMER_START_SECONDS || timerRemaining === 0 ? "Iniciar 60 s" : "Continuar"}</button><button type="button" onClick={resetTimer} aria-label="Reiniciar temporizador"><RotateCcw size={15} /></button></div><small>Pitido suave opcional · no se reproduce automáticamente</small></aside>
         </section>
 
         <section id="metodo" className="manifesto-section section-dark"><div className="manifesto-section__blueprint" aria-hidden="true"><span>01</span><span>02</span><span>03</span><span>04</span></div><div className="container manifesto-layout"><div className="manifesto-layout__aside"><SectionTag light>Centro de entrenamiento</SectionTag><div className="vertical-note">TÉCNICA / SALUD / PROGRESIÓN</div></div><div className="manifesto-layout__content"><h2 className="reveal-on-scroll">Tu progreso<span>tiene método.</span></h2><p className="manifesto-lede reveal-on-scroll">Plaza Fitness entrega entrenamiento funcional dinámico con una mirada completa: cada clase ayuda a mejorar o mantener tu condición física, capacidad cardiorrespiratoria, fuerza, movilidad, control articular y composición corporal para una vida más activa y sana.</p><div className="method-list">{method.map((item, index) => <div className="method-item reveal-on-scroll" style={{ "--delay": `${index * 55}ms` } as React.CSSProperties} key={item.id}><span className="method-item__number">{item.id}</span><div><h3>{item.title}</h3><p>{item.text}</p></div><ArrowUpRight size={18} /></div>)}</div></div></div></section>
 
-        <section id="horarios" className="schedule-section section-bone"><div className="section-meter" aria-hidden="true"><span>02 / 05</span><i /><span>CIRCUITO SEMANAL / HORARIOS</span></div><div className="container schedule-section__head"><div><SectionTag>Elige tu circuito</SectionTag><h2>Entrena a<br /><em>tu ritmo.</em></h2></div><p>Selecciona el bloque que mejor conversa con tu semana. Cada circuito revela sus estaciones horarias sin tablas ni pasos innecesarios.</p></div><div className="container schedule-circuit"><div className="schedule-circuit__switch" role="tablist" aria-label="Circuitos semanales">{scheduleGroups.map((group) => <button key={group.id} type="button" role="tab" aria-selected={activeSchedule === group.id} className={activeSchedule === group.id ? "is-active" : ""} onClick={() => setActiveSchedule(group.id)}><span>{group.badge}</span><strong>{group.nav}</strong><small>{group.id === "sat" ? "Fin de semana" : "Circuito semanal"}</small><ChevronRight size={17} /></button>)}</div><div className="schedule-circuit__stage" role="tabpanel"><div className="schedule-circuit__stage-head"><span>RUTA / {currentSchedule.badge}</span><h3>{currentSchedule.title}</h3><p>{currentSchedule.days} · {currentSchedule.brief}</p></div><div className="schedule-stations">{currentSchedule.slots.map((slot, index) => <a key={slot} className="schedule-station" href={buildWhatsappLink(`Hola Plaza Fitness, quiero consultar por el horario ${slot} de ${currentSchedule.days}.`)} target="_blank" rel="noreferrer"><span>{String(index + 1).padStart(2, "0")}</span><i /><strong>{slot}</strong><small>Consultar</small></a>)}</div><div className="schedule-circuit__action"><span>¿No sabes qué horario elegir?</span><a href={buildWhatsappLink("Hola Plaza Fitness, necesito ayuda para elegir un horario de entrenamiento funcional.")} target="_blank" rel="noreferrer">Hablar con Plaza Fitness <ArrowUpRight size={16} /></a></div></div></div><div className="container schedule-section__source"><details><summary><span>Ver horarios oficiales publicados</span><ChevronDown size={17} /></summary><img src={SCHEDULE_SOURCE} alt="Gráfica de horarios oficiales de Plaza Fitness" loading="lazy" /></details></div></section>
+        <section id="horarios" className="schedule-section section-bone"><div className="section-meter" aria-hidden="true"><span>02 / 05</span><i /><span>TABLERO DE SESIONES / HORARIOS</span></div><div className="container schedule-section__head"><div><SectionTag>Horarios Plaza Fitness</SectionTag><h2>Elige cuándo<br /><em>moverte.</em></h2></div><p>Un tablero informativo para ubicar las sesiones de la semana. La agenda digital y la toma de cupos se incorporarán próximamente para alumnos activos.</p></div><div className="container session-board"><div className="session-board__top"><span>SESIONES SEMANALES</span><span>INFORMACIÓN ACTUAL</span></div><div className="session-board__columns">{scheduleGroups.map((group) => <article className="session-board__column" key={group.id}><header><span>{group.badge}</span><div><strong>{group.nav}</strong><small>{group.days}</small></div></header><p>{group.brief}</p><div className="session-board__slots">{group.slots.map((slot) => <div key={slot}><i /><strong>{slot}</strong></div>)}</div><footer><span>Horario informativo</span></footer></article>)}</div><div className="session-board__notice"><Clock3 size={17} /><p>Próximamente podrás ingresar como alumno activo, tomar cupos y ver tu agenda desde los terminales de Plaza Fitness.</p></div></div></section>
 
-        <section id="planes" className="plans-command-section section-dark"><div className="plans-command-section__trail" aria-hidden="true"><span>PLAN</span><i /><span>CHOOSE</span><i /><span>START</span></div><div className="container plans-command-section__head"><div><SectionTag light>Elige tu plan</SectionTag><h2>Tu siguiente<br /><em>round.</em></h2></div><p>Explora cada formato en perspectiva. Cuando estés listo, abre la inscripción del plan que mejor calza con tu ritmo.</p></div><div className="container audience-switch" role="group" aria-label="Elegir tipo de plan"><button type="button" className={audience === "general" ? "is-active" : ""} onClick={() => { setAudience("general"); setRevealedPlan(null); }}><span>01</span>Planes generales</button><button type="button" className={audience === "student" ? "is-active" : ""} onClick={() => { setAudience("student"); setRevealedPlan(null); }}><span>02</span>Planes estudiantes</button></div><div className="plans-perspective-track" role="region" aria-label="Planes de entrenamiento con detalle interactivo"><div className="plans-perspective-track__inner">{audiencePlans.map((plan) => <PlanPerspectiveCard key={plan.id} plan={plan} revealed={revealedPlan === plan.id} onReveal={() => setRevealedPlan((current) => current === plan.id ? null : plan.id)} onStart={() => openEnrollment(plan)} />)}</div></div><div className="container plans-command-section__foot"><span><strong>Perspective Reveal</strong> · toca cada tarjeta para girar y conocer su ritmo.</span><a href={buildWhatsappLink("Hola Plaza Fitness, quiero que me orienten para elegir un plan.")} target="_blank" rel="noreferrer" className="text-link text-link--light">Necesito orientación <ArrowRight size={16} /></a></div></section>
+        <section id="planes" className="plans-command-section section-dark"><div className="plans-command-section__trail" aria-hidden="true"><span>PLAN</span><i /><span>CHOOSE</span><i /><span>START</span></div><div className="container plans-command-section__head"><div><SectionTag light>Elige tu plan</SectionTag><h2>Tu siguiente<br /><em>round.</em></h2></div><p>Primero selecciona tu credencial de atleta. Después explora los formatos y abre la inscripción del que mejor calza con tu ritmo.</p></div><div className="container athlete-selector" role="group" aria-label="Seleccionar tipo de plan"><button type="button" className={`athlete-selector__card ${audience === "general" ? "is-active" : ""}`} onClick={() => { setAudience("general"); setRevealedPlan(null); }}><span className="athlete-selector__serial">01</span><UserRound size={29} /><div><strong>Plan general</strong><small>Para quienes entrenan su propio ritmo</small></div><ChevronRight size={18} /></button><button type="button" className={`athlete-selector__card ${audience === "student" ? "is-active" : ""}`} onClick={() => { setAudience("student"); setRevealedPlan(null); }}><span className="athlete-selector__serial">02</span><ClipboardCheck size={29} /><div><strong>Plan estudiante</strong><small>Con tarifa y certificado vigente</small></div><ChevronRight size={18} /></button></div><div className="plans-perspective-track" role="region" aria-label="Planes de entrenamiento con detalle interactivo"><div className="plans-perspective-track__inner">{audiencePlans.map((plan) => <PlanPerspectiveCard key={plan.id} plan={plan} revealed={revealedPlan === plan.id} onReveal={() => setRevealedPlan((current) => current === plan.id ? null : plan.id)} onStart={() => openEnrollment(plan)} />)}</div></div><div className="container plans-command-section__foot"><span><strong>Perspective Reveal</strong> · toca cada tarjeta para girar y conocer su ritmo.</span><a href={buildWhatsappLink("Hola Plaza Fitness, quiero que me orienten para elegir un plan.")} target="_blank" rel="noreferrer" className="text-link text-link--light">Necesito orientación <ArrowRight size={16} /></a></div></section>
 
-        <section id="reglas" className="rules-section section-bone"><div className="section-meter" aria-hidden="true"><span>04 / 05</span><i /><span>REGLAS / RITMO / CUIDADO</span></div><div className="container rules-section__head"><div><SectionTag>Reglas de la pista</SectionTag><h2>Todo claro.<br /><em>Todo visible.</em></h2></div><p>Información simple para que organices tus clases, cuides los cupos y mantengas tu entrenamiento en movimiento.</p></div><div className="container policy-panel">{policies.map((policy, index) => { const Icon = policy.icon; return <article className="policy-panel__card reveal-on-scroll" style={{ "--delay": `${index * 45}ms` } as React.CSSProperties} key={policy.metric}><span className="policy-panel__icon"><Icon size={21} /></span><div><b>{policy.metric}</b><h3>{policy.title}</h3><p>{policy.text}</p></div></article>; })}</div><div className="container rules-source"><details><summary><span>Ver pieza informativa original</span><ChevronDown size={17} /></summary><img src={POLICIES_SOURCE} alt="Gráfica de reglas e información importante de Plaza Fitness" loading="lazy" /></details></div></section>
+        <section id="reglas" className="rules-section section-bone"><div className="section-meter" aria-hidden="true"><span>04 / 05</span><i /><span>REGLAS / RITMO / CUIDADO</span></div><div className="container rules-section__head"><div><SectionTag>Reglas de la pista</SectionTag><h2>Todo claro.<br /><em>Todo visible.</em></h2></div><p>Información simple para que organices tus clases, cuides los cupos y mantengas tu entrenamiento en movimiento.</p></div><div className="container policy-panel">{policies.map((policy, index) => { const Icon = policy.icon; return <article className="policy-panel__card reveal-on-scroll" style={{ "--delay": `${index * 45}ms` } as React.CSSProperties} key={policy.metric}><span className="policy-panel__icon"><Icon size={21} /></span><div><b>{policy.metric}</b><h3>{policy.title}</h3><p>{policy.text}</p></div></article>; })}</div></section>
 
         <section id="contacto" className="contact-section section-dark"><div className="contact-section__mark" aria-hidden="true"><BrandMark className="brand-mark--contact" decorative /></div><div className="container contact-layout"><div className="contact-layout__main"><SectionTag light>Da el siguiente paso</SectionTag><h2>Nos vemos<br /><em>en la pista.</em></h2><p>Escríbenos para confirmar tu plan, activar tu acceso y encontrar el horario que calza contigo.</p><WhatsAppButton /></div><div className="contact-layout__details"><div className="contact-detail"><MapPin size={20} /><div><span>Encuéntranos</span><strong>Calle Quillota 656<br />Viña del Mar, Valparaíso</strong></div></div><div className="contact-detail"><Clock3 size={20} /><div><span>Horarios</span><strong>Consulta el circuito que<br />mejor calza contigo</strong></div></div><div className="contact-detail"><Phone size={20} /><div><span>WhatsApp</span><strong>+56 9 5225 4029</strong></div></div></div></div><div className="contact-section__marquee" aria-hidden="true"><span>PLAZA FITNESS · CALLE QUILLOTA 656 · VIÑA DEL MAR · </span><span>PLAZA FITNESS · CALLE QUILLOTA 656 · VIÑA DEL MAR · </span></div></section>
       </main>
