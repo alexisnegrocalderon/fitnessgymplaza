@@ -89,6 +89,7 @@ export default function Hero() {
     <section id="inicio" className="hero-section" ref={sectionRef}>
       <motion.div className="hero-section__media" style={{ y: mediaY }}>
         <video
+          className="hero-video hero-video--desktop"
           autoPlay
           muted
           loop
@@ -97,12 +98,19 @@ export default function Hero() {
           poster={MARK_URL}
           aria-label="Animación del emblema de Plaza Fitness"
         >
-          <source
-            media="(max-width: 600px)"
-            src={MOBILE_VIDEO_URL}
-            type="video/mp4"
-          />
           <source src={VIDEO_URL} type="video/mp4" />
+        </video>
+        <video
+          className="hero-video hero-video--mobile"
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="metadata"
+          poster={MARK_URL}
+          aria-label="Video vertical de Plaza Fitness para celulares"
+        >
+          <source src={MOBILE_VIDEO_URL} type="video/mp4" />
         </video>
       </motion.div>
       <div className="hero-section__veil" />
