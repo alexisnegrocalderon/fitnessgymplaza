@@ -24,7 +24,7 @@ export default function Rules() {
   return (
     <section id="reglas" className="rules-section section-bone">
       <div className="section-meter" aria-hidden="true">
-        <span>06 / 08</span>
+        <span>05 / 07</span>
         <i />
         <span>Reglas / Ritmo / Cuidado</span>
       </div>

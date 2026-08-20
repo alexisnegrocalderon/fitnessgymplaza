@@ -58,9 +58,6 @@ export default function Header() {
         <a href="#metodo" onClick={closeMenu}>
           Método
         </a>
-        <a href="#espacio" onClick={closeMenu}>
-          Espacio
-        </a>
         <a href="#planes" onClick={closeMenu}>
           Planes
         </a>

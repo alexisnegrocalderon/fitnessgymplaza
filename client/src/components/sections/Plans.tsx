@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { ChevronRight, ClipboardCheck, UserRound } from "lucide-react";
-import { SectionTag, WhatsAppButton } from "@/components/common";
+import { BrandMark, SectionTag, WhatsAppButton } from "@/components/common";
 import EnrollmentModal from "@/components/EnrollmentModal";
 import PlansCarousel from "@/components/PlansCarousel";
 import { Reveal } from "@/components/Reveal";
@@ -20,6 +20,10 @@ export default function Plans() {
 
   return (
     <section id="planes" className="plans-section section-bone">
+      <BrandMark
+        className="plans-section__brand-anchor"
+        decorative
+      />
       <div className="plans-section__top container">
         <div>
           <Reveal>

@@ -8,7 +8,12 @@ import {
 } from "framer-motion";
 import { ArrowRight, ChevronDown, ShieldCheck } from "lucide-react";
 import { BrandMark, WhatsAppButton } from "@/components/common";
-import { ADDRESS_LINE, VIDEO_URL, MARK_URL } from "@/lib/gym-content";
+import {
+  ADDRESS_LINE,
+  MARK_URL,
+  MOBILE_VIDEO_URL,
+  VIDEO_URL,
+} from "@/lib/gym-content";
 import { useIsDesktop } from "@/lib/useIsDesktop";
 import { calm, spring } from "@/lib/motion";
 
@@ -92,6 +97,11 @@ export default function Hero() {
           poster={MARK_URL}
           aria-label="Animación del emblema de Plaza Fitness"
         >
+          <source
+            media="(max-width: 600px)"
+            src={MOBILE_VIDEO_URL}
+            type="video/mp4"
+          />
           <source src={VIDEO_URL} type="video/mp4" />
         </video>
       </motion.div>

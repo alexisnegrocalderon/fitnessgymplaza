@@ -9,7 +9,6 @@ import ScrollProgress from "@/components/ScrollProgress";
 import Header from "@/components/sections/Header";
 import Hero from "@/components/sections/Hero";
 import Method from "@/components/sections/Method";
-import Space from "@/components/sections/Space";
 import Schedule from "@/components/sections/Schedule";
 import Rules from "@/components/sections/Rules";
 import Coaching from "@/components/sections/Coaching";
@@ -28,7 +27,6 @@ function Home() {
       <main>
         <Hero />
         <Method />
-        <Space />
         <Plans />
         <Schedule />
         <Rules />

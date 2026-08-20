@@ -6,7 +6,7 @@ export default function Coaching() {
   return (
     <section className="coaching-section section-dark">
       <div className="section-meter section-meter--light" aria-hidden="true">
-        <span>07 / 08</span>
+        <span>06 / 07</span>
         <i />
         <span>Person / Load / Range</span>
       </div>

@@ -51,11 +51,17 @@ export function useLenis() {
       const href = anchor?.getAttribute("href");
       if (!href || href === "#") return;
 
-      const target = document.querySelector(href);
+      const target = document.querySelector(href) as HTMLElement | null;
       if (!target) return;
 
       event.preventDefault();
-      lenis.scrollTo(target as HTMLElement, { offset: -72 });
+      const headerHeight = document
+        .querySelector<HTMLElement>(".site-header")
+        ?.getBoundingClientRect().height ?? 72;
+      lenis.scrollTo(target, {
+        offset: -(headerHeight + 18),
+        duration: 1,
+      });
     }
 
     document.addEventListener("click", onAnchorClick);

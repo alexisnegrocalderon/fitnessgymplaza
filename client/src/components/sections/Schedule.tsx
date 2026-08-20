@@ -1,15 +1,21 @@
 import { Clock3 } from "lucide-react";
 import { SectionTag } from "@/components/common";
-import { Reveal, RevealGroup, RevealItem } from "@/components/Reveal";
+import { Reveal } from "@/components/Reveal";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { scheduleGroups } from "@/lib/gym-content";
 
 export default function Schedule() {
   return (
     <section id="horarios" className="schedule-section section-bone">
       <div className="section-meter" aria-hidden="true">
-        <span>05 / 08</span>
+        <span>04 / 07</span>
         <i />
-        <span>Tablero de sesiones / Horarios</span>
+        <span>Ritmo semanal / Horarios</span>
       </div>
       <div className="container schedule-section__head">
         <div>
@@ -18,63 +24,76 @@ export default function Schedule() {
           </Reveal>
           <Reveal kind="mask" delay={0.06}>
             <h2>
-              Elige cuándo
+              Abre tu
               <br />
-              <em>moverte.</em>
+              <em>jornada.</em>
             </h2>
           </Reveal>
         </div>
         <Reveal delay={0.14}>
           <p>
-            Un tablero informativo para ubicar las sesiones de la semana. La
-            agenda digital y la toma de cupos se incorporarán próximamente para
+            Tres ritmos, una semana. Toca cada barra para desplegar las clases
+            disponibles; la toma de cupos se incorporará próximamente para
             alumnos activos.
           </p>
         </Reveal>
       </div>
 
-      <RevealGroup
-        className="container session-board"
-        stagger={0.08}
-        amount={0.15}
-      >
-        <div className="session-board__top">
-          <span>Sesiones semanales</span>
-          <span>Información actual</span>
+      <Reveal className="container schedule-accordion" amount={0.15}>
+        <div className="schedule-accordion__top">
+          <span>Horarios vigentes</span>
+          <span>Despliega una jornada</span>
         </div>
-        <div className="session-board__columns">
-          {scheduleGroups.map(group => (
-            <RevealItem className="session-board__column" key={group.id}>
-              <header>
-                <span>{group.badge}</span>
-                <div>
+        <Accordion
+          type="single"
+          collapsible
+          defaultValue="lwmf"
+          className="schedule-accordion__list"
+        >
+          {scheduleGroups.map((group, index) => (
+            <AccordionItem
+              className="schedule-accordion__item"
+              key={group.id}
+              value={group.id}
+            >
+              <AccordionTrigger className="schedule-accordion__trigger">
+                <span className="schedule-accordion__serial">
+                  {String(index + 1).padStart(2, "0")}
+                </span>
+                <span className="schedule-accordion__day">
                   <strong>{group.nav}</strong>
                   <small>{group.days}</small>
-                </div>
-              </header>
-              <p>{group.brief}</p>
-              <div className="session-board__slots">
-                {group.slots.map(slot => (
-                  <div key={slot}>
-                    <i />
-                    <strong>{slot}</strong>
+                </span>
+                <span className="schedule-accordion__label">
+                  {group.id === "sat" ? "Fin de semana" : "Semana activa"}
+                </span>
+              </AccordionTrigger>
+              <AccordionContent className="schedule-accordion__content">
+                <div className="schedule-accordion__body">
+                  <p>{group.brief}</p>
+                  <div className="schedule-accordion__slots">
+                    {group.slots.map((slot, slotIndex) => (
+                      <div key={slot}>
+                        <span>{String(slotIndex + 1).padStart(2, "0")}</span>
+                        <strong>{slot}</strong>
+                        <small>Entrenamiento funcional</small>
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
-              <footer>
-                <span>Horario informativo</span>
-              </footer>
-            </RevealItem>
+                </div>
+              </AccordionContent>
+            </AccordionItem>
           ))}
-        </div>
-        <div className="session-board__notice">
+        </Accordion>
+        <div className="schedule-accordion__notice">
           <Clock3 size={17} />
           <p>
-            Próximamente podrás ingresar como alumno activo, tomar cupos y ver
-            tu agenda desde los terminales de Plaza Fitness.
+            Horarios informativos. Próximamente podrás ingresar como alumno
+            activo, tomar cupos y ver tu agenda desde los terminales de Plaza
+            Fitness.
           </p>
         </div>
-      </RevealGroup>
+      </Reveal>
     </section>
   );
 }

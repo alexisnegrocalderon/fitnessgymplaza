@@ -10,7 +10,7 @@ export default function Contact() {
         <BrandMark className="brand-mark--contact" decorative />
       </div>
       <div className="section-meter" aria-hidden="true">
-        <span>08 / 08</span>
+        <span>07 / 07</span>
         <i />
         <span>Contact / Viña del Mar</span>
       </div>

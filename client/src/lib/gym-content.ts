@@ -1,4 +1,5 @@
-export const VIDEO_URL = "/media/plaza-fitness-logo-animation.mp4";
+export const VIDEO_URL = "/manus-storage/plaza-fitness-hero-desktop_deedf91e.mp4";
+export const MOBILE_VIDEO_URL = "/manus-storage/plaza-fitness-hero-mobile-3x4_e0a54070.mp4";
 export const MARK_URL = "/media/plaza-fitness-logo.png";
 export const SPACE_IMAGE = "/media/plaza-fitness-space.jpg";
 export const COACHING_IMAGE = "/media/plaza-fitness-coaching.jpg";

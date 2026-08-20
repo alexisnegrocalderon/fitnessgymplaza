@@ -88,6 +88,10 @@ video {
   overflow-x: clip;
   overflow-y: visible;
 }
+main > section[id] {
+  position: relative;
+  scroll-margin-top: 96px;
+}
 .container {
   width: min(100% - 48px, 1240px);
   margin-inline: auto;
@@ -958,9 +962,11 @@ video {
 .plans-section {
   position: relative;
   padding: 145px 0 0;
+  isolation: isolate;
+  overflow: hidden;
 }
 .plans-section::before {
-  content: "CAL / 04";
+  content: "CAL / 03";
   position: absolute;
   top: 54px;
   right: max(24px, calc((100vw - 1240px) / 2));
@@ -1225,7 +1231,9 @@ video {
   align-items: center;
   gap: 14px;
   padding: 18px 20px;
-  background: var(--bone-deep);
+  background:
+    linear-gradient(115deg, rgba(217, 45, 32, 0.045), transparent 42%),
+    var(--bone-deep);
   border: 1px solid var(--bone-line);
   color: var(--graphite);
   text-align: left;
@@ -1260,7 +1268,9 @@ video {
   color: rgba(14, 17, 16, 0.3);
 }
 .athlete-selector__card.is-active {
-  background: var(--graphite);
+  background:
+    linear-gradient(120deg, rgba(217, 45, 32, 0.2), transparent 42%),
+    var(--graphite);
   border-color: var(--graphite);
   color: #fff;
 }
@@ -1409,6 +1419,158 @@ video {
 .session-board__notice svg {
   flex: 0 0 auto;
   color: var(--cobalt);
+}
+
+/* ---------- horarios: tres jornadas desplegables ---------- */
+.schedule-accordion {
+  position: relative;
+}
+.schedule-accordion__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 15px;
+  border-bottom: 1px solid var(--bone-line);
+  color: rgba(14, 17, 16, 0.44);
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+.schedule-accordion__list {
+  display: grid;
+  gap: 12px;
+  margin-top: 14px;
+}
+.schedule-accordion__item {
+  overflow: hidden;
+  border: 1px solid var(--bone-line);
+  background: var(--bone);
+  transition: box-shadow 0.28s var(--ease-out), border-color 0.28s var(--ease-out);
+}
+.schedule-accordion__item:has([data-state="open"]) {
+  border-color: rgba(217, 45, 32, 0.48);
+  box-shadow: 10px 10px 0 rgba(217, 45, 32, 0.1);
+}
+.schedule-accordion__trigger {
+  display: grid;
+  grid-template-columns: 50px minmax(0, 1fr) auto 18px;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  min-height: 104px;
+  padding: 18px 24px;
+  border: 0;
+  border-radius: 0;
+  color: var(--graphite);
+  background: transparent;
+  text-decoration: none !important;
+}
+.schedule-accordion__trigger:hover {
+  background: rgba(217, 45, 32, 0.035);
+}
+.schedule-accordion__trigger > svg {
+  width: 20px;
+  height: 20px;
+  color: var(--cobalt);
+}
+.schedule-accordion__serial {
+  color: var(--cobalt);
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 30px;
+  font-weight: 700;
+}
+.schedule-accordion__day {
+  display: grid;
+  gap: 5px;
+}
+.schedule-accordion__day strong {
+  font-family: "Archivo Black", sans-serif;
+  font-size: clamp(20px, 2.8vw, 34px);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: 0.95;
+  text-transform: uppercase;
+}
+.schedule-accordion__day small {
+  color: rgba(14, 17, 16, 0.54);
+  font-size: 11px;
+  line-height: 1.35;
+}
+.schedule-accordion__label {
+  color: rgba(14, 17, 16, 0.44);
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+.schedule-accordion__content > div {
+  padding: 0;
+}
+.schedule-accordion__body {
+  display: grid;
+  grid-template-columns: 0.62fr 1.38fr;
+  gap: 26px;
+  padding: 0 24px 26px 90px;
+  border-top: 1px solid var(--bone-line);
+  background: linear-gradient(90deg, rgba(217, 45, 32, 0.05), transparent 56%);
+}
+.schedule-accordion__body > p {
+  align-self: start;
+  margin: 22px 0 0;
+  color: rgba(14, 17, 16, 0.63);
+  font-size: 12.5px;
+  line-height: 1.65;
+}
+.schedule-accordion__slots {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  margin-top: 18px;
+  background: var(--bone-line);
+}
+.schedule-accordion__slots div {
+  display: grid;
+  gap: 6px;
+  min-height: 96px;
+  padding: 15px;
+  background: rgba(255, 255, 255, 0.92);
+}
+.schedule-accordion__slots span {
+  color: var(--cobalt);
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+}
+.schedule-accordion__slots strong {
+  font-family: "Archivo Black", sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.05;
+}
+.schedule-accordion__slots small {
+  color: rgba(14, 17, 16, 0.48);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.schedule-accordion__notice {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 22px;
+  padding: 17px 21px;
+  background: var(--graphite);
+  color: rgba(255, 255, 255, 0.68);
+  font-size: 12px;
+  line-height: 1.55;
+}
+.schedule-accordion__notice svg {
+  flex: 0 0 auto;
+  color: #ff8d84;
 }
 
 /* ---------- reglas ---------- */
@@ -1907,6 +2069,13 @@ video {
   .policy-panel {
     grid-template-columns: 1fr;
   }
+  .schedule-accordion__body {
+    grid-template-columns: 1fr;
+    padding-left: 24px;
+  }
+  .schedule-accordion__body > p {
+    margin-bottom: -8px;
+  }
   .athlete-selector {
     grid-template-columns: 1fr;
   }
@@ -1997,27 +2166,29 @@ video {
   }
   .hero-section__media {
     inset: 0 0 auto;
-    height: 286px;
-    padding: 78px 8px 0;
+    height: 78svh;
+    padding: 80px 0 0;
     align-items: flex-start;
     justify-content: center;
     mask-image: none;
     -webkit-mask-image: none;
   }
   .hero-section__media video {
-    width: min(96vw, 390px);
-    height: 210px;
+    width: 100%;
+    height: calc(78svh - 80px);
+    object-fit: cover;
+    object-position: center;
   }
   .hero-section__veil {
     background: linear-gradient(
       180deg,
-      rgba(7, 10, 9, 0.2) 0%,
-      rgba(7, 10, 9, 0.08) 48%,
-      rgba(7, 10, 9, 0.34) 100%
+      rgba(7, 10, 9, 0.1) 0%,
+      rgba(7, 10, 9, 0.04) 52%,
+      rgba(7, 10, 9, 0.48) 100%
     );
   }
   .hero-content {
-    padding-top: 334px;
+    padding-top: calc(78svh + 26px);
     padding-bottom: 24px;
   }
   .hero-content__topline {
@@ -2029,7 +2200,7 @@ video {
   }
   .hero-content__main {
     max-width: 100%;
-    margin-top: 42px;
+    margin-top: 30px;
   }
   .hero-content h1 {
     font-size: clamp(34px, 11vw, 50px);
@@ -2077,6 +2248,51 @@ video {
   .session-board__column,
   .policy-panel__card {
     padding: 22px 20px;
+  }
+  .schedule-accordion__top {
+    font-size: 8px;
+  }
+  .schedule-accordion__trigger {
+    grid-template-columns: 34px minmax(0, 1fr) 16px;
+    gap: 10px;
+    min-height: 84px;
+    padding: 15px;
+  }
+  .schedule-accordion__label {
+    display: none;
+  }
+  .schedule-accordion__serial {
+    font-size: 24px;
+  }
+  .schedule-accordion__day strong {
+    font-size: 21px;
+  }
+  .schedule-accordion__day small {
+    font-size: 10px;
+  }
+  .schedule-accordion__body {
+    gap: 9px;
+    padding: 0 15px 15px;
+  }
+  .schedule-accordion__body > p {
+    margin-top: 16px;
+    font-size: 11.5px;
+  }
+  .schedule-accordion__slots {
+    grid-template-columns: repeat(2, 1fr);
+    margin-top: 8px;
+  }
+  .schedule-accordion__slots div {
+    min-height: 82px;
+    padding: 12px;
+  }
+  .schedule-accordion__slots strong {
+    font-size: 14px;
+  }
+  .schedule-accordion__notice {
+    align-items: flex-start;
+    padding: 15px;
+    font-size: 11px;
   }
   .manifesto-section__blueprint {
     top: 60px;
@@ -2235,6 +2451,102 @@ video {
   }
   .site-header__edge {
     background: rgba(255, 255, 255, 0.45);
+  }
+}
+
+/* ---------- capa de materialidad: pista editorial continua ---------- */
+.plans-section::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  top: 204px;
+  left: -6vw;
+  width: 54vw;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(217, 45, 32, 0.42), transparent);
+  transform: rotate(-3deg);
+}
+.plans-section__brand-anchor {
+  position: absolute;
+  z-index: -1;
+  top: 36px;
+  right: max(24px, calc((100vw - 1240px) / 2));
+  width: clamp(170px, 18vw, 290px);
+  height: auto;
+  opacity: 0.14;
+  filter: grayscale(1) invert(1) contrast(1.35);
+  mix-blend-mode: multiply;
+  pointer-events: none;
+}
+.athlete-selector__card::before {
+  content: "";
+  width: 18px;
+  height: 1px;
+  background: var(--cobalt);
+  opacity: 0.55;
+}
+.athlete-selector__card.is-active {
+  box-shadow: inset 0 1px rgba(255, 255, 255, 0.09), 9px 9px 0 rgba(217, 45, 32, 0.12);
+}
+.plan-card-h {
+  background:
+    radial-gradient(circle at 100% 0%, rgba(217, 45, 32, 0.13), transparent 31%),
+    linear-gradient(145deg, rgba(255, 255, 255, 0.055), transparent 22%),
+    rgba(14, 17, 16, 0.96);
+  box-shadow: inset 0 1px rgba(255, 255, 255, 0.09), 12px 12px 0 rgba(14, 17, 16, 0.14);
+}
+.schedule-accordion {
+  padding-left: clamp(12px, 2.4vw, 34px);
+}
+.schedule-accordion::before {
+  content: "";
+  position: absolute;
+  top: 45px;
+  bottom: 58px;
+  left: 0;
+  width: 1px;
+  background: linear-gradient(var(--cobalt), rgba(217, 45, 32, 0.08));
+}
+.schedule-accordion__item {
+  background:
+    linear-gradient(115deg, rgba(217, 45, 32, 0.04), transparent 37%),
+    var(--bone);
+  transition: box-shadow 0.28s var(--ease-out), border-color 0.28s var(--ease-out), transform 0.28s var(--ease-out);
+}
+.schedule-accordion__item:has([data-state="open"]) {
+  box-shadow: inset 0 1px rgba(255, 255, 255, 0.8), 10px 10px 0 rgba(217, 45, 32, 0.1);
+  transform: translateX(8px);
+}
+.policy-panel__card {
+  position: relative;
+  overflow: hidden;
+  background:
+    linear-gradient(125deg, rgba(217, 45, 32, 0.035), transparent 45%),
+    var(--bone);
+  box-shadow: inset 0 1px rgba(255, 255, 255, 0.86);
+}
+.policy-panel__card::after {
+  content: "";
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  width: 17px;
+  height: 1px;
+  background: var(--cobalt);
+  opacity: 0.55;
+}
+@media (min-width: 901px) {
+  .policy-panel__card:nth-child(2),
+  .policy-panel__card:nth-child(5) {
+    transform: translateY(18px);
+    box-shadow: inset 0 1px rgba(255, 255, 255, 0.86), 8px 8px 0 rgba(217, 45, 32, 0.06);
+  }
+}
+@media (max-width: 900px) {
+  .plans-section__brand-anchor {
+    top: 38px;
+    width: 150px;
+    opacity: 0.1;
   }
 }
 
