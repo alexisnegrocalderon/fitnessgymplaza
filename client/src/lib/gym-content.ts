@@ -1,5 +1,12 @@
-export const VIDEO_URL = "/manus-storage/plaza-fitness-hero-desktop_deedf91e.mp4";
-export const MOBILE_VIDEO_URL = "/manus-storage/plaza-fitness-hero-mobile-3x4_e0a54070.mp4";
+const isVercelRuntime =
+  typeof window !== "undefined" && window.location.hostname.endsWith(".vercel.app");
+
+export const VIDEO_URL = isVercelRuntime
+  ? "/media/plaza-fitness-hero-desktop.mp4"
+  : "/manus-storage/plaza-fitness-hero-desktop_deedf91e.mp4";
+export const MOBILE_VIDEO_URL = isVercelRuntime
+  ? "/media/plaza-fitness-hero-mobile-3x4.mp4"
+  : "/manus-storage/plaza-fitness-hero-mobile-3x4_e0a54070.mp4";
 export const MARK_URL = "/media/plaza-fitness-logo.png";
 export const SPACE_IMAGE = "/media/plaza-fitness-space.jpg";
 export const COACHING_IMAGE = "/media/plaza-fitness-coaching.jpg";
