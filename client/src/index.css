@@ -3088,6 +3088,18 @@ main > section[id] {
   color: rgba(255, 255, 255, 0.5);
   font-size: 13px;
 }
+.admin-mp__charge-editor input[type="email"] {
+  width: 200px;
+  text-align: left;
+}
+.admin-mp__charge-editor select {
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.04);
+  color: #fff;
+  font-size: 13px;
+}
 .admin-mp__notice {
   flex-basis: 100%;
   margin: 0;

@@ -27,20 +27,6 @@ export const COACHING_IMAGE = "/media/plaza-fitness-coaching.jpg";
 export const GRIP_IMAGE = "/media/plaza-fitness-plans-accent.jpg";
 export const STOREFRONT_IMAGE = "/media/plaza-fitness-storefront.jpg";
 
-const BASE_WHATSAPP = "https://wa.me/56952254029";
-
-export function buildWhatsappLink(message: string) {
-  return `${BASE_WHATSAPP}?text=${encodeURIComponent(message)}`;
-}
-
-export const WHATSAPP_URL = buildWhatsappLink(
-  "Hola Plaza Fitness, quiero conocer los planes y horarios."
-);
-export const INSTAGRAM_URL = "https://www.instagram.com/plazafitnessvina";
-
-export const ADDRESS_LINE = "Calle Quillota 656";
-export const ADDRESS_CITY = "Viña del Mar";
-
 export {
   plans,
   findPlan,
@@ -49,6 +35,18 @@ export {
   type Plan,
   type PlanTier,
 } from "@shared/plans";
+
+export {
+  BASE_WHATSAPP,
+  buildWhatsappLink,
+  WHATSAPP_URL,
+  INSTAGRAM_URL,
+  ADDRESS_LINE,
+  ADDRESS_CITY,
+  mapsSearchUrl,
+} from "@shared/contact";
+
+export { scheduleGroups } from "@shared/schedule";
 
 export const method = [
   {
@@ -85,52 +83,6 @@ export const method = [
     id: "07",
     title: "Salud activa",
     text: "Una práctica para mejorar o mantener tu condición física y composición corporal a largo plazo.",
-  },
-];
-
-export const scheduleGroups = [
-  {
-    id: "lwmf",
-    badge: "01",
-    nav: "L / M / V",
-    title: "Tu semana en marcha",
-    days: "Lunes, miércoles y viernes",
-    brief:
-      "Seis oportunidades para instalar una frecuencia que se siente en tu cuerpo.",
-    slots: [
-      "08:30–09:30",
-      "09:30–10:30",
-      "12:00–13:00",
-      "17:00–18:00",
-      "18:00–19:00",
-      "19:00–20:00",
-    ],
-  },
-  {
-    id: "tt",
-    badge: "02",
-    nav: "M / J",
-    title: "Tu ritmo intercalado",
-    days: "Martes y jueves",
-    brief:
-      "Una ruta compacta para volver, recuperar y progresar sin desconectarte.",
-    slots: [
-      "08:30–09:30",
-      "09:30–10:30",
-      "12:00–13:00",
-      "18:00–19:00",
-      "19:00–20:00",
-      "20:00–21:00",
-    ],
-  },
-  {
-    id: "sat",
-    badge: "03",
-    nav: "SÁB",
-    title: "Activa tu sábado",
-    days: "Sábado",
-    brief: "Dos sesiones para abrir el fin de semana con energía y técnica.",
-    slots: ["09:30–10:30", "10:30–11:30"],
   },
 ];
 

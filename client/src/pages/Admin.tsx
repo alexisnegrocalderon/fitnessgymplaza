@@ -172,6 +172,80 @@ function ServiceChargePanel() {
   );
 }
 
+function TestEmailPanel() {
+  const [to, setTo] = useState("");
+  const [template, setTemplate] = useState<"invitation" | "plan">("plan");
+  const [sending, setSending] = useState(false);
+  const [notice, setNotice] = useState<string | null>(null);
+
+  async function send() {
+    if (!to.trim()) {
+      setNotice("Ingresa un email de destino.");
+      return;
+    }
+    setSending(true);
+    setNotice(null);
+    try {
+      const res = await fetch("/api/admin/test-email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ to, template }),
+      });
+      const data = await res.json().catch(() => ({}));
+      setNotice(
+        res.ok
+          ? `Correo de prueba enviado a ${to}.`
+          : `No se pudo enviar: ${data.message ?? data.error ?? "error desconocido"}.`
+      );
+    } catch {
+      setNotice("No se pudo enviar. Intenta de nuevo.");
+    } finally {
+      setSending(false);
+    }
+  }
+
+  return (
+    <div className="admin-mp">
+      <div className="admin-mp__info">
+        <Mail size={18} />
+        <div>
+          <p className="admin-mp__title">Correo de prueba</p>
+          <p className="admin-mp__sub">
+            Manda una de las plantillas con datos de ejemplo a la dirección que
+            quieras, para ver cómo llega de verdad a una bandeja.
+          </p>
+        </div>
+      </div>
+      <div className="admin-mp__charge-editor">
+        <input
+          type="email"
+          placeholder="tu@email.com"
+          value={to}
+          onChange={e => setTo(e.target.value)}
+          aria-label="Email de destino"
+        />
+        <select
+          value={template}
+          onChange={e => setTemplate(e.target.value as "invitation" | "plan")}
+          aria-label="Plantilla"
+        >
+          <option value="plan">Plan confirmado</option>
+          <option value="invitation">Invitación evento</option>
+        </select>
+        <button
+          type="button"
+          className="button button--cobalt"
+          onClick={send}
+          disabled={sending}
+        >
+          {sending ? "Enviando…" : "Enviar prueba"}
+        </button>
+      </div>
+      {notice && <p className="admin-mp__notice">{notice}</p>}
+    </div>
+  );
+}
+
 type Session = "checking" | "out" | "in";
 
 /** Solo 200 + JSON válido cuenta como sesión activa — cualquier otra
@@ -526,6 +600,7 @@ function Dashboard({ onLoggedOut }: { onLoggedOut: () => void }) {
 
       <MercadoPagoPanel />
       <ServiceChargePanel />
+      <TestEmailPanel />
 
       <div className="admin-stats">
         <StatTile
