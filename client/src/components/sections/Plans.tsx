@@ -43,16 +43,22 @@ function SegmentedPill<T extends string>({
   value,
   onChange,
   extra,
+  accent = false,
 }: {
   layoutGroup: string;
   items: { id: T; label: string; icon?: ReactNode }[];
   value: T;
   onChange: (id: T) => void;
   extra?: (id: T) => ReactNode;
+  /** Fondo activo en rojo (paleta de marca) en vez del graphite por defecto. */
+  accent?: boolean;
 }) {
   const reduced = useReducedMotion();
   return (
-    <div className="segmented" role="tablist">
+    <div
+      className={`segmented ${accent ? "segmented--accent" : ""}`}
+      role="tablist"
+    >
       {items.map(item => {
         const active = item.id === value;
         return (
@@ -217,6 +223,7 @@ export default function Plans() {
           items={AUDIENCE_ITEMS}
           value={audience}
           onChange={setAudience}
+          accent
         />
         <SegmentedPill
           layoutGroup="tier"
