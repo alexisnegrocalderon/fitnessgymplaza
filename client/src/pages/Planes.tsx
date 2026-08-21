@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type CSSProperties } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { Payment, initMercadoPago } from "@mercadopago/sdk-react";
 import {
@@ -63,6 +63,58 @@ function readQueryPlan(): { audience: Audience; tier: PlanTier } | null {
 /** Payload que entrega el Payment Brick en su onSubmit — se reenvía tal
  * cual a api/plan-pay.ts, que a su vez lo pasa a la API de Mercado Pago. */
 type BrickFormData = Record<string, unknown>;
+
+/** Mismo mecanismo de reveal palabra por palabra que el titular del Hero
+ * (client/src/components/sections/Hero.tsx) — reutiliza sus clases CSS
+ * .hero-word/.hero-word__inner tal cual, sin CSS nuevo. */
+function StepWords({ text }: { text: string }) {
+  const tokens = text.split(" ");
+  return (
+    <>
+      {tokens.map((token, i) => (
+        <span key={`${token}-${i}`}>
+          <span className="hero-word">
+            <motion.span
+              className="hero-word__inner"
+              variants={{
+                hidden: { opacity: 0, y: "0.4em" },
+                visible: { opacity: 1, y: 0 },
+              }}
+              transition={spring.reveal}
+            >
+              {token}
+            </motion.span>
+          </span>
+          {i < tokens.length - 1 ? " " : null}
+        </span>
+      ))}
+    </>
+  );
+}
+
+/** Título de cada paso: se construye palabra por palabra, más ágil que el
+ * reveal del Hero porque dispara en cada cambio de paso, no una sola vez. */
+function StepTitle({ text, style }: { text: string; style?: CSSProperties }) {
+  const reduced = useReducedMotion();
+  return (
+    <motion.h1
+      style={style}
+      variants={{
+        hidden: {},
+        visible: {
+          transition: {
+            staggerChildren: reduced ? 0 : 0.04,
+            delayChildren: reduced ? 0 : 0.04,
+          },
+        },
+      }}
+      initial="hidden"
+      animate="visible"
+    >
+      <StepWords text={text} />
+    </motion.h1>
+  );
+}
 
 export default function Planes() {
   const reduced = useReducedMotion();
@@ -266,9 +318,25 @@ export default function Planes() {
   const showProgress = questionIndex >= 0;
   const showBack = phase === "payment" || questionIndex > 0;
 
+  const stepMotion = reduced
+    ? {
+        initial: { opacity: 0 },
+        animate: { opacity: 1 },
+        exit: { opacity: 0 },
+        transition: calm,
+      }
+    : {
+        initial: { opacity: 0, y: 14, filter: "blur(4px)" },
+        animate: { opacity: 1, y: 0, filter: "blur(0px)" },
+        exit: { opacity: 0, y: -8, filter: "blur(4px)" },
+        transition: spring.ui,
+      };
+
   return (
     <div className="immersive-flow">
       <div className="immersive-flow__glow" aria-hidden="true" />
+      <div className="immersive-flow__grid" aria-hidden="true" />
+      <BrandMark className="immersive-flow__mark" decorative />
       <div className="immersive-flow__content">
         <motion.a
           href="/"
@@ -324,14 +392,8 @@ export default function Planes() {
 
           <AnimatePresence mode="wait">
             {phase === "audience" ? (
-              <motion.div
-                key="audience"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0 }}
-                transition={calm}
-              >
-                <h1>¿Eres estudiante?</h1>
+              <motion.div key="audience" {...stepMotion}>
+                <StepTitle text="¿Eres estudiante?" />
                 <p
                   className="immersive-flow__lede"
                   style={{ margin: "10px 0 22px" }}
@@ -380,14 +442,8 @@ export default function Planes() {
                 </div>
               </motion.div>
             ) : phase === "tier" ? (
-              <motion.div
-                key="tier"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0 }}
-                transition={calm}
-              >
-                <h1>¿Cuántas clases quieres al mes?</h1>
+              <motion.div key="tier" {...stepMotion}>
+                <StepTitle text="¿Cuántas clases quieres al mes?" />
                 <p
                   className="immersive-flow__lede"
                   style={{ margin: "10px 0 22px" }}
@@ -423,16 +479,13 @@ export default function Planes() {
             ) : phase === "name" ? (
               <motion.form
                 key="name"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0 }}
-                transition={calm}
+                {...stepMotion}
                 onSubmit={e => {
                   e.preventDefault();
                   validateAndAdvance("name");
                 }}
               >
-                <h1>¿Cuál es tu nombre completo?</h1>
+                <StepTitle text="¿Cuál es tu nombre completo?" />
                 <label
                   className="immersive-flow__field"
                   style={{ marginTop: 18 }}
@@ -454,16 +507,13 @@ export default function Planes() {
             ) : phase === "rut" ? (
               <motion.form
                 key="rut"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0 }}
-                transition={calm}
+                {...stepMotion}
                 onSubmit={e => {
                   e.preventDefault();
                   validateAndAdvance("rut");
                 }}
               >
-                <h1>¿Cuál es tu RUT?</h1>
+                <StepTitle text="¿Cuál es tu RUT?" />
                 <label
                   className="immersive-flow__field"
                   style={{ marginTop: 18 }}
@@ -486,16 +536,13 @@ export default function Planes() {
             ) : phase === "whatsapp" ? (
               <motion.form
                 key="whatsapp"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0 }}
-                transition={calm}
+                {...stepMotion}
                 onSubmit={e => {
                   e.preventDefault();
                   validateAndAdvance("whatsapp");
                 }}
               >
-                <h1>¿Cuál es tu WhatsApp?</h1>
+                <StepTitle text="¿Cuál es tu WhatsApp?" />
                 <label
                   className="immersive-flow__field"
                   style={{ marginTop: 18 }}
@@ -517,16 +564,13 @@ export default function Planes() {
             ) : phase === "email" ? (
               <motion.form
                 key="email"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0 }}
-                transition={calm}
+                {...stepMotion}
                 onSubmit={e => {
                   e.preventDefault();
                   validateAndAdvance("email");
                 }}
               >
-                <h1>¿Cuál es tu email?</h1>
+                <StepTitle text="¿Cuál es tu email?" />
                 <label
                   className="immersive-flow__field"
                   style={{ marginTop: 18 }}
@@ -553,16 +597,11 @@ export default function Planes() {
                 </button>
               </motion.form>
             ) : phase === "payment" ? (
-              <motion.div
-                key="payment"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={calm}
-              >
-                <h1 style={{ fontSize: "clamp(26px, 6vw, 40px)" }}>
-                  Pago seguro con Mercado Pago
-                </h1>
+              <motion.div key="payment" {...stepMotion}>
+                <StepTitle
+                  text="Pago seguro con Mercado Pago"
+                  style={{ fontSize: "clamp(26px, 6vw, 40px)" }}
+                />
                 {pricing && plan && (
                   <div
                     className="immersive-flow__breakdown"

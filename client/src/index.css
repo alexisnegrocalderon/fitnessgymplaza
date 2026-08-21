@@ -2391,11 +2391,50 @@ main > section[id] {
 .immersive-flow__glow {
   position: absolute;
   inset: -20%;
-  background: radial-gradient(
-    ellipse 55% 45% at 50% 20%,
-    rgba(217, 45, 32, 0.16),
-    transparent 70%
+  z-index: 0;
+  background:
+    radial-gradient(
+      ellipse 55% 45% at 50% 15%,
+      rgba(217, 45, 32, 0.22),
+      transparent 70%
+    ),
+    radial-gradient(
+      ellipse 40% 35% at 85% 85%,
+      rgba(217, 45, 32, 0.08),
+      transparent 70%
+    );
+  pointer-events: none;
+}
+.immersive-flow__grid {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  opacity: 0.1;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.14) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.14) 1px, transparent 1px);
+  background-size: 120px 120px;
+  mask-image: radial-gradient(
+    ellipse 70% 60% at 50% 30%,
+    #000,
+    transparent 75%
   );
+  -webkit-mask-image: radial-gradient(
+    ellipse 70% 60% at 50% 30%,
+    #000,
+    transparent 75%
+  );
+  pointer-events: none;
+}
+.immersive-flow__mark {
+  position: absolute;
+  z-index: 0;
+  top: -8vw;
+  right: -10vw;
+  width: clamp(280px, 34vw, 520px);
+  height: auto;
+  opacity: 0.05;
+  filter: grayscale(1) invert(1) contrast(1.35);
   pointer-events: none;
 }
 .immersive-flow__content {
@@ -2405,7 +2444,7 @@ main > section[id] {
   flex-direction: column;
   align-items: center;
   text-align: center;
-  width: min(100%, 480px);
+  width: min(100%, 420px);
 }
 .immersive-flow__brand {
   display: inline-flex;
@@ -2463,9 +2502,9 @@ main > section[id] {
 .immersive-flow__panel {
   position: relative;
   width: 100%;
-  margin-top: 32px;
-  padding: 28px;
-  border-radius: 20px;
+  margin-top: 26px;
+  padding: 22px 24px;
+  border-radius: 26px;
   text-align: left;
   overflow: hidden;
 }
@@ -2477,7 +2516,7 @@ main > section[id] {
   background: linear-gradient(
     90deg,
     transparent,
-    rgba(255, 255, 255, 0.35),
+    rgba(255, 255, 255, 0.22),
     transparent
   );
   pointer-events: none;
@@ -2485,7 +2524,7 @@ main > section[id] {
 .immersive-flow__field {
   display: grid;
   gap: 6px;
-  margin-bottom: 16px;
+  margin-bottom: 14px;
 }
 .immersive-flow__field span {
   font-family: "Barlow Condensed", sans-serif;
@@ -2496,7 +2535,7 @@ main > section[id] {
   color: rgba(255, 255, 255, 0.6);
 }
 .immersive-flow__field input {
-  min-height: 46px;
+  min-height: 44px;
   padding: 0 14px;
   border: 1px solid rgba(255, 255, 255, 0.18);
   border-radius: 10px;
