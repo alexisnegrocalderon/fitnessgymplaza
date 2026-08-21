@@ -30,5 +30,10 @@ export const EVENT_DETAILS = {
 /** Monto a cobrar por Mercado Pago, en pesos chilenos (sin decimales). */
 export const EVENT_PRICE_CLP = 3500;
 
+/** Cargo por servicio en pesos, a partir de puntos base (1000 = 10.00%). */
+export function calculateServiceCharge(basePrice: number, bps: number): number {
+  return Math.round((basePrice * bps) / 10000);
+}
+
 /** Cupos internos. Nunca se muestra al público, solo cierra el formulario. */
 export const EVENT_CAPACITY = 100;

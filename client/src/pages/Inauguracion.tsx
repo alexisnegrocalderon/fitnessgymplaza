@@ -13,12 +13,19 @@ import {
 } from "lucide-react";
 import { BrandMark } from "@/components/common";
 import { calm, spring } from "@/lib/motion";
+import { formatCLP } from "@shared/format";
 import {
   EVENT_DETAILS,
   EVENT_PRICE_CLP,
   registrationSchema,
   type RegistrationInput,
 } from "@shared/registration";
+
+type PriceBreakdown = {
+  basePrice: number;
+  serviceCharge: number;
+  total: number;
+};
 
 type ViewState =
   | "form"
@@ -39,6 +46,7 @@ export default function Inauguracion() {
   const [checkingCapacity, setCheckingCapacity] = useState(true);
   const [contact, setContact] = useState<RegistrationInput | null>(null);
   const [publicKey, setPublicKey] = useState<string | null>(null);
+  const [pricing, setPricing] = useState<PriceBreakdown | null>(null);
   const [paymentError, setPaymentError] = useState<string | null>(null);
 
   const {
@@ -80,6 +88,27 @@ export default function Inauguracion() {
       cancelled = true;
     };
   }, [view, publicKey]);
+
+  useEffect(() => {
+    if (view !== "payment" || pricing) return;
+    let cancelled = false;
+    fetch("/api/event-pricing")
+      .then(res => (res.ok ? res.json() : Promise.reject()))
+      .then(data => {
+        if (!cancelled) setPricing(data);
+      })
+      .catch(() => {
+        if (!cancelled)
+          setPricing({
+            basePrice: EVENT_PRICE_CLP,
+            serviceCharge: 0,
+            total: EVENT_PRICE_CLP,
+          });
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [view, pricing]);
 
   function onContactSubmit(data: RegistrationInput) {
     setContact(data);
@@ -257,18 +286,33 @@ export default function Inauguracion() {
                 transition={calm}
                 className="inauguracion__payment"
               >
-                <p className="inauguracion__payment-amount">
-                  Total a pagar: <strong>{EVENT_DETAILS.price}</strong>
-                </p>
+                {pricing && (
+                  <div className="inauguracion__breakdown">
+                    <div>
+                      <span>Valor entrada</span>
+                      <span>{formatCLP(pricing.basePrice)}</span>
+                    </div>
+                    {pricing.serviceCharge > 0 && (
+                      <div>
+                        <span>Cargo por servicio</span>
+                        <span>{formatCLP(pricing.serviceCharge)}</span>
+                      </div>
+                    )}
+                    <div className="inauguracion__breakdown-total">
+                      <span>Total a pagar</span>
+                      <span>{formatCLP(pricing.total)}</span>
+                    </div>
+                  </div>
+                )}
                 {paymentError && (
                   <p className="inauguracion__payment-error">
                     <AlertTriangle size={14} /> {paymentError}
                   </p>
                 )}
-                {publicKey ? (
+                {publicKey && pricing ? (
                   <Payment
                     initialization={{
-                      amount: EVENT_PRICE_CLP,
+                      amount: pricing.total,
                       payer: { email: contact?.email },
                     }}
                     customization={{

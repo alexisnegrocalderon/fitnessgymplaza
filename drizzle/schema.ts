@@ -76,3 +76,18 @@ export const mpConnections = pgTable("mp_connections", {
 
 export type MpConnection = typeof mpConnections.$inferSelect;
 export type InsertMpConnection = typeof mpConnections.$inferInsert;
+
+/**
+ * Configuración del evento — fila única. `serviceChargeBps` es el cargo
+ * por servicio en puntos base (1000 = 10.00%) que se suma al valor de la
+ * entrada al momento de pagar; se guarda en enteros para evitar errores de
+ * redondeo con decimales.
+ */
+export const eventSettings = pgTable("event_settings", {
+  id: integer("id").generatedAlwaysAsIdentity().primaryKey(),
+  serviceChargeBps: integer("serviceChargeBps").default(1000).notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
+});
+
+export type EventSettings = typeof eventSettings.$inferSelect;
+export type InsertEventSettings = typeof eventSettings.$inferInsert;

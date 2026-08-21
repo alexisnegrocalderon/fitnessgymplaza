@@ -6,6 +6,7 @@ import {
   countActiveRegistrations,
   createApprovedRegistration,
   findRegistrationByContact,
+  getEventSettings,
 } from "../server/db.js";
 import { sendInvitationEmail } from "../server/lib/resend.js";
 import {
@@ -15,6 +16,7 @@ import {
 import {
   EVENT_DETAILS,
   EVENT_PRICE_CLP,
+  calculateServiceCharge,
   registrationSchema,
 } from "../shared/registration.js";
 
@@ -62,6 +64,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return;
     }
 
+    const settings = await getEventSettings();
+    const serviceCharge = calculateServiceCharge(
+      EVENT_PRICE_CLP,
+      settings.serviceChargeBps
+    );
+    const totalAmount = EVENT_PRICE_CLP + serviceCharge;
+
     const accessToken = await getValidAccessToken();
     const mpConfig = new MercadoPagoConfig({
       accessToken,
@@ -70,7 +79,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     const paymentBody = {
       ...body.formData,
-      transaction_amount: EVENT_PRICE_CLP,
+      // El cargo por servicio se cobra completo al cliente; la comisión de
+      // marketplace (application_fee) se calcula solo sobre el valor de la
+      // entrada, no sobre el total con cargo por servicio.
+      transaction_amount: totalAmount,
       application_fee: calculateApplicationFee(EVENT_PRICE_CLP),
       description: EVENT_DETAILS.name,
       external_reference: `inauguracion-${parsed.data.email}`,
@@ -96,7 +108,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const row = await createApprovedRegistration({
       ...parsed.data,
       mpPaymentId: String(payment.id),
-      amount: EVENT_PRICE_CLP,
+      amount: totalAmount,
     });
 
     try {

@@ -2,6 +2,7 @@ import { neon } from "@neondatabase/serverless";
 import { and, desc, eq, ne, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/neon-http";
 import {
+  eventSettings,
   InsertMpConnection,
   InsertRegistration,
   InsertUser,
@@ -225,6 +226,32 @@ export async function updateMpConnectionTokens(
     .update(mpConnections)
     .set({ ...data, updatedAt: new Date() })
     .where(eq(mpConnections.id, id))
+    .returning();
+  return row;
+}
+
+// ---------------------------------------------------------------------------
+// Configuración del evento (cargo por servicio) — fila única.
+// ---------------------------------------------------------------------------
+
+/** Crea la fila por defecto la primera vez que se pide (10% = 1000 bps). */
+export async function getEventSettings() {
+  const db = getDb();
+  if (!db) throw new Error("Database not configured");
+  const existing = await db.select().from(eventSettings).limit(1);
+  if (existing[0]) return existing[0];
+  const [row] = await db.insert(eventSettings).values({}).returning();
+  return row;
+}
+
+export async function updateServiceChargeBps(bps: number) {
+  const db = getDb();
+  if (!db) throw new Error("Database not configured");
+  const current = await getEventSettings();
+  const [row] = await db
+    .update(eventSettings)
+    .set({ serviceChargeBps: bps, updatedAt: new Date() })
+    .where(eq(eventSettings.id, current.id))
     .returning();
   return row;
 }

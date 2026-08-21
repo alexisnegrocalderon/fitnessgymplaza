@@ -4,13 +4,19 @@ import {
   Clock,
   CreditCard,
   LogOut,
+  Percent,
   Ticket,
   UserCheck,
   Users,
   XCircle,
 } from "lucide-react";
 import { BrandMark } from "@/components/common";
-import { EVENT_CAPACITY } from "@shared/registration";
+import { formatCLP } from "@shared/format";
+import {
+  EVENT_CAPACITY,
+  EVENT_PRICE_CLP,
+  calculateServiceCharge,
+} from "@shared/registration";
 import type { Registration } from "../../../drizzle/schema";
 
 type MpStatus =
@@ -75,6 +81,91 @@ function MercadoPagoPanel() {
       >
         {status.connected ? "Reconectar" : "Conectar Mercado Pago"}
       </a>
+      {notice && <p className="admin-mp__notice">{notice}</p>}
+    </div>
+  );
+}
+
+function ServiceChargePanel() {
+  const [bps, setBps] = useState<number | null>(null);
+  const [draft, setDraft] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [notice, setNotice] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetch("/api/admin/settings")
+      .then(res => (res.ok ? res.json() : null))
+      .then(data => {
+        if (!data) return;
+        setBps(data.serviceChargeBps);
+        setDraft((data.serviceChargeBps / 100).toString());
+      })
+      .catch(() => {});
+  }, []);
+
+  async function save() {
+    const percent = Number(draft.replace(",", "."));
+    if (!Number.isFinite(percent) || percent < 0 || percent > 50) {
+      setNotice("Ingresa un porcentaje válido entre 0 y 50.");
+      return;
+    }
+    const nextBps = Math.round(percent * 100);
+    setSaving(true);
+    setNotice(null);
+    try {
+      const res = await fetch("/api/admin/settings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ serviceChargeBps: nextBps }),
+      });
+      if (!res.ok) throw new Error("failed");
+      const data = await res.json();
+      setBps(data.serviceChargeBps);
+      setNotice("Cargo por servicio actualizado.");
+    } catch {
+      setNotice("No se pudo guardar. Intenta de nuevo.");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  if (bps === null) return null;
+
+  const preview = calculateServiceCharge(EVENT_PRICE_CLP, bps);
+
+  return (
+    <div className="admin-mp">
+      <div className="admin-mp__info">
+        <Percent size={18} />
+        <div>
+          <p className="admin-mp__title">Cargo por servicio</p>
+          <p className="admin-mp__sub">
+            Se suma al valor de la entrada al pagar. Hoy: {formatCLP(preview)}{" "}
+            sobre {formatCLP(EVENT_PRICE_CLP)} (total{" "}
+            {formatCLP(EVENT_PRICE_CLP + preview)}).
+          </p>
+        </div>
+      </div>
+      <div className="admin-mp__charge-editor">
+        <input
+          type="number"
+          min={0}
+          max={50}
+          step={0.5}
+          value={draft}
+          onChange={e => setDraft(e.target.value)}
+          aria-label="Porcentaje de cargo por servicio"
+        />
+        <span>%</span>
+        <button
+          type="button"
+          className="button button--cobalt"
+          onClick={save}
+          disabled={saving}
+        >
+          {saving ? "Guardando…" : "Guardar"}
+        </button>
+      </div>
       {notice && <p className="admin-mp__notice">{notice}</p>}
     </div>
   );
@@ -299,6 +390,7 @@ function Dashboard({ onLoggedOut }: { onLoggedOut: () => void }) {
       </header>
 
       <MercadoPagoPanel />
+      <ServiceChargePanel />
 
       <div className="admin-stats">
         <StatTile
