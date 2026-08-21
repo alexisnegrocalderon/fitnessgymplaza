@@ -101,10 +101,10 @@ export async function countActiveRegistrations(): Promise<number> {
   return count;
 }
 
-export async function findRegistrationByContact(
-  email: string,
-  whatsapp: string
-) {
+/** La identidad de una inscripción es el email: es a donde llega la
+ * invitación. El WhatsApp NO se usa para deduplicar — dos personas de la
+ * misma casa comparten teléfono y la segunda quedaba fuera del evento. */
+export async function findRegistrationByEmail(email: string) {
   const db = getDb();
   if (!db) throw new Error("Database not configured");
   const result = await db
@@ -113,23 +113,40 @@ export async function findRegistrationByContact(
     .where(
       and(
         ne(registrations.status, "rejected"),
-        eq(registrations.email, email.toLowerCase())
+        eq(registrations.email, email.trim().toLowerCase())
       )
     )
     .limit(1);
-  if (result[0]) return result[0];
+  return result[0];
+}
 
-  const byWhatsapp = await db
-    .select()
-    .from(registrations)
-    .where(
-      and(
-        ne(registrations.status, "rejected"),
-        eq(registrations.whatsapp, whatsapp)
-      )
-    )
-    .limit(1);
-  return byWhatsapp[0];
+/** Al reinscribirse con los mismos datos de contacto, el nombre/WhatsApp
+ * más recientes reemplazan a los de la fila original. */
+export async function updateRegistrationContact(
+  id: number,
+  data: Pick<InsertRegistration, "fullName" | "whatsapp">
+) {
+  const db = getDb();
+  if (!db) throw new Error("Database not configured");
+  const [row] = await db
+    .update(registrations)
+    .set({ fullName: data.fullName, whatsapp: data.whatsapp })
+    .where(eq(registrations.id, id))
+    .returning();
+  return row;
+}
+
+/** Se sella recién cuando Resend aceptó el envío, nunca al aprobar:
+ * así el panel distingue "aprobado" de "invitación efectivamente enviada". */
+export async function markInvitationSent(id: number) {
+  const db = getDb();
+  if (!db) throw new Error("Database not configured");
+  const [row] = await db
+    .update(registrations)
+    .set({ invitationSentAt: new Date() })
+    .where(eq(registrations.id, id))
+    .returning();
+  return row;
 }
 
 export async function createRegistration(data: InsertRegistration) {
@@ -161,7 +178,7 @@ export async function markRegistrationApproved(id: number) {
   if (!db) throw new Error("Database not configured");
   const [row] = await db
     .update(registrations)
-    .set({ status: "approved", invitationSentAt: new Date() })
+    .set({ status: "approved" })
     .where(eq(registrations.id, id))
     .returning();
   return row;
@@ -196,7 +213,7 @@ export async function approveRegistration(id: number) {
   if (!db) throw new Error("Database not configured");
   const [row] = await db
     .update(registrations)
-    .set({ status: "approved", invitationSentAt: new Date() })
+    .set({ status: "approved" })
     .where(eq(registrations.id, id))
     .returning();
   return row;

@@ -6,6 +6,7 @@ const state = vi.hoisted(() => ({
     status: "approved" | "pending";
     email: string;
     fullName: string;
+    invitationSentAt: Date | null;
   },
   activeCount: 0,
   emailFailure: null as Error | null,
@@ -14,15 +15,21 @@ const state = vi.hoisted(() => ({
     status: "approved" as const,
     email: "persona@example.com",
     fullName: "Persona de Prueba",
+    invitationSentAt: null,
   },
 }));
 
 vi.mock("../server/db.js", () => ({
   EVENT_CAPACITY: 100,
-  findRegistrationByContact: vi.fn(async () => state.existing),
+  findRegistrationByEmail: vi.fn(async () => state.existing),
   countActiveRegistrations: vi.fn(async () => state.activeCount),
   createApprovedRegistration: vi.fn(async () => state.created),
-  approveRegistration: vi.fn(async () => state.created),
+  approveRegistration: vi.fn(async () => ({
+    ...state.existing,
+    status: "approved",
+  })),
+  updateRegistrationContact: vi.fn(async () => state.existing),
+  markInvitationSent: vi.fn(async () => state.created),
 }));
 
 vi.mock("../server/lib/resend.js", () => ({
@@ -32,7 +39,12 @@ vi.mock("../server/lib/resend.js", () => ({
 }));
 
 import handler from "../api/register";
-import { createApprovedRegistration } from "../server/db.js";
+import {
+  approveRegistration,
+  createApprovedRegistration,
+  markInvitationSent,
+  updateRegistrationContact,
+} from "../server/db.js";
 import { sendInvitationEmail } from "../server/lib/resend.js";
 
 function responseRecorder() {
@@ -50,14 +62,13 @@ function responseRecorder() {
   return { recorded, response };
 }
 
-function registrationRequest(resend = false) {
+function registrationRequest() {
   return {
     method: "POST",
     body: {
       fullName: "Persona de Prueba",
       email: "persona@example.com",
       whatsapp: "+56 9 5225 4029",
-      resend,
     },
   };
 }
@@ -70,6 +81,18 @@ describe("registro de inauguración y entrega de correo", () => {
     vi.clearAllMocks();
   });
 
+  it("guarda la inscripción, envía la invitación y sella el envío", async () => {
+    const { recorded, response } = responseRecorder();
+
+    await handler(registrationRequest() as never, response as never);
+
+    expect(createApprovedRegistration).toHaveBeenCalledOnce();
+    expect(sendInvitationEmail).toHaveBeenCalledOnce();
+    expect(markInvitationSent).toHaveBeenCalledWith(42);
+    expect(recorded.statusCode).toBe(201);
+    expect(recorded.body).toEqual({ ok: true, emailSent: true });
+  });
+
   it("confirma el registro nuevo aunque el proveedor rechace el correo", async () => {
     state.emailFailure = new Error("sender_not_verified");
     const { recorded, response } = responseRecorder();
@@ -77,43 +100,85 @@ describe("registro de inauguración y entrega de correo", () => {
     await handler(registrationRequest() as never, response as never);
 
     expect(createApprovedRegistration).toHaveBeenCalledOnce();
+    expect(markInvitationSent).not.toHaveBeenCalled();
     expect(recorded.statusCode).toBe(201);
-    expect(recorded.body).toEqual({ ok: true, emailFailed: true });
+    expect(recorded.body).toEqual({ ok: true, emailSent: false });
   });
 
-  it("permite reenviar de forma explícita a una inscripción aprobada", async () => {
+  it("reenvía la invitación cuando alguien ya inscrito vuelve al formulario", async () => {
     state.existing = {
       id: 4,
       status: "approved",
       email: "persona@example.com",
-      fullName: "Persona de Prueba",
-    };
-    const { recorded, response } = responseRecorder();
-
-    await handler(registrationRequest(true) as never, response as never);
-
-    expect(recorded.statusCode).toBe(200);
-    expect(recorded.body).toEqual({
-      ok: true,
-      alreadyRegistered: true,
-      emailResent: true,
-    });
-    expect(sendInvitationEmail).toHaveBeenCalledOnce();
-  });
-
-  it("no reenvía automáticamente una inscripción duplicada", async () => {
-    state.existing = {
-      id: 4,
-      status: "approved",
-      email: "persona@example.com",
-      fullName: "Persona de Prueba",
+      fullName: "Nombre Antiguo",
+      invitationSentAt: new Date(Date.now() - 60 * 60 * 1000),
     };
     const { recorded, response } = responseRecorder();
 
     await handler(registrationRequest() as never, response as never);
 
+    expect(sendInvitationEmail).toHaveBeenCalledOnce();
+    expect(updateRegistrationContact).toHaveBeenCalledWith(4, {
+      fullName: "Persona de Prueba",
+      whatsapp: "+56 9 5225 4029",
+    });
     expect(recorded.statusCode).toBe(200);
-    expect(recorded.body).toEqual({ ok: true, alreadyRegistered: true });
+    expect(recorded.body).toEqual({
+      ok: true,
+      alreadyRegistered: true,
+      emailSent: true,
+    });
+  });
+
+  it("no vuelve a enviar si la invitación salió hace segundos", async () => {
+    state.existing = {
+      id: 4,
+      status: "approved",
+      email: "persona@example.com",
+      fullName: "Persona de Prueba",
+      invitationSentAt: new Date(),
+    };
+    const { recorded, response } = responseRecorder();
+
+    await handler(registrationRequest() as never, response as never);
+
     expect(sendInvitationEmail).not.toHaveBeenCalled();
+    expect(recorded.body).toEqual({
+      ok: true,
+      alreadyRegistered: true,
+      emailSent: true,
+    });
+  });
+
+  it("completa y notifica una fila pendiente heredada", async () => {
+    state.existing = {
+      id: 7,
+      status: "pending",
+      email: "persona@example.com",
+      fullName: "Persona de Prueba",
+      invitationSentAt: null,
+    };
+    const { recorded, response } = responseRecorder();
+
+    await handler(registrationRequest() as never, response as never);
+
+    expect(approveRegistration).toHaveBeenCalledWith(7);
+    expect(sendInvitationEmail).toHaveBeenCalledOnce();
+    expect(recorded.statusCode).toBe(200);
+    expect(recorded.body).toEqual({
+      ok: true,
+      alreadyRegistered: true,
+      emailSent: true,
+    });
+  });
+
+  it("cierra el formulario cuando el cupo está lleno", async () => {
+    state.activeCount = 100;
+    const { recorded, response } = responseRecorder();
+
+    await handler(registrationRequest() as never, response as never);
+
+    expect(createApprovedRegistration).not.toHaveBeenCalled();
+    expect(recorded.statusCode).toBe(409);
   });
 });
