@@ -72,6 +72,7 @@ export default function Planes() {
   const [audience, setAudience] = useState<Audience | null>(
     deepLink?.audience ?? null
   );
+  const [pickedAudience, setPickedAudience] = useState<Audience | null>(null);
   const [tier, setTier] = useState<PlanTier | null>(deepLink?.tier ?? null);
   const [fullName, setFullName] = useState("");
   const [rut, setRut] = useState("");
@@ -135,8 +136,9 @@ export default function Planes() {
   }
 
   function selectAudience(next: Audience) {
+    setPickedAudience(next);
     setAudience(next);
-    setPhase("tier");
+    window.setTimeout(() => setPhase("tier"), 180);
   }
 
   function selectTier(next: PlanTier) {
@@ -329,42 +331,52 @@ export default function Planes() {
                 exit={{ opacity: 0 }}
                 transition={calm}
               >
-                <h1>¿Eres alumno regular o estudiante?</h1>
+                <h1>¿Eres estudiante?</h1>
                 <p
                   className="immersive-flow__lede"
                   style={{ margin: "10px 0 22px" }}
                 >
-                  La tarifa cambia según el tipo de acceso.
+                  Así te mostramos la tarifa correcta.
                 </p>
-                <div className="immersive-flow__options">
-                  <button
+                <div className="immersive-flow__split">
+                  <motion.button
                     type="button"
-                    className="immersive-flow__option"
+                    className={`immersive-flow__split-half ${pickedAudience === "general" ? "is-active" : ""}`}
                     onClick={() => selectAudience("general")}
+                    whileTap={{ scale: 0.97 }}
                   >
-                    <span className="immersive-flow__option-icon">
-                      <UserRound size={20} />
+                    {pickedAudience === "general" && (
+                      <motion.span
+                        layoutId="audience-fill"
+                        className="immersive-flow__split-fill"
+                        transition={reduced ? calm : spring.ui}
+                      />
+                    )}
+                    <span className="immersive-flow__split-icon">
+                      <UserRound size={18} />
                     </span>
-                    <span className="immersive-flow__option-body">
-                      <strong>General</strong>
-                      <small>Para quienes entrenan a su propio ritmo</small>
-                    </span>
-                    <ArrowRight size={18} />
-                  </button>
-                  <button
+                    <strong>No</strong>
+                    <small>Alumno regular</small>
+                  </motion.button>
+                  <motion.button
                     type="button"
-                    className="immersive-flow__option"
+                    className={`immersive-flow__split-half ${pickedAudience === "student" ? "is-active" : ""}`}
                     onClick={() => selectAudience("student")}
+                    whileTap={{ scale: 0.97 }}
                   >
-                    <span className="immersive-flow__option-icon">
-                      <ClipboardCheck size={20} />
+                    {pickedAudience === "student" && (
+                      <motion.span
+                        layoutId="audience-fill"
+                        className="immersive-flow__split-fill"
+                        transition={reduced ? calm : spring.ui}
+                      />
+                    )}
+                    <span className="immersive-flow__split-icon">
+                      <ClipboardCheck size={18} />
                     </span>
-                    <span className="immersive-flow__option-body">
-                      <strong>Estudiante</strong>
-                      <small>Con certificado de alumno regular</small>
-                    </span>
-                    <ArrowRight size={18} />
-                  </button>
+                    <strong>Sí</strong>
+                    <small>Cuento con certificado de alumno regular</small>
+                  </motion.button>
                 </div>
               </motion.div>
             ) : phase === "tier" ? (
@@ -388,11 +400,13 @@ export default function Planes() {
                       p => p.audience === audience && p.tier === t
                     );
                     return (
-                      <button
+                      <motion.button
                         key={t}
                         type="button"
                         className="immersive-flow__option"
                         onClick={() => selectTier(t)}
+                        whileTap={{ scale: 0.98 }}
+                        whileHover={reduced ? undefined : { y: -2 }}
                       >
                         <span className="immersive-flow__option-body">
                           <strong>{optionPlan?.label}</strong>
@@ -401,7 +415,7 @@ export default function Planes() {
                         <span className="immersive-flow__option-price">
                           {optionPlan?.price}
                         </span>
-                      </button>
+                      </motion.button>
                     );
                   })}
                 </div>
