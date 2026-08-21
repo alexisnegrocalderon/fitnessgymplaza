@@ -21,8 +21,9 @@ vi.mock("../server/db.js", () => ({
   EVENT_CAPACITY: 100,
   findRegistrationByContact: vi.fn(async () => state.existing),
   countActiveRegistrations: vi.fn(async () => state.activeCount),
-  createApprovedRegistration: vi.fn(async () => state.created),
+  createRegistration: vi.fn(async () => state.created),
   approveRegistration: vi.fn(async () => state.created),
+  markRegistrationRejected: vi.fn(async () => state.created),
 }));
 
 vi.mock("../server/lib/resend.js", () => ({
@@ -32,6 +33,7 @@ vi.mock("../server/lib/resend.js", () => ({
 }));
 
 import handler from "../api/register";
+import { markRegistrationRejected } from "../server/db.js";
 import { sendInvitationEmail } from "../server/lib/resend.js";
 
 function responseRecorder() {
@@ -77,6 +79,7 @@ describe("registro de inauguración y entrega de correo", () => {
 
     expect(recorded.statusCode).toBe(502);
     expect(recorded.body).toEqual({ error: "email_delivery_failed" });
+    expect(markRegistrationRejected).toHaveBeenCalledWith(42);
   });
 
   it("permite reenviar de forma explícita a una inscripción aprobada", async () => {

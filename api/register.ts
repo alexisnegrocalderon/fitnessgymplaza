@@ -3,8 +3,9 @@ import {
   EVENT_CAPACITY,
   approveRegistration,
   countActiveRegistrations,
-  createApprovedRegistration,
+  createRegistration,
   findRegistrationByContact,
+  markRegistrationRejected,
 } from "../server/db.js";
 import { sendInvitationEmail } from "../server/lib/resend.js";
 import { registrationSchema } from "../shared/registration.js";
@@ -71,14 +72,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return;
     }
 
-    const row = await createApprovedRegistration(parsed.data);
+    const row = await createRegistration({ ...parsed.data, status: "pending" });
     try {
       await sendInvitationEmail(row.email, row.fullName);
     } catch (emailError) {
       console.error("[register] invitation email failed", emailError);
+      await markRegistrationRejected(row.id);
       res.status(502).json({ error: "email_delivery_failed" });
       return;
     }
+    await approveRegistration(row.id);
     res.status(201).json({ ok: true });
   } catch (error) {
     console.error("[register] failed", error);
