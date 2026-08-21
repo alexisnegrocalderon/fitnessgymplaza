@@ -7,6 +7,7 @@ import {
   Mail,
   MessageCircle,
   Percent,
+  Send,
   Ticket,
   UserCheck,
   Users,
@@ -541,7 +542,7 @@ function Dashboard({ onLoggedOut }: { onLoggedOut: () => void }) {
     loadPlans();
   }, []);
 
-  async function act(id: number, action: "approve" | "reject") {
+  async function act(id: number, action: "approve" | "reject" | "resend") {
     setActingId(id);
     setError(null);
     try {
@@ -558,7 +559,9 @@ function Dashboard({ onLoggedOut }: { onLoggedOut: () => void }) {
       if (!res.ok) throw new Error(data.error ?? "failed");
       if (data.emailFailed) {
         setError(
-          "Se aprobó, pero el correo de invitación falló al enviarse. Revisa la config de Resend."
+          `No se pudo enviar el correo de invitación${
+            data.message ? ` (${data.message})` : ""
+          }. Revisa la configuración de Resend y reintenta con "Reenviar invitación".`
         );
       }
       await load();
@@ -672,6 +675,7 @@ function Dashboard({ onLoggedOut }: { onLoggedOut: () => void }) {
                   <th>Email</th>
                   <th>WhatsApp</th>
                   <th>Estado</th>
+                  <th>Invitación</th>
                   <th>Inscrito</th>
                   <th />
                 </tr>
@@ -690,9 +694,33 @@ function Dashboard({ onLoggedOut }: { onLoggedOut: () => void }) {
                       </span>
                     </td>
                     <td>
+                      {row.invitationSentAt ? (
+                        <span className="admin-dashboard__status admin-dashboard__status--approved">
+                          Enviada{" "}
+                          {new Date(row.invitationSentAt).toLocaleDateString(
+                            "es-CL"
+                          )}
+                        </span>
+                      ) : (
+                        <span className="admin-dashboard__status admin-dashboard__status--pending">
+                          Sin enviar
+                        </span>
+                      )}
+                    </td>
+                    <td>
                       {new Date(row.createdAt).toLocaleDateString("es-CL")}
                     </td>
                     <td className="admin-dashboard__actions">
+                      {row.status === "approved" && (
+                        <button
+                          type="button"
+                          onClick={() => act(row.id, "resend")}
+                          disabled={actingId === row.id}
+                          title="Reenviar invitación por correo"
+                        >
+                          <Send size={16} />
+                        </button>
+                      )}
                       {row.status === "pending" && (
                         <>
                           <button

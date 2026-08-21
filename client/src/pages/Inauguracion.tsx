@@ -17,7 +17,7 @@ import {
   type RegistrationInput,
 } from "@shared/registration";
 
-type ViewState = "form" | "success" | "duplicate" | "resent" | "full";
+type ViewState = "form" | "success" | "duplicate" | "full";
 
 export default function Inauguracion() {
   const reduced = useReducedMotion();
@@ -49,14 +49,14 @@ export default function Inauguracion() {
     };
   }, []);
 
-  async function onContactSubmit(data: RegistrationInput, resend = false) {
+  async function onContactSubmit(data: RegistrationInput) {
     setSubmittingContact(true);
     setSubmitError(null);
     try {
       const res = await fetch("/api/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...data, resend }),
+        body: JSON.stringify(data),
       });
 
       if (res.status === 409) {
@@ -66,22 +66,16 @@ export default function Inauguracion() {
 
       const json = await res.json().catch(() => ({}));
       if (!res.ok) {
-        if (json.error === "email_delivery_failed") {
-          setDeliveryIssue(true);
-          setView("duplicate");
-          return;
-        }
-        setSubmitError("No pudimos completar la inscripción. Intenta nuevamente.");
-        return;
-      }
-      if (json.alreadyRegistered) {
-        setDeliveryIssue(false);
-        setView(json.emailResent ? "resent" : "duplicate");
+        setSubmitError(
+          "No pudimos completar la inscripción. Intenta nuevamente."
+        );
         return;
       }
 
-      setDeliveryIssue(false);
-      setView("success");
+      // La inscripción ya quedó guardada aquí pase lo que pase con el correo;
+      // emailSent solo decide qué mensaje ve la persona.
+      setDeliveryIssue(json.emailSent === false);
+      setView(json.alreadyRegistered ? "duplicate" : "success");
     } catch {
       setSubmitError("No se pudo guardar tus datos. Intenta de nuevo.");
     } finally {
@@ -166,7 +160,7 @@ export default function Inauguracion() {
             {checkingCapacity ? null : view === "form" ? (
               <motion.form
                 key="form"
-                onSubmit={handleSubmit(data => onContactSubmit(data))}
+                onSubmit={handleSubmit(onContactSubmit)}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
@@ -228,8 +222,9 @@ export default function Inauguracion() {
                 <CheckCircle2 size={32} />
                 <h2>¡Tu inscripción quedó confirmada!</h2>
                 <p>
-                  Te enviamos un correo con los detalles — gracias por celebrar
-                  con nosotros. ¡Los esperamos!
+                  {deliveryIssue
+                    ? "Tu cupo ya está guardado, pero no pudimos enviarte el correo con los detalles. Escríbenos por WhatsApp y te lo reenviamos — igual te esperamos."
+                    : "Te enviamos un correo con los detalles — gracias por celebrar con nosotros. ¡Los esperamos! Si no lo ves, revisa spam o promociones."}
                 </p>
               </motion.div>
             ) : view === "duplicate" ? (
@@ -244,29 +239,9 @@ export default function Inauguracion() {
                 <h2>Ya estás inscrito</h2>
                 <p>
                   {deliveryIssue
-                    ? "Tu inscripción quedó guardada, pero no pudimos confirmar el correo. Puedes reenviar la invitación."
-                    : "Ya tenemos tu inscripción registrada con estos datos. Si no ves la invitación, puedes reenviarla."}
+                    ? "Tu cupo sigue guardado, pero no pudimos enviarte la invitación por correo. Escríbenos por WhatsApp y te la reenviamos."
+                    : "Ya teníamos tu inscripción con este email, así que te reenviamos la invitación. Revisa también spam o promociones."}
                 </p>
-                <button
-                  type="button"
-                  className="button button--cobalt"
-                  disabled={submittingContact}
-                  onClick={handleSubmit(data => onContactSubmit(data, true))}
-                >
-                  {submittingContact ? "Reenviando…" : "Reenviar invitación"}
-                </button>
-              </motion.div>
-            ) : view === "resent" ? (
-              <motion.div
-                key="resent"
-                className="immersive-flow__result"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={calm}
-              >
-                <CheckCircle2 size={32} />
-                <h2>Invitación reenviada</h2>
-                <p>Revisa también spam o promociones si no la ves en unos minutos.</p>
               </motion.div>
             ) : (
               <motion.div
