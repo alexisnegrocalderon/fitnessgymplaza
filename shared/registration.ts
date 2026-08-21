@@ -27,5 +27,8 @@ export const EVENT_DETAILS = {
   price: "$3.500 p/p",
 } as const;
 
+/** Monto a cobrar por Mercado Pago, en pesos chilenos (sin decimales). */
+export const EVENT_PRICE_CLP = 3500;
+
 /** Cupos internos. Nunca se muestra al público, solo cierra el formulario. */
 export const EVENT_CAPACITY = 100;

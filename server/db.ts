@@ -2,8 +2,10 @@ import { neon } from "@neondatabase/serverless";
 import { and, desc, eq, ne, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/neon-http";
 import {
+  InsertMpConnection,
   InsertRegistration,
   InsertUser,
+  mpConnections,
   registrations,
   users,
 } from "../drizzle/schema.js";
@@ -169,6 +171,60 @@ export async function markRegistrationRejected(id: number) {
     .update(registrations)
     .set({ status: "rejected" })
     .where(eq(registrations.id, id))
+    .returning();
+  return row;
+}
+
+export async function createApprovedRegistration(data: InsertRegistration) {
+  const db = getDb();
+  if (!db) throw new Error("Database not configured");
+  const [row] = await db
+    .insert(registrations)
+    .values({ ...data, status: "approved" })
+    .returning();
+  return row;
+}
+
+// ---------------------------------------------------------------------------
+// Conexión Mercado Pago (OAuth / Marketplace Connect) — fila única.
+// ---------------------------------------------------------------------------
+
+export async function getMpConnection() {
+  const db = getDb();
+  if (!db) throw new Error("Database not configured");
+  const result = await db.select().from(mpConnections).limit(1);
+  return result[0];
+}
+
+/** Reemplaza la fila única existente (si la hay) por la conexión nueva. */
+export async function saveMpConnection(
+  data: Omit<InsertMpConnection, "id" | "connectedAt" | "updatedAt">
+) {
+  const db = getDb();
+  if (!db) throw new Error("Database not configured");
+  const existing = await getMpConnection();
+  if (existing) {
+    const [row] = await db
+      .update(mpConnections)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(mpConnections.id, existing.id))
+      .returning();
+    return row;
+  }
+  const [row] = await db.insert(mpConnections).values(data).returning();
+  return row;
+}
+
+export async function updateMpConnectionTokens(
+  id: number,
+  data: Pick<InsertMpConnection, "accessToken" | "refreshToken" | "expiresAt">
+) {
+  const db = getDb();
+  if (!db) throw new Error("Database not configured");
+  const [row] = await db
+    .update(mpConnections)
+    .set({ ...data, updatedAt: new Date() })
+    .where(eq(mpConnections.id, id))
     .returning();
   return row;
 }

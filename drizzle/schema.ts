@@ -1,4 +1,5 @@
 import {
+  boolean,
   integer,
   pgEnum,
   pgTable,
@@ -48,8 +49,30 @@ export const registrations = pgTable("registrations", {
   whatsapp: varchar("whatsapp", { length: 32 }).notNull(),
   status: registrationStatus("status").default("pending").notNull(),
   invitationSentAt: timestamp("invitationSentAt"),
+  mpPaymentId: varchar("mpPaymentId", { length: 64 }),
+  amount: integer("amount"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
 });
 
 export type Registration = typeof registrations.$inferSelect;
 export type InsertRegistration = typeof registrations.$inferInsert;
+
+/**
+ * Conexión OAuth del dueño con su cuenta de Mercado Pago (Marketplace
+ * Connect) — fila única. Los pagos de /inauguracion se crean con el
+ * accessToken de aquí, así que acreditan directo en la cuenta del dueño.
+ */
+export const mpConnections = pgTable("mp_connections", {
+  id: integer("id").generatedAlwaysAsIdentity().primaryKey(),
+  mpUserId: varchar("mpUserId", { length: 64 }).notNull(),
+  accessToken: text("accessToken").notNull(),
+  refreshToken: text("refreshToken").notNull(),
+  publicKey: varchar("publicKey", { length: 128 }).notNull(),
+  liveMode: boolean("liveMode").default(true).notNull(),
+  expiresAt: timestamp("expiresAt").notNull(),
+  connectedAt: timestamp("connectedAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
+});
+
+export type MpConnection = typeof mpConnections.$inferSelect;
+export type InsertMpConnection = typeof mpConnections.$inferInsert;

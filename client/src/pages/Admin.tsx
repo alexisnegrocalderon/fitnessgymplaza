@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import {
   CheckCircle2,
   Clock,
+  CreditCard,
   LogOut,
   Ticket,
   UserCheck,
@@ -11,6 +12,73 @@ import {
 import { BrandMark } from "@/components/common";
 import { EVENT_CAPACITY } from "@shared/registration";
 import type { Registration } from "../../../drizzle/schema";
+
+type MpStatus =
+  | { connected: false }
+  | {
+      connected: true;
+      mpUserId: string;
+      liveMode: boolean;
+      connectedAt: string;
+    };
+
+const mpMessages: Record<string, string> = {
+  connected: "Cuenta de Mercado Pago conectada correctamente.",
+  denied: "Conexión cancelada — no se autorizó el acceso en Mercado Pago.",
+  invalid_state:
+    "El enlace de conexión expiró o no es válido. Intenta de nuevo.",
+  error: "No se pudo completar la conexión con Mercado Pago. Intenta de nuevo.",
+};
+
+function MercadoPagoPanel() {
+  const [status, setStatus] = useState<MpStatus | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const mp = params.get("mp");
+    if (mp && mpMessages[mp]) {
+      setNotice(mpMessages[mp]);
+      params.delete("mp");
+      const rest = params.toString();
+      window.history.replaceState(
+        {},
+        "",
+        window.location.pathname + (rest ? `?${rest}` : "")
+      );
+    }
+
+    fetch("/api/admin/mercadopago/status")
+      .then(res => (res.ok ? res.json() : { connected: false }))
+      .then(setStatus)
+      .catch(() => setStatus({ connected: false }));
+  }, []);
+
+  if (!status) return null;
+
+  return (
+    <div className="admin-mp">
+      <div className="admin-mp__info">
+        <CreditCard size={18} />
+        <div>
+          <p className="admin-mp__title">Mercado Pago</p>
+          <p className="admin-mp__sub">
+            {status.connected
+              ? `Conectado el ${new Date(status.connectedAt).toLocaleDateString("es-CL")} · cuenta ${status.mpUserId}${status.liveMode ? "" : " (modo prueba)"}`
+              : "Sin conectar — los pagos de la inscripción no funcionarán hasta conectar tu cuenta."}
+          </p>
+        </div>
+      </div>
+      <a
+        href="/api/admin/mercadopago/connect"
+        className="button button--cobalt"
+      >
+        {status.connected ? "Reconectar" : "Conectar Mercado Pago"}
+      </a>
+      {notice && <p className="admin-mp__notice">{notice}</p>}
+    </div>
+  );
+}
 
 type Session = "checking" | "out" | "in";
 
@@ -229,6 +297,8 @@ function Dashboard({ onLoggedOut }: { onLoggedOut: () => void }) {
           <LogOut size={15} /> Salir
         </button>
       </header>
+
+      <MercadoPagoPanel />
 
       <div className="admin-stats">
         <StatTile

@@ -2,7 +2,9 @@ import { useEffect, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useForm } from "react-hook-form";
+import { Payment, initMercadoPago } from "@mercadopago/sdk-react";
 import {
+  AlertTriangle,
   CalendarDays,
   CheckCircle2,
   MapPin,
@@ -13,17 +15,31 @@ import { BrandMark } from "@/components/common";
 import { calm, spring } from "@/lib/motion";
 import {
   EVENT_DETAILS,
+  EVENT_PRICE_CLP,
   registrationSchema,
   type RegistrationInput,
 } from "@shared/registration";
 
-type ViewState = "form" | "success" | "duplicate" | "full";
+type ViewState =
+  | "form"
+  | "payment"
+  | "success"
+  | "duplicate"
+  | "full"
+  | "mp_unavailable";
+
+/** Payload que entrega el Payment Brick en su onSubmit — se reenvía tal
+ * cual a api/pay.ts, que a su vez lo pasa a la API de Mercado Pago. */
+type BrickFormData = Record<string, unknown>;
 
 export default function Inauguracion() {
   const reduced = useReducedMotion();
   const [view, setView] = useState<ViewState>("form");
   const [submitting, setSubmitting] = useState(false);
   const [checkingCapacity, setCheckingCapacity] = useState(true);
+  const [contact, setContact] = useState<RegistrationInput | null>(null);
+  const [publicKey, setPublicKey] = useState<string | null>(null);
+  const [paymentError, setPaymentError] = useState<string | null>(null);
 
   const {
     register,
@@ -47,13 +63,39 @@ export default function Inauguracion() {
     };
   }, []);
 
-  async function onSubmit(data: RegistrationInput) {
+  useEffect(() => {
+    if (view !== "payment" || publicKey) return;
+    let cancelled = false;
+    fetch("/api/mercadopago-public-key")
+      .then(res => (res.ok ? res.json() : Promise.reject()))
+      .then(data => {
+        if (cancelled) return;
+        initMercadoPago(data.publicKey);
+        setPublicKey(data.publicKey);
+      })
+      .catch(() => {
+        if (!cancelled) setView("mp_unavailable");
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [view, publicKey]);
+
+  function onContactSubmit(data: RegistrationInput) {
+    setContact(data);
+    setPaymentError(null);
+    setView("payment");
+  }
+
+  async function onPaymentSubmit(formData: BrickFormData) {
+    if (!contact) return;
     setSubmitting(true);
+    setPaymentError(null);
     try {
-      const res = await fetch("/api/register", {
+      const res = await fetch("/api/pay", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+        body: JSON.stringify({ ...contact, formData }),
       });
 
       if (res.status === 409) {
@@ -66,11 +108,18 @@ export default function Inauguracion() {
         setView("duplicate");
         return;
       }
-      if (!res.ok) throw new Error("request_failed");
+      if (json.ok) {
+        setView("success");
+        return;
+      }
 
-      setView("success");
+      setPaymentError(
+        json.status === "rejected"
+          ? "El pago fue rechazado. Verifica los datos de tu tarjeta o intenta con otro medio de pago."
+          : "El pago quedó en proceso de confirmación. Te avisaremos por correo apenas se confirme."
+      );
     } catch {
-      // El fetch falló (red, 5xx, etc): dejamos el formulario visible para reintentar.
+      setPaymentError("No se pudo procesar el pago. Intenta de nuevo.");
     } finally {
       setSubmitting(false);
     }
@@ -156,7 +205,7 @@ export default function Inauguracion() {
             {checkingCapacity ? null : view === "form" ? (
               <motion.form
                 key="form"
-                onSubmit={handleSubmit(onSubmit)}
+                onSubmit={handleSubmit(onContactSubmit)}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
@@ -190,19 +239,76 @@ export default function Inauguracion() {
                   />
                   {errors.whatsapp && <em>{errors.whatsapp.message}</em>}
                 </label>
-                <button
-                  type="submit"
-                  className="button button--cobalt"
-                  disabled={submitting}
-                >
-                  {submitting ? "Enviando…" : "Confirmar mi inscripción"}
+                <button type="submit" className="button button--cobalt">
+                  Continuar al pago
                 </button>
                 <p className="inauguracion__fineprint">
-                  Cupos limitados, valor {EVENT_DETAILS.price}. Tu inscripción
-                  queda pendiente de aprobación — te llegará un correo de
-                  confirmación. ¡Los esperamos!
+                  Cupos limitados, valor {EVENT_DETAILS.price}. El siguiente
+                  paso es el pago — tu cupo queda confirmado apenas se apruebe.
+                  ¡Los esperamos!
                 </p>
               </motion.form>
+            ) : view === "payment" ? (
+              <motion.div
+                key="payment"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={calm}
+                className="inauguracion__payment"
+              >
+                <p className="inauguracion__payment-amount">
+                  Total a pagar: <strong>{EVENT_DETAILS.price}</strong>
+                </p>
+                {paymentError && (
+                  <p className="inauguracion__payment-error">
+                    <AlertTriangle size={14} /> {paymentError}
+                  </p>
+                )}
+                {publicKey ? (
+                  <Payment
+                    initialization={{
+                      amount: EVENT_PRICE_CLP,
+                      payer: { email: contact?.email },
+                    }}
+                    customization={{
+                      paymentMethods: {
+                        creditCard: "all",
+                        debitCard: "all",
+                      },
+                    }}
+                    onSubmit={async ({ formData }) => {
+                      await onPaymentSubmit(
+                        formData as unknown as BrickFormData
+                      );
+                    }}
+                  />
+                ) : (
+                  <p className="inauguracion__payment-loading">
+                    Cargando el formulario de pago…
+                  </p>
+                )}
+                {submitting && (
+                  <p className="inauguracion__payment-loading">
+                    Procesando tu pago…
+                  </p>
+                )}
+              </motion.div>
+            ) : view === "mp_unavailable" ? (
+              <motion.div
+                key="mp_unavailable"
+                className="inauguracion__result"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={calm}
+              >
+                <AlertTriangle size={32} />
+                <h2>Pagos no disponibles por ahora</h2>
+                <p>
+                  Estamos ajustando el sistema de pago. Escríbenos por WhatsApp
+                  y te ayudamos a confirmar tu cupo.
+                </p>
+              </motion.div>
             ) : view === "success" ? (
               <motion.div
                 key="success"
@@ -214,9 +320,9 @@ export default function Inauguracion() {
                 <CheckCircle2 size={32} />
                 <h2>¡Listo!</h2>
                 <p>
-                  Recibimos tu inscripción. Te avisaremos por correo apenas se
-                  confirme tu cupo — gracias por celebrar con nosotros. ¡Los
-                  esperamos!
+                  Tu pago fue aprobado y tu cupo quedó confirmado. Te enviamos
+                  un correo con los detalles — gracias por celebrar con
+                  nosotros. ¡Los esperamos!
                 </p>
               </motion.div>
             ) : view === "duplicate" ? (
