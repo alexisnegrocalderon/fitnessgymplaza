@@ -6,6 +6,7 @@
  * invent new ones.
  */
 import ScrollProgress from "@/components/ScrollProgress";
+import { WhatsAppButton } from "@/components/common";
 import Header from "@/components/sections/Header";
 import Hero from "@/components/sections/Hero";
 import Method from "@/components/sections/Method";
@@ -34,6 +35,9 @@ function Home() {
         <Contact />
       </main>
       <Footer />
+      <div className="floating-cta">
+        <WhatsAppButton label="Comienza Hoy!" variant="glass" />
+      </div>
     </div>
   );
 }

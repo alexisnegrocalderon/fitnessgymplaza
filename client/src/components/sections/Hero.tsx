@@ -7,7 +7,7 @@ import {
   type Variants,
 } from "framer-motion";
 import { ArrowRight, ChevronDown, ShieldCheck } from "lucide-react";
-import { BrandMark, WhatsAppButton } from "@/components/common";
+import { BrandMark } from "@/components/common";
 import {
   ADDRESS_LINE,
   MARK_URL,
@@ -195,7 +195,6 @@ export default function Hero() {
             <a href="#metodo" className="text-link text-link--light">
               Conoce el método <ArrowRight size={16} />
             </a>
-            <WhatsAppButton label="Comienza Hoy!" variant="glass" />
           </motion.div>
         </div>
         <div className="hero-content__bottomline">
