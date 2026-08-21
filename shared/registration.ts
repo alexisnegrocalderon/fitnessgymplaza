@@ -24,6 +24,7 @@ export const EVENT_DETAILS = {
   date: "29 de agosto",
   time: "20:00 hrs",
   address: "Calle Quillota 656, Viña del Mar",
+  price: "$3.500 p/p",
 } as const;
 
 /** Cupos internos. Nunca se muestra al público, solo cierra el formulario. */

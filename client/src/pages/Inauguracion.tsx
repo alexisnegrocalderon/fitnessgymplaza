@@ -2,7 +2,13 @@ import { useEffect, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useForm } from "react-hook-form";
-import { CalendarDays, CheckCircle2, MapPin, PartyPopper } from "lucide-react";
+import {
+  CalendarDays,
+  CheckCircle2,
+  MapPin,
+  PartyPopper,
+  Ticket,
+} from "lucide-react";
 import { BrandMark } from "@/components/common";
 import { calm, spring } from "@/lib/motion";
 import {
@@ -103,11 +109,22 @@ export default function Inauguracion() {
           Gran <em>Inauguración</em>
         </motion.h1>
 
+        <motion.p
+          className="inauguracion__lede"
+          initial={{ opacity: 0, y: 14 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={reduced ? calm : { ...spring.reveal, delay: 0.18 }}
+        >
+          Volvimos a nuestra casa oficial, y no podríamos estar más felices de
+          celebrarlo junto a ustedes. Gracias por el apoyo de siempre y por ser
+          parte de esta gran familia que es Plaza Fitness.
+        </motion.p>
+
         <motion.div
           className="inauguracion__meta"
           initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={reduced ? calm : { ...spring.reveal, delay: 0.22 }}
+          transition={reduced ? calm : { ...spring.reveal, delay: 0.26 }}
         >
           <span>
             <CalendarDays size={15} /> {EVENT_DETAILS.date} ·{" "}
@@ -115,6 +132,9 @@ export default function Inauguracion() {
           </span>
           <span>
             <MapPin size={15} /> {EVENT_DETAILS.address}
+          </span>
+          <span>
+            <Ticket size={15} /> {EVENT_DETAILS.price}
           </span>
         </motion.div>
 
@@ -178,8 +198,9 @@ export default function Inauguracion() {
                   {submitting ? "Enviando…" : "Confirmar mi inscripción"}
                 </button>
                 <p className="inauguracion__fineprint">
-                  Cupos limitados. Tu inscripción queda pendiente de aprobación
-                  — te llegará un correo de confirmación.
+                  Cupos limitados, valor {EVENT_DETAILS.price}. Tu inscripción
+                  queda pendiente de aprobación — te llegará un correo de
+                  confirmación. ¡Los esperamos!
                 </p>
               </motion.form>
             ) : view === "success" ? (
@@ -194,7 +215,8 @@ export default function Inauguracion() {
                 <h2>¡Listo!</h2>
                 <p>
                   Recibimos tu inscripción. Te avisaremos por correo apenas se
-                  confirme tu cupo para la inauguración.
+                  confirme tu cupo — gracias por celebrar con nosotros. ¡Los
+                  esperamos!
                 </p>
               </motion.div>
             ) : view === "duplicate" ? (

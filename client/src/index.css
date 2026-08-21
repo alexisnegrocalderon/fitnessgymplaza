@@ -2689,6 +2689,13 @@ main > section[id] {
   font-style: normal;
   color: var(--cobalt);
 }
+.inauguracion__lede {
+  max-width: 420px;
+  margin: 16px auto 0;
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 14px;
+  line-height: 1.65;
+}
 .inauguracion__meta {
   display: flex;
   flex-direction: column;
