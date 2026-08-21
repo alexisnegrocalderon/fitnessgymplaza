@@ -2285,6 +2285,13 @@ main > section[id] {
     gap: 18px;
     margin-top: 24px;
   }
+  /* En mobile solo .hero-content__copy debe llevar margin-top: auto — si
+     .hero-content__bottomline también lo lleva (como en desktop), flexbox
+     reparte el espacio libre entre ambos y el texto/botón quedan a medio
+     camino en vez de pegados abajo, tapando el logo del video. */
+  .hero-content__bottomline {
+    margin-top: 20px;
+  }
   .hero-scroll {
     font-size: 8px;
   }
