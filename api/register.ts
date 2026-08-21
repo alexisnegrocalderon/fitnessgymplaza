@@ -3,9 +3,8 @@ import {
   EVENT_CAPACITY,
   approveRegistration,
   countActiveRegistrations,
-  createRegistration,
+  createApprovedRegistration,
   findRegistrationByContact,
-  markRegistrationRejected,
 } from "../server/db.js";
 import { sendInvitationEmail } from "../server/lib/resend.js";
 import { registrationSchema } from "../shared/registration.js";
@@ -55,14 +54,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       // Fila "pending" heredada de cuando la inscripción todavía cobraba —
       // se completa gratis ahora en vez de dejarla varada.
       const row = await approveRegistration(existing.id);
+      let emailFailed = false;
       try {
         await sendInvitationEmail(row.email, row.fullName);
       } catch (emailError) {
         console.error("[register] invitation email failed", emailError);
-        res.status(502).json({ error: "email_delivery_failed" });
-        return;
+        emailFailed = true;
       }
-      res.status(200).json({ ok: true });
+      res.status(200).json({ ok: true, emailFailed });
       return;
     }
 
@@ -72,17 +71,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return;
     }
 
-    const row = await createRegistration({ ...parsed.data, status: "pending" });
+    const row = await createApprovedRegistration(parsed.data);
+    let emailFailed = false;
     try {
       await sendInvitationEmail(row.email, row.fullName);
     } catch (emailError) {
       console.error("[register] invitation email failed", emailError);
-      await markRegistrationRejected(row.id);
-      res.status(502).json({ error: "email_delivery_failed" });
-      return;
+      emailFailed = true;
     }
-    await approveRegistration(row.id);
-    res.status(201).json({ ok: true });
+    res.status(201).json({ ok: true, emailFailed });
   } catch (error) {
     console.error("[register] failed", error);
     res.status(500).json({ error: "server_error" });

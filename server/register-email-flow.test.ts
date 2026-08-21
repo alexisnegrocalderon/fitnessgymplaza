@@ -21,9 +21,8 @@ vi.mock("../server/db.js", () => ({
   EVENT_CAPACITY: 100,
   findRegistrationByContact: vi.fn(async () => state.existing),
   countActiveRegistrations: vi.fn(async () => state.activeCount),
-  createRegistration: vi.fn(async () => state.created),
+  createApprovedRegistration: vi.fn(async () => state.created),
   approveRegistration: vi.fn(async () => state.created),
-  markRegistrationRejected: vi.fn(async () => state.created),
 }));
 
 vi.mock("../server/lib/resend.js", () => ({
@@ -33,7 +32,7 @@ vi.mock("../server/lib/resend.js", () => ({
 }));
 
 import handler from "../api/register";
-import { markRegistrationRejected } from "../server/db.js";
+import { createApprovedRegistration } from "../server/db.js";
 import { sendInvitationEmail } from "../server/lib/resend.js";
 
 function responseRecorder() {
@@ -71,15 +70,15 @@ describe("registro de inauguración y entrega de correo", () => {
     vi.clearAllMocks();
   });
 
-  it("no confirma un registro nuevo cuando el proveedor rechaza el correo", async () => {
+  it("confirma el registro nuevo aunque el proveedor rechace el correo", async () => {
     state.emailFailure = new Error("sender_not_verified");
     const { recorded, response } = responseRecorder();
 
     await handler(registrationRequest() as never, response as never);
 
-    expect(recorded.statusCode).toBe(502);
-    expect(recorded.body).toEqual({ error: "email_delivery_failed" });
-    expect(markRegistrationRejected).toHaveBeenCalledWith(42);
+    expect(createApprovedRegistration).toHaveBeenCalledOnce();
+    expect(recorded.statusCode).toBe(201);
+    expect(recorded.body).toEqual({ ok: true, emailFailed: true });
   });
 
   it("permite reenviar de forma explícita a una inscripción aprobada", async () => {
