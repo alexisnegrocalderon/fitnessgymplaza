@@ -7,6 +7,7 @@ import {
   createApprovedRegistration,
   findRegistrationByContact,
   getEventSettings,
+  markRegistrationApprovedWithPayment,
 } from "../server/db.js";
 import { sendInvitationEmail } from "../server/lib/resend.js";
 import {
@@ -49,19 +50,24 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    const activeCount = await countActiveRegistrations();
-    if (activeCount >= EVENT_CAPACITY) {
-      res.status(409).json({ error: "event_full" });
-      return;
-    }
-
+    // El paso 1 (api/register.ts) ya dejó a esta persona como "pending" al
+    // llenar el formulario — acá se sube esa misma fila a "approved" en vez
+    // de insertar una nueva. Solo se bloquea si ya había pagado antes.
     const existing = await findRegistrationByContact(
       parsed.data.email,
       parsed.data.whatsapp
     );
-    if (existing) {
+    if (existing?.status === "approved") {
       res.status(200).json({ ok: true, alreadyRegistered: true });
       return;
+    }
+
+    if (!existing) {
+      const activeCount = await countActiveRegistrations();
+      if (activeCount >= EVENT_CAPACITY) {
+        res.status(409).json({ error: "event_full" });
+        return;
+      }
     }
 
     const settings = await getEventSettings();
@@ -105,11 +111,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return;
     }
 
-    const row = await createApprovedRegistration({
-      ...parsed.data,
-      mpPaymentId: String(payment.id),
-      amount: totalAmount,
-    });
+    const row = existing
+      ? await markRegistrationApprovedWithPayment(
+          existing.id,
+          String(payment.id),
+          totalAmount
+        )
+      : await createApprovedRegistration({
+          ...parsed.data,
+          mpPaymentId: String(payment.id),
+          amount: totalAmount,
+        });
 
     try {
       await sendInvitationEmail(row.email, row.fullName);

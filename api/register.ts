@@ -22,18 +22,25 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    const activeCount = await countActiveRegistrations();
-    if (activeCount >= EVENT_CAPACITY) {
-      res.status(409).json({ error: "event_full" });
-      return;
-    }
-
     const existing = await findRegistrationByContact(
       parsed.data.email,
       parsed.data.whatsapp
     );
     if (existing) {
-      res.status(200).json({ ok: true, alreadyRegistered: true });
+      // Ya pagó: no se vuelve a registrar. Si sigue "pending" es un lead
+      // que llenó el formulario antes pero no completó el pago — se deja
+      // pasar sin duplicar fila, así retoma el pago desde donde quedó.
+      if (existing.status === "approved") {
+        res.status(200).json({ ok: true, alreadyRegistered: true });
+        return;
+      }
+      res.status(200).json({ ok: true });
+      return;
+    }
+
+    const activeCount = await countActiveRegistrations();
+    if (activeCount >= EVENT_CAPACITY) {
+      res.status(409).json({ error: "event_full" });
       return;
     }
 

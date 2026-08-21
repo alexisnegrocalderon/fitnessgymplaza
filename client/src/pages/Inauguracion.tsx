@@ -43,6 +43,7 @@ export default function Inauguracion() {
   const reduced = useReducedMotion();
   const [view, setView] = useState<ViewState>("form");
   const [submitting, setSubmitting] = useState(false);
+  const [submittingContact, setSubmittingContact] = useState(false);
   const [checkingCapacity, setCheckingCapacity] = useState(true);
   const [contact, setContact] = useState<RegistrationInput | null>(null);
   const [publicKey, setPublicKey] = useState<string | null>(null);
@@ -110,10 +111,36 @@ export default function Inauguracion() {
     };
   }, [view, pricing]);
 
-  function onContactSubmit(data: RegistrationInput) {
-    setContact(data);
-    setPaymentError(null);
-    setView("payment");
+  async function onContactSubmit(data: RegistrationInput) {
+    setSubmittingContact(true);
+    try {
+      // Guarda al contacto de inmediato (aunque no termine de pagar) para
+      // que aparezca en /admin como cliente/lead desde este momento.
+      const res = await fetch("/api/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+
+      if (res.status === 409) {
+        setView("full");
+        return;
+      }
+
+      const json = await res.json();
+      if (json.alreadyRegistered) {
+        setView("duplicate");
+        return;
+      }
+
+      setContact(data);
+      setPaymentError(null);
+      setView("payment");
+    } catch {
+      setPaymentError("No se pudo guardar tus datos. Intenta de nuevo.");
+    } finally {
+      setSubmittingContact(false);
+    }
   }
 
   async function onPaymentSubmit(formData: BrickFormData) {
@@ -268,8 +295,17 @@ export default function Inauguracion() {
                   />
                   {errors.whatsapp && <em>{errors.whatsapp.message}</em>}
                 </label>
-                <button type="submit" className="button button--cobalt">
-                  Continuar al pago
+                {paymentError && (
+                  <p className="inauguracion__payment-error">
+                    <AlertTriangle size={14} /> {paymentError}
+                  </p>
+                )}
+                <button
+                  type="submit"
+                  className="button button--cobalt"
+                  disabled={submittingContact}
+                >
+                  {submittingContact ? "Guardando…" : "Continuar al pago"}
                 </button>
                 <p className="inauguracion__fineprint">
                   Cupos limitados, valor {EVENT_DETAILS.price}. El siguiente

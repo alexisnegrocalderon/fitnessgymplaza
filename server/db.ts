@@ -186,6 +186,28 @@ export async function createApprovedRegistration(data: InsertRegistration) {
   return row;
 }
 
+/** Sube a "approved" una fila que ya existía como "pending" (creada al
+ * llenar el formulario), en vez de insertar una fila nueva duplicada. */
+export async function markRegistrationApprovedWithPayment(
+  id: number,
+  mpPaymentId: string,
+  amount: number
+) {
+  const db = getDb();
+  if (!db) throw new Error("Database not configured");
+  const [row] = await db
+    .update(registrations)
+    .set({
+      status: "approved",
+      invitationSentAt: new Date(),
+      mpPaymentId,
+      amount,
+    })
+    .where(eq(registrations.id, id))
+    .returning();
+  return row;
+}
+
 // ---------------------------------------------------------------------------
 // Conexión Mercado Pago (OAuth / Marketplace Connect) — fila única.
 // ---------------------------------------------------------------------------

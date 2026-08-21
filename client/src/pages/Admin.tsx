@@ -4,6 +4,8 @@ import {
   Clock,
   CreditCard,
   LogOut,
+  Mail,
+  MessageCircle,
   Percent,
   Ticket,
   UserCheck,
@@ -305,11 +307,69 @@ function StatTile({
   );
 }
 
+/** wa.me solo acepta dígitos — se limpia +, espacios y guiones del input. */
+function waLink(whatsapp: string): string {
+  return `https://wa.me/${whatsapp.replace(/\D/g, "")}`;
+}
+
+function ClientesTable({ rows }: { rows: Registration[] }) {
+  if (rows.length === 0) {
+    return <p className="admin-dashboard__empty">Todavía no hay clientes.</p>;
+  }
+
+  return (
+    <div className="admin-dashboard__table-wrap">
+      <table className="admin-dashboard__table admin-dashboard__table--clientes">
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Email</th>
+            <th>WhatsApp</th>
+            <th>Estado</th>
+            <th>Desde</th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map(row => (
+            <tr key={row.id}>
+              <td>{row.fullName}</td>
+              <td>
+                <a href={`mailto:${row.email}`} className="admin-contact-link">
+                  <Mail size={14} /> {row.email}
+                </a>
+              </td>
+              <td>
+                <a
+                  href={waLink(row.whatsapp)}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="admin-contact-link"
+                >
+                  <MessageCircle size={14} /> {row.whatsapp}
+                </a>
+              </td>
+              <td>
+                <span
+                  className={`admin-dashboard__status admin-dashboard__status--${row.status}`}
+                >
+                  {statusLabel[row.status]}
+                </span>
+              </td>
+              <td>{new Date(row.createdAt).toLocaleDateString("es-CL")}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
 function Dashboard({ onLoggedOut }: { onLoggedOut: () => void }) {
   const [rows, setRows] = useState<Registration[]>([]);
   const [loading, setLoading] = useState(true);
   const [actingId, setActingId] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [tab, setTab] = useState<"inscripciones" | "clientes">("inscripciones");
 
   async function load() {
     setLoading(true);
@@ -418,9 +478,28 @@ function Dashboard({ onLoggedOut }: { onLoggedOut: () => void }) {
 
       {error && <p className="admin-dashboard__error">{error}</p>}
 
+      <div className="admin-tabs">
+        <button
+          type="button"
+          className={tab === "inscripciones" ? "is-active" : ""}
+          onClick={() => setTab("inscripciones")}
+        >
+          Inscripciones
+        </button>
+        <button
+          type="button"
+          className={tab === "clientes" ? "is-active" : ""}
+          onClick={() => setTab("clientes")}
+        >
+          Clientes
+        </button>
+      </div>
+
       <div className="admin-dashboard__panel">
         {loading ? (
           <p className="admin-dashboard__empty">Cargando…</p>
+        ) : tab === "clientes" ? (
+          <ClientesTable rows={rows} />
         ) : rows.length === 0 ? (
           <p className="admin-dashboard__empty">
             Todavía no hay inscripciones.
