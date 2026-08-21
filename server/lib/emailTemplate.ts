@@ -1,7 +1,6 @@
 import { EVENT_DETAILS } from "../../shared/registration.js";
 import { SITE_URL, WHATSAPP_URL, mapsSearchUrl } from "../../shared/contact.js";
 import { scheduleGroups } from "../../shared/schedule.js";
-import { method } from "../../shared/method.js";
 
 const HEADER_IMAGE_URL = `${SITE_URL}/media/plaza-fitness-mail-header.png`;
 const MAPS_URL = mapsSearchUrl(EVENT_DETAILS.address);
@@ -19,27 +18,6 @@ function scheduleRows(): string {
                     </tr>`
     )
     .join("");
-}
-
-/** Fila de 4 pilares de marca — mismos badges numerados "01/02/03/04"
- * que ya usa la sección Método del sitio, sin depender de íconos/SVG
- * (mal soportados en Outlook). */
-function valuesRow(): string {
-  const items = method.slice(0, 4);
-  const cells = items
-    .map(
-      item => `
-                    <td width="25%" style="padding:0 6px;text-align:center;vertical-align:top;">
-                      <div style="width:34px;height:34px;margin:0 auto 8px;border-radius:999px;background:rgba(217,45,32,.16);border:1px solid rgba(217,45,32,.4);color:#ff8d84;font-family:'Barlow Condensed',Arial,sans-serif;font-size:12px;font-weight:800;line-height:32px;">${item.id}</div>
-                      <div style="font-size:11px;font-weight:700;color:rgba(234,231,223,.85);line-height:1.4;">${item.title}</div>
-                    </td>`
-    )
-    .join("");
-
-  return `
-              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 20px;">
-                <tr>${cells}</tr>
-              </table>`;
 }
 
 /** Dos botones de acción tipo pill — celdas con background-color/
@@ -62,6 +40,18 @@ function actionButtons(): string {
 function shell(kicker: string, body: string): string {
   return `<!doctype html>
 <html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="supported-color-schemes" content="dark" />
+    <style>
+      :root {
+        color-scheme: dark;
+        supported-color-schemes: dark;
+      }
+    </style>
+  </head>
   <body style="margin:0;padding:0;background:#0e1110;font-family:'Manrope',Arial,sans-serif;">
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#0e1110;padding:32px 16px;">
       <tr>
@@ -120,7 +110,6 @@ export function invitationEmailHtml(fullName: string): string {
                     </td>
                   </tr>
                 </table>
-                ${valuesRow()}
                 ${actionButtons()}
                 <p style="margin:16px 0 4px;font-size:13px;line-height:1.6;color:rgba(234,231,223,.65);">
                   Muéstranos este correo al llegar. ¡Nos vemos pronto!
@@ -169,7 +158,6 @@ export function planConfirmationEmailHtml(
                     </td>
                   </tr>
                 </table>
-                ${valuesRow()}
                 ${actionButtons()}
                 <p style="margin:16px 0 4px;font-size:13px;line-height:1.6;color:rgba(234,231,223,.65);">
                   Escríbenos por WhatsApp para coordinar tu primera clase. ¡Nos vemos pronto!
