@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { createAdminSessionCookie } from "../../server/lib/adminAuth";
+import { createAdminSessionCookie } from "../../server/lib/adminAuth.js";
 
 /** Rate-limit muy simple, en memoria (basta para un panel de un solo admin). */
 const attempts = new Map<string, { count: number; resetAt: number }>();

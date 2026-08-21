@@ -1,4 +1,4 @@
-import { EVENT_DETAILS } from "../../shared/registration";
+import { EVENT_DETAILS } from "../../shared/registration.js";
 
 /**
  * Email de invitación, de marca. Colores y tipografía calcan la paleta del

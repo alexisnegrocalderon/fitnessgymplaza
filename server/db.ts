@@ -6,9 +6,9 @@ import {
   InsertUser,
   registrations,
   users,
-} from "../drizzle/schema";
-import { ENV } from "./_core/env";
-import { EVENT_CAPACITY } from "../shared/registration";
+} from "../drizzle/schema.js";
+import { ENV } from "./_core/env.js";
+import { EVENT_CAPACITY } from "../shared/registration.js";
 
 export { EVENT_CAPACITY };
 

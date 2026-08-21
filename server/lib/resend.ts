@@ -1,6 +1,6 @@
 import { Resend } from "resend";
-import { EVENT_DETAILS } from "../../shared/registration";
-import { invitationEmailHtml } from "./emailTemplate";
+import { EVENT_DETAILS } from "../../shared/registration.js";
+import { invitationEmailHtml } from "./emailTemplate.js";
 
 export async function sendInvitationEmail(to: string, fullName: string) {
   const apiKey = process.env.RESEND_API_KEY;

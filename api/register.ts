@@ -4,8 +4,8 @@ import {
   countActiveRegistrations,
   createRegistration,
   findRegistrationByContact,
-} from "../server/db";
-import { registrationSchema } from "../shared/registration";
+} from "../server/db.js";
+import { registrationSchema } from "../shared/registration.js";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== "POST") {
@@ -15,7 +15,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   const parsed = registrationSchema.safeParse(req.body);
   if (!parsed.success) {
-    res.status(400).json({ error: "invalid_input", issues: parsed.error.issues });
+    res
+      .status(400)
+      .json({ error: "invalid_input", issues: parsed.error.issues });
     return;
   }
 

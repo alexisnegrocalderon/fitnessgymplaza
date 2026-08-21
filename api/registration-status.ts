@@ -1,8 +1,11 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { EVENT_CAPACITY, countActiveRegistrations } from "../server/db";
+import { EVENT_CAPACITY, countActiveRegistrations } from "../server/db.js";
 
 /** Solo expone si el cupo está lleno — nunca el conteo real. */
-export default async function handler(_req: VercelRequest, res: VercelResponse) {
+export default async function handler(
+  _req: VercelRequest,
+  res: VercelResponse
+) {
   try {
     const count = await countActiveRegistrations();
     res.status(200).json({ full: count >= EVENT_CAPACITY });

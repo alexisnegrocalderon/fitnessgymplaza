@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { listRegistrations } from "../../../server/db";
-import { isAdminRequest } from "../../../server/lib/adminAuth";
+import { listRegistrations } from "../../../server/db.js";
+import { isAdminRequest } from "../../../server/lib/adminAuth.js";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== "GET") {
