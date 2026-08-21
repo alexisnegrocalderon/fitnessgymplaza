@@ -8,7 +8,10 @@ import {
   findRegistrationByContact,
 } from "../server/db.js";
 import { sendInvitationEmail } from "../server/lib/resend.js";
-import { getValidAccessToken } from "../server/lib/mercadopago.js";
+import {
+  calculateApplicationFee,
+  getValidAccessToken,
+} from "../server/lib/mercadopago.js";
 import {
   EVENT_DETAILS,
   EVENT_PRICE_CLP,
@@ -68,6 +71,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const paymentBody = {
       ...body.formData,
       transaction_amount: EVENT_PRICE_CLP,
+      application_fee: calculateApplicationFee(EVENT_PRICE_CLP),
       description: EVENT_DETAILS.name,
       external_reference: `inauguracion-${parsed.data.email}`,
       payer: {

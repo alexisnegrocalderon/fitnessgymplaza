@@ -11,6 +11,20 @@ const USERS_ME_URL = "https://api.mercadopago.com/users/me";
 /** Refresca si faltan menos de 7 días para el vencimiento del access_token. */
 const REFRESH_MARGIN_MS = 1000 * 60 * 60 * 24 * 7;
 
+/**
+ * Comisión de marketplace: se descuenta de cada pago y se acredita
+ * automáticamente a la cuenta dueña de la aplicación (Client ID/Secret,
+ * cuenta ANC) — no a la cuenta conectada (Plaza Fitness). Requiere que el
+ * pago se cree con el access_token del vendedor conectado por OAuth, que
+ * es justamente lo que hace getValidAccessToken().
+ */
+const APPLICATION_FEE_RATE = 0.015;
+
+/** Monto de comisión en la misma unidad que `amount` (CLP, sin decimales). */
+export function calculateApplicationFee(amount: number): number {
+  return Math.round(amount * APPLICATION_FEE_RATE);
+}
+
 function requireEnv(name: string): string {
   const value = process.env[name];
   if (!value) throw new Error(`${name} is required for Mercado Pago OAuth`);
