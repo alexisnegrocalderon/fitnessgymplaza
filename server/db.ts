@@ -195,6 +195,18 @@ export async function markRegistrationRejected(id: number) {
   return row;
 }
 
+/** Borrado definitivo de una inscripción — el panel lo protege con doble
+ * confirmación (y con la clave del admin si la fila tiene pagos). */
+export async function deleteRegistration(id: number) {
+  const db = getDb();
+  if (!db) throw new Error("Database not configured");
+  const [row] = await db
+    .delete(registrations)
+    .where(eq(registrations.id, id))
+    .returning();
+  return row;
+}
+
 export async function createApprovedRegistration(data: InsertRegistration) {
   const db = getDb();
   if (!db) throw new Error("Database not configured");
@@ -351,6 +363,29 @@ export async function markPlanPurchaseApprovedWithPayment(
   const [row] = await db
     .update(planPurchases)
     .set({ status: "approved", mpPaymentId, amount })
+    .where(eq(planPurchases.id, id))
+    .returning();
+  return row;
+}
+
+export async function getPlanPurchaseById(id: number) {
+  const db = getDb();
+  if (!db) throw new Error("Database not configured");
+  const result = await db
+    .select()
+    .from(planPurchases)
+    .where(eq(planPurchases.id, id))
+    .limit(1);
+  return result[0];
+}
+
+/** Igual que deleteRegistration, pero una compra siempre lleva dinero
+ * asociado, así que el panel siempre pide la clave del admin. */
+export async function deletePlanPurchase(id: number) {
+  const db = getDb();
+  if (!db) throw new Error("Database not configured");
+  const [row] = await db
+    .delete(planPurchases)
     .where(eq(planPurchases.id, id))
     .returning();
   return row;

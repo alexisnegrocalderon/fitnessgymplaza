@@ -38,6 +38,16 @@ export function clearAdminSessionCookie(): string {
   });
 }
 
+/** Reconfirmación de la clave del admin para acciones destructivas: la
+ * cookie de sesión prueba "soy el admin", esto prueba "soy yo, ahora".
+ * Mismo trim que el login, por los espacios de más al pegar el valor en
+ * las variables de entorno. */
+export function verifyAdminPassword(password: string | undefined): boolean {
+  const expected = (process.env.ADMIN_PASSWORD ?? "").trim();
+  if (!expected) return false;
+  return (password ?? "").trim() === expected;
+}
+
 export async function isAdminRequest(
   cookieHeader: string | undefined
 ): Promise<boolean> {

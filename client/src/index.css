@@ -3296,6 +3296,137 @@ main > section[id] {
   cursor: default;
 }
 
+/* Los hover por posición dejaron de alcanzar al sumar reenviar/eliminar:
+   ahora cada acción se pinta por lo que hace, no por dónde cayó. */
+.admin-dashboard__actions button[title^="Reenviar"]:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+}
+.admin-dashboard__actions button[title^="Rechazar"]:hover,
+.admin-dashboard__actions button[title^="Eliminar"]:hover {
+  background: rgba(217, 45, 32, 0.14);
+  color: #ff8d84;
+}
+
+/* Confirmación de borrado — dos pasos, y clave de admin si hay dinero. */
+.admin-confirm {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(6, 6, 8, 0.72);
+  backdrop-filter: blur(4px);
+}
+.admin-confirm__panel {
+  display: grid;
+  gap: 12px;
+  width: min(100%, 400px);
+  padding: 26px 24px 22px;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--graphite-soft);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+}
+.admin-confirm__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 11px;
+  background: rgba(217, 45, 32, 0.16);
+  color: #ff8d84;
+}
+.admin-confirm__panel h2 {
+  margin: 0;
+  color: #fff;
+  font-family: "Archivo Black", sans-serif;
+  text-transform: uppercase;
+  font-size: 17px;
+}
+.admin-confirm__panel p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 13px;
+  line-height: 1.5;
+}
+.admin-confirm__field {
+  display: grid;
+  gap: 6px;
+  margin-top: 2px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.55);
+}
+.admin-confirm__field input {
+  min-height: 44px;
+  padding: 0 14px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: normal;
+  transition: border-color 0.2s var(--ease-out);
+}
+.admin-confirm__field input:focus-visible {
+  outline: none;
+  border-color: var(--cobalt);
+}
+.admin-confirm__error {
+  margin: 0;
+  color: #ff8d84;
+  font-size: 12px;
+}
+.admin-confirm__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 6px;
+}
+.admin-confirm__actions button {
+  min-height: 40px;
+  padding: 0 16px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 10px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    background-color 0.15s var(--ease-out),
+    border-color 0.15s var(--ease-out),
+    color 0.15s var(--ease-out);
+}
+.admin-confirm__actions button:hover {
+  border-color: rgba(255, 255, 255, 0.28);
+  color: #fff;
+}
+.admin-confirm__danger {
+  border-color: transparent;
+  background: var(--cobalt);
+  color: #fff;
+}
+.admin-confirm__danger:hover {
+  border-color: transparent;
+  background: #b8241a;
+  color: #fff;
+}
+.admin-confirm__actions button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
 @media (max-width: 720px) {
   .admin-stats {
     grid-template-columns: repeat(2, 1fr);
