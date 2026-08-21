@@ -91,3 +91,30 @@ export const eventSettings = pgTable("event_settings", {
 
 export type EventSettings = typeof eventSettings.$inferSelect;
 export type InsertEventSettings = typeof eventSettings.$inferInsert;
+
+export const planAudience = pgEnum("plan_audience", ["general", "student"]);
+export const planTier = pgEnum("plan_tier", ["single", "eight", "twelve"]);
+
+/**
+ * Compra de un plan de gimnasio desde /planes. Reutiliza el enum
+ * `registrationStatus` (pending/approved/rejected): nace "pending" al
+ * completar los datos de contacto, y sube a "approved" solo cuando el
+ * pago de Mercado Pago se confirma — mismo patrón que `registrations`.
+ */
+export const planPurchases = pgTable("plan_purchases", {
+  id: integer("id").generatedAlwaysAsIdentity().primaryKey(),
+  fullName: varchar("fullName", { length: 200 }).notNull(),
+  rut: varchar("rut", { length: 16 }).notNull(),
+  whatsapp: varchar("whatsapp", { length: 32 }).notNull(),
+  email: varchar("email", { length: 320 }).notNull(),
+  audience: planAudience("audience").notNull(),
+  tier: planTier("tier").notNull(),
+  planLabel: varchar("planLabel", { length: 60 }).notNull(),
+  status: registrationStatus("status").default("pending").notNull(),
+  mpPaymentId: varchar("mpPaymentId", { length: 64 }),
+  amount: integer("amount"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type PlanPurchase = typeof planPurchases.$inferSelect;
+export type InsertPlanPurchase = typeof planPurchases.$inferInsert;

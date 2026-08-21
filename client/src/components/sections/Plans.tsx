@@ -1,8 +1,7 @@
-import { useMemo, useRef, useState, type ReactNode } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { ArrowUpRight, Check, ClipboardCheck, UserRound } from "lucide-react";
 import { BrandMark, SectionTag, WhatsAppButton } from "@/components/common";
-import EnrollmentModal from "@/components/EnrollmentModal";
 import { Reveal } from "@/components/Reveal";
 import { calm, spring } from "@/lib/motion";
 import {
@@ -25,7 +24,7 @@ const AUDIENCE_ITEMS: { id: Audience; label: string; icon: ReactNode }[] = [
 ];
 
 const TIER_ITEMS: { id: PlanTier; label: string }[] = [
-  { id: "single", label: "Clase única" },
+  { id: "single", label: "Pase diario" },
   { id: "eight", label: "8 clases" },
   { id: "twelve", label: "12 clases" },
 ];
@@ -95,15 +94,8 @@ function SegmentedPill<T extends string>({
   );
 }
 
-function PlanDetail({
-  plan,
-  onSelect,
-}: {
-  plan: Plan;
-  onSelect: (plan: Plan, origin: HTMLElement) => void;
-}) {
+function PlanDetail({ plan }: { plan: Plan }) {
   const reduced = useReducedMotion();
-  const ctaRef = useRef<HTMLButtonElement>(null);
 
   return (
     <AnimatePresence mode="wait">
@@ -161,14 +153,12 @@ function PlanDetail({
               </li>
             )}
           </ul>
-          <button
-            ref={ctaRef}
-            type="button"
+          <a
+            href={`/planes?audience=${plan.audience}&tier=${plan.tier}`}
             className="plan-detail__cta"
-            onClick={() => ctaRef.current && onSelect(plan, ctaRef.current)}
           >
             Continuar inscripción <ArrowUpRight size={16} />
-          </button>
+          </a>
         </div>
       </motion.article>
     </AnimatePresence>
@@ -178,10 +168,6 @@ function PlanDetail({
 export default function Plans() {
   const [audience, setAudience] = useState<Audience>("general");
   const [tier, setTier] = useState<PlanTier>("single");
-  const [selected, setSelected] = useState<{
-    plan: Plan;
-    origin: HTMLElement;
-  } | null>(null);
 
   const audiencePlans = useMemo(
     () => plans.filter(plan => plan.audience === audience),
@@ -235,22 +221,13 @@ export default function Plans() {
       </Reveal>
 
       <div className="container">
-        <PlanDetail
-          plan={activePlan}
-          onSelect={(plan, origin) => setSelected({ plan, origin })}
-        />
+        <PlanDetail plan={activePlan} />
       </div>
 
       <div className="plans-section__foot container">
         <span>Valores y horarios disponibles por WhatsApp</span>
         <WhatsAppButton compact />
       </div>
-
-      <EnrollmentModal
-        plan={selected?.plan ?? null}
-        origin={selected?.origin ?? null}
-        onClose={() => setSelected(null)}
-      />
     </section>
   );
 }

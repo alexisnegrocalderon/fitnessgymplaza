@@ -184,12 +184,12 @@ export default function Inauguracion() {
   const transition = reduced ? calm : spring.reveal;
 
   return (
-    <div className="inauguracion">
-      <div className="inauguracion__glow" aria-hidden="true" />
-      <div className="inauguracion__content">
+    <div className="immersive-flow">
+      <div className="immersive-flow__glow" aria-hidden="true" />
+      <div className="immersive-flow__content">
         <motion.a
           href="/"
-          className="inauguracion__brand"
+          className="immersive-flow__brand"
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={transition}
@@ -198,7 +198,7 @@ export default function Inauguracion() {
         </motion.a>
 
         <motion.div
-          className="inauguracion__eyebrow"
+          className="immersive-flow__eyebrow"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={reduced ? calm : { ...spring.ui, delay: 0.06 }}
@@ -215,7 +215,7 @@ export default function Inauguracion() {
         </motion.h1>
 
         <motion.p
-          className="inauguracion__lede"
+          className="immersive-flow__lede"
           initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
           transition={reduced ? calm : { ...spring.reveal, delay: 0.18 }}
@@ -226,7 +226,7 @@ export default function Inauguracion() {
         </motion.p>
 
         <motion.div
-          className="inauguracion__meta"
+          className="immersive-flow__meta"
           initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
           transition={reduced ? calm : { ...spring.reveal, delay: 0.26 }}
@@ -244,7 +244,7 @@ export default function Inauguracion() {
         </motion.div>
 
         <motion.div
-          className="inauguracion__panel glass-card"
+          className="immersive-flow__panel glass-card"
           initial={
             reduced
               ? { opacity: 0 }
@@ -268,7 +268,7 @@ export default function Inauguracion() {
                 transition={calm}
                 noValidate
               >
-                <label className="inauguracion__field">
+                <label className="immersive-flow__field">
                   <span>Nombre completo</span>
                   <input
                     type="text"
@@ -277,7 +277,7 @@ export default function Inauguracion() {
                   />
                   {errors.fullName && <em>{errors.fullName.message}</em>}
                 </label>
-                <label className="inauguracion__field">
+                <label className="immersive-flow__field">
                   <span>Email</span>
                   <input
                     type="email"
@@ -286,7 +286,7 @@ export default function Inauguracion() {
                   />
                   {errors.email && <em>{errors.email.message}</em>}
                 </label>
-                <label className="inauguracion__field">
+                <label className="immersive-flow__field">
                   <span>WhatsApp</span>
                   <input
                     type="tel"
@@ -296,7 +296,7 @@ export default function Inauguracion() {
                   {errors.whatsapp && <em>{errors.whatsapp.message}</em>}
                 </label>
                 {paymentError && (
-                  <p className="inauguracion__payment-error">
+                  <p className="immersive-flow__payment-error">
                     <AlertTriangle size={14} /> {paymentError}
                   </p>
                 )}
@@ -307,7 +307,7 @@ export default function Inauguracion() {
                 >
                   {submittingContact ? "Guardando…" : "Continuar al pago"}
                 </button>
-                <p className="inauguracion__fineprint">
+                <p className="immersive-flow__fineprint">
                   Cupos limitados, valor {EVENT_DETAILS.price}. El siguiente
                   paso es el pago — tu cupo queda confirmado apenas se apruebe.
                   ¡Los esperamos!
@@ -320,10 +320,10 @@ export default function Inauguracion() {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={calm}
-                className="inauguracion__payment"
+                className="immersive-flow__payment"
               >
                 {pricing && (
-                  <div className="inauguracion__breakdown">
+                  <div className="immersive-flow__breakdown">
                     <div>
                       <span>Valor entrada</span>
                       <span>{formatCLP(pricing.basePrice)}</span>
@@ -334,14 +334,14 @@ export default function Inauguracion() {
                         <span>{formatCLP(pricing.serviceCharge)}</span>
                       </div>
                     )}
-                    <div className="inauguracion__breakdown-total">
+                    <div className="immersive-flow__breakdown-total">
                       <span>Total a pagar</span>
                       <span>{formatCLP(pricing.total)}</span>
                     </div>
                   </div>
                 )}
                 {paymentError && (
-                  <p className="inauguracion__payment-error">
+                  <p className="immersive-flow__payment-error">
                     <AlertTriangle size={14} /> {paymentError}
                   </p>
                 )}
@@ -364,12 +364,12 @@ export default function Inauguracion() {
                     }}
                   />
                 ) : (
-                  <p className="inauguracion__payment-loading">
+                  <p className="immersive-flow__payment-loading">
                     Cargando el formulario de pago…
                   </p>
                 )}
                 {submitting && (
-                  <p className="inauguracion__payment-loading">
+                  <p className="immersive-flow__payment-loading">
                     Procesando tu pago…
                   </p>
                 )}
@@ -377,7 +377,7 @@ export default function Inauguracion() {
             ) : view === "mp_unavailable" ? (
               <motion.div
                 key="mp_unavailable"
-                className="inauguracion__result"
+                className="immersive-flow__result"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={calm}
@@ -392,7 +392,7 @@ export default function Inauguracion() {
             ) : view === "success" ? (
               <motion.div
                 key="success"
-                className="inauguracion__result"
+                className="immersive-flow__result"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={calm}
@@ -408,7 +408,7 @@ export default function Inauguracion() {
             ) : view === "duplicate" ? (
               <motion.div
                 key="duplicate"
-                className="inauguracion__result"
+                className="immersive-flow__result"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={calm}
@@ -420,7 +420,7 @@ export default function Inauguracion() {
             ) : (
               <motion.div
                 key="full"
-                className="inauguracion__result"
+                className="immersive-flow__result"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={calm}

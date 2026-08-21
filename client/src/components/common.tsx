@@ -52,12 +52,9 @@ const MAGNET_PULL = 7;
 export function WhatsAppButton({
   compact = false,
   label = "Conversemos",
-  variant = "solid",
 }: {
   compact?: boolean;
   label?: string;
-  /** "glass" es la variante pill translúcida usada en el Hero. */
-  variant?: "solid" | "glass";
 }) {
   const ref = useRef<HTMLAnchorElement>(null);
   const reduced = useReducedMotion();
@@ -91,7 +88,7 @@ export function WhatsAppButton({
       href={WHATSAPP_URL}
       target="_blank"
       rel="noreferrer"
-      className={`button ${variant === "glass" ? "button--glass" : "button--cobalt"} ${compact ? "button--compact" : ""}`}
+      className={`button button--cobalt ${compact ? "button--compact" : ""}`}
       style={{ x: magnetX, y: magnetY, scale }}
       onPointerMove={onPointerMove}
       onPointerDown={() => scale.set(0.97)}

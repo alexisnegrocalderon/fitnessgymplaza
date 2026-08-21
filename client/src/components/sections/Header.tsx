@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { Instagram, Menu, Phone, X } from "lucide-react";
-import { BrandMark, WhatsAppButton } from "@/components/common";
+import { BrandMark } from "@/components/common";
 import { INSTAGRAM_URL } from "@/lib/gym-content";
 
 /** Distancia en la que la barra termina de materializarse. */
@@ -58,7 +58,7 @@ export default function Header() {
         <a href="#metodo" onClick={closeMenu}>
           Método
         </a>
-        <a href="#planes" onClick={closeMenu}>
+        <a href="/planes" onClick={closeMenu}>
           Planes
         </a>
         <a href="#horarios" onClick={closeMenu}>
@@ -80,7 +80,9 @@ export default function Header() {
           >
             <Instagram size={17} />
           </a>
-          <WhatsAppButton compact />
+          <a href="/planes" className="button button--cobalt button--compact">
+            Comienza Hoy!
+          </a>
         </div>
       </nav>
 
@@ -97,7 +99,9 @@ export default function Header() {
         >
           <Instagram size={16} />
         </a>
-        <WhatsAppButton compact />
+        <a href="/planes" className="button button--cobalt button--compact">
+          Comienza Hoy!
+        </a>
         <button
           className="menu-toggle"
           type="button"

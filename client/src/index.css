@@ -1618,207 +1618,6 @@ main > section[id] {
   line-height: 1.6;
 }
 
-/* ---------- modal de inscripción ---------- */
-.enrollment-modal__scrim {
-  position: fixed;
-  inset: 0;
-  z-index: 60;
-  background: rgba(8, 10, 9, 0.72);
-  backdrop-filter: blur(4px);
-}
-.enrollment-modal {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  z-index: 61;
-  display: grid;
-  gap: 28px;
-  width: min(880px, calc(100vw - 32px));
-  max-height: min(88vh, 900px);
-  padding: 40px 40px 34px;
-  overflow-y: auto;
-  background: var(--graphite);
-  color: #fff;
-  transform: translate(-50%, -50%);
-}
-.enrollment-modal:focus-visible {
-  outline: none;
-}
-.enrollment-modal__glow {
-  position: absolute;
-  top: -20%;
-  right: -10%;
-  z-index: -1;
-  width: 60%;
-  aspect-ratio: 1;
-  background: radial-gradient(circle, rgba(217, 45, 32, 0.16), transparent 70%);
-}
-.enrollment-modal__close {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  color: rgba(255, 255, 255, 0.72);
-  transition:
-    color 0.2s var(--ease-out),
-    border-color 0.2s var(--ease-out);
-}
-.enrollment-modal__close:hover {
-  color: #fff;
-  border-color: rgba(255, 255, 255, 0.4);
-}
-.enrollment-modal__header {
-  max-width: 520px;
-}
-.enrollment-modal__header h2 {
-  margin: 18px 0 14px;
-  font-family: "Archivo Black", sans-serif;
-  text-transform: uppercase;
-  font-size: clamp(26px, 3.4vw, 36px);
-  font-weight: 400;
-  line-height: 1.05;
-}
-.enrollment-modal__header h2 span {
-  color: var(--cobalt);
-}
-.enrollment-modal__header p {
-  color: rgba(255, 255, 255, 0.62);
-  font-size: 13.5px;
-  line-height: 1.7;
-}
-.enrollment-modal__grid {
-  display: grid;
-  grid-template-columns: 1.1fr 0.9fr;
-  gap: 34px;
-}
-.modal-steps {
-  display: grid;
-  gap: 20px;
-  align-content: start;
-}
-.modal-steps article {
-  display: flex;
-  gap: 16px;
-}
-.modal-steps span {
-  flex: 0 0 auto;
-  color: var(--cobalt);
-  font-family: "Barlow Condensed", sans-serif;
-  font-size: 22px;
-}
-.modal-steps svg {
-  color: rgba(255, 255, 255, 0.5);
-}
-.modal-steps h3 {
-  margin: 8px 0 4px;
-  font-family: "Barlow Condensed", sans-serif;
-  font-size: 14px;
-  font-weight: 700;
-}
-.modal-steps p {
-  color: rgba(255, 255, 255, 0.58);
-  font-size: 12.5px;
-  line-height: 1.6;
-}
-.modal-transfer {
-  display: grid;
-  align-content: start;
-  gap: 16px;
-  padding: 24px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-}
-.modal-transfer__head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding-bottom: 16px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.14);
-}
-.modal-transfer__head span {
-  display: block;
-  color: rgba(255, 255, 255, 0.5);
-  font-size: 10px;
-  font-weight: 800;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-}
-.modal-transfer__head h3 {
-  margin-top: 4px;
-  font-family: "Archivo Black", sans-serif;
-  font-size: 24px;
-  font-weight: 400;
-  color: var(--cobalt);
-}
-.modal-transfer__head svg {
-  color: rgba(255, 255, 255, 0.4);
-}
-.transfer-command__data {
-  display: grid;
-  gap: 2px;
-}
-.transfer-command__data div {
-  display: grid;
-  grid-template-columns: 90px 1fr auto;
-  align-items: center;
-  gap: 10px;
-  padding: 9px 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-}
-.transfer-command__data span {
-  color: rgba(255, 255, 255, 0.46);
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-}
-.transfer-command__data strong {
-  overflow: hidden;
-  font-size: 12.5px;
-  font-weight: 700;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.transfer-command__data button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  color: rgba(255, 255, 255, 0.7);
-  transition: border-color 0.2s var(--ease-out);
-}
-.transfer-command__data button:hover {
-  border-color: var(--cobalt);
-  color: var(--cobalt);
-}
-.transfer-command__foot {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  color: rgba(255, 255, 255, 0.56);
-  font-size: 11.5px;
-  line-height: 1.6;
-}
-.transfer-command__foot svg {
-  flex: 0 0 auto;
-  margin-top: 2px;
-  color: var(--cobalt);
-}
-.transfer-command__foot strong {
-  color: #fff;
-}
-.modal-transfer .button {
-  justify-content: center;
-  margin-top: 4px;
-}
-
 .contact-section {
   position: relative;
   padding: 150px 0 118px;
@@ -2066,13 +1865,6 @@ main > section[id] {
   .plan-detail__media {
     aspect-ratio: 16 / 9;
     max-height: 200px;
-  }
-  .enrollment-modal {
-    padding: 32px 22px 26px;
-  }
-  .enrollment-modal__grid {
-    grid-template-columns: 1fr;
-    gap: 26px;
   }
   .manifesto-section__blueprint {
     left: 35%;
@@ -2585,7 +2377,7 @@ main > section[id] {
 }
 
 /* ---------- inauguración: formulario inmersivo ---------- */
-.inauguracion {
+.immersive-flow {
   position: relative;
   min-height: 100svh;
   display: flex;
@@ -2596,7 +2388,7 @@ main > section[id] {
   background: var(--graphite);
   color: #fff;
 }
-.inauguracion__glow {
+.immersive-flow__glow {
   position: absolute;
   inset: -20%;
   background: radial-gradient(
@@ -2606,7 +2398,7 @@ main > section[id] {
   );
   pointer-events: none;
 }
-.inauguracion__content {
+.immersive-flow__content {
   position: relative;
   z-index: 1;
   display: flex;
@@ -2615,11 +2407,11 @@ main > section[id] {
   text-align: center;
   width: min(100%, 480px);
 }
-.inauguracion__brand {
+.immersive-flow__brand {
   display: inline-flex;
   margin-bottom: 12px;
 }
-.inauguracion__eyebrow {
+.immersive-flow__eyebrow {
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -2630,7 +2422,7 @@ main > section[id] {
   letter-spacing: 0.16em;
   text-transform: uppercase;
 }
-.inauguracion h1 {
+.immersive-flow h1 {
   margin: 14px 0 0;
   font-family: "Archivo Black", sans-serif;
   text-transform: uppercase;
@@ -2638,18 +2430,18 @@ main > section[id] {
   line-height: 0.98;
   letter-spacing: -0.01em;
 }
-.inauguracion h1 em {
+.immersive-flow h1 em {
   font-style: normal;
   color: var(--cobalt);
 }
-.inauguracion__lede {
+.immersive-flow__lede {
   max-width: 420px;
   margin: 16px auto 0;
   color: rgba(255, 255, 255, 0.75);
   font-size: 14px;
   line-height: 1.65;
 }
-.inauguracion__meta {
+.immersive-flow__meta {
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -2658,29 +2450,29 @@ main > section[id] {
   font-size: 13px;
   font-weight: 600;
 }
-.inauguracion__meta span {
+.immersive-flow__meta span {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
 }
-.inauguracion__meta svg {
+.immersive-flow__meta svg {
   color: var(--cobalt);
   flex: 0 0 auto;
 }
-.inauguracion__panel {
+.immersive-flow__panel {
   width: 100%;
   margin-top: 32px;
   padding: 28px;
   border-radius: 20px;
   text-align: left;
 }
-.inauguracion__field {
+.immersive-flow__field {
   display: grid;
   gap: 6px;
   margin-bottom: 16px;
 }
-.inauguracion__field span {
+.immersive-flow__field span {
   font-family: "Barlow Condensed", sans-serif;
   font-size: 10px;
   font-weight: 800;
@@ -2688,7 +2480,7 @@ main > section[id] {
   text-transform: uppercase;
   color: rgba(255, 255, 255, 0.6);
 }
-.inauguracion__field input {
+.immersive-flow__field input {
   min-height: 46px;
   padding: 0 14px;
   border: 1px solid rgba(255, 255, 255, 0.18);
@@ -2697,41 +2489,41 @@ main > section[id] {
   color: #fff;
   font-size: 14px;
 }
-.inauguracion__field input:focus-visible {
+.immersive-flow__field input:focus-visible {
   outline: 2px solid var(--cobalt);
   outline-offset: 2px;
 }
-.inauguracion__field em {
+.immersive-flow__field em {
   font-style: normal;
   color: #ff8d84;
   font-size: 12px;
 }
-.inauguracion__panel .button {
+.immersive-flow__panel .button {
   width: 100%;
   margin-top: 4px;
 }
-.inauguracion__fineprint {
+.immersive-flow__fineprint {
   margin: 14px 0 0;
   color: rgba(255, 255, 255, 0.45);
   font-size: 11px;
   line-height: 1.5;
   text-align: center;
 }
-.inauguracion__breakdown {
+.immersive-flow__breakdown {
   margin: 0 0 16px;
   padding: 14px 16px;
   border-radius: 12px;
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
-.inauguracion__breakdown > div {
+.immersive-flow__breakdown > div {
   display: flex;
   justify-content: space-between;
   padding: 4px 0;
   color: rgba(255, 255, 255, 0.6);
   font-size: 13px;
 }
-.inauguracion__breakdown-total {
+.immersive-flow__breakdown-total {
   margin-top: 6px;
   padding-top: 10px !important;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
@@ -2739,7 +2531,7 @@ main > section[id] {
   font-weight: 700;
   font-size: 15px !important;
 }
-.inauguracion__payment-error {
+.immersive-flow__payment-error {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -2751,13 +2543,13 @@ main > section[id] {
   font-size: 13px;
   line-height: 1.5;
 }
-.inauguracion__payment-loading {
+.immersive-flow__payment-loading {
   margin: 10px 0 0;
   text-align: center;
   color: rgba(255, 255, 255, 0.5);
   font-size: 13px;
 }
-.inauguracion__result {
+.immersive-flow__result {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -2765,20 +2557,120 @@ main > section[id] {
   gap: 10px;
   padding: 12px 0;
 }
-.inauguracion__result svg {
+.immersive-flow__result svg {
   color: var(--cobalt);
 }
-.inauguracion__result h2 {
+.immersive-flow__result h2 {
   margin: 0;
   font-family: "Archivo Black", sans-serif;
   text-transform: uppercase;
   font-size: 22px;
 }
-.inauguracion__result p {
+.immersive-flow__result p {
   margin: 0;
   color: rgba(255, 255, 255, 0.7);
   font-size: 14px;
   line-height: 1.6;
+}
+
+/* ---------- wizard multi-paso (/planes): progreso + botones grandes ---------- */
+.immersive-flow__progress {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  margin-bottom: 22px;
+}
+.immersive-flow__back {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 34px;
+  height: 34px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.05);
+  color: #fff;
+  transition: background-color 0.2s var(--ease-out);
+}
+.immersive-flow__back:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+.immersive-flow__progress-track {
+  position: relative;
+  flex: 1;
+  height: 3px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.1);
+}
+.immersive-flow__progress-bar {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--cobalt);
+}
+.immersive-flow__progress-count {
+  flex: 0 0 auto;
+  color: rgba(255, 255, 255, 0.45);
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+.immersive-flow__options {
+  display: grid;
+  width: 100%;
+  gap: 12px;
+}
+.immersive-flow__option {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px 22px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.04);
+  color: #fff;
+  text-align: left;
+  transition:
+    background-color 0.2s var(--ease-out),
+    border-color 0.2s var(--ease-out);
+}
+.immersive-flow__option:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.24);
+}
+.immersive-flow__option-icon {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: rgba(217, 45, 32, 0.16);
+  color: var(--cobalt);
+}
+.immersive-flow__option-body {
+  display: grid;
+  flex: 1;
+  gap: 2px;
+}
+.immersive-flow__option-body strong {
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+}
+.immersive-flow__option-body small {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 12px;
+}
+.immersive-flow__option-price {
+  flex: 0 0 auto;
+  color: var(--cobalt);
+  font-family: "Archivo Black", sans-serif;
+  font-size: 18px;
 }
 
 /* ---------- admin ---------- */

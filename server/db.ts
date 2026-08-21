@@ -4,9 +4,11 @@ import { drizzle } from "drizzle-orm/neon-http";
 import {
   eventSettings,
   InsertMpConnection,
+  InsertPlanPurchase,
   InsertRegistration,
   InsertUser,
   mpConnections,
+  planPurchases,
   registrations,
   users,
 } from "../drizzle/schema.js";
@@ -276,4 +278,77 @@ export async function updateServiceChargeBps(bps: number) {
     .where(eq(eventSettings.id, current.id))
     .returning();
   return row;
+}
+
+// ---------------------------------------------------------------------------
+// Compra de planes de gimnasio — /planes
+// ---------------------------------------------------------------------------
+
+export async function findPlanPurchaseByContact(
+  email: string,
+  whatsapp: string
+) {
+  const db = getDb();
+  if (!db) throw new Error("Database not configured");
+  const result = await db
+    .select()
+    .from(planPurchases)
+    .where(
+      and(
+        ne(planPurchases.status, "rejected"),
+        eq(planPurchases.email, email.toLowerCase())
+      )
+    )
+    .limit(1);
+  if (result[0]) return result[0];
+
+  const byWhatsapp = await db
+    .select()
+    .from(planPurchases)
+    .where(
+      and(
+        ne(planPurchases.status, "rejected"),
+        eq(planPurchases.whatsapp, whatsapp)
+      )
+    )
+    .limit(1);
+  return byWhatsapp[0];
+}
+
+export async function createPlanPurchase(data: InsertPlanPurchase) {
+  const db = getDb();
+  if (!db) throw new Error("Database not configured");
+  const [row] = await db.insert(planPurchases).values(data).returning();
+  return row;
+}
+
+export async function createApprovedPlanPurchase(data: InsertPlanPurchase) {
+  const db = getDb();
+  if (!db) throw new Error("Database not configured");
+  const [row] = await db
+    .insert(planPurchases)
+    .values({ ...data, status: "approved" })
+    .returning();
+  return row;
+}
+
+export async function markPlanPurchaseApprovedWithPayment(
+  id: number,
+  mpPaymentId: string,
+  amount: number
+) {
+  const db = getDb();
+  if (!db) throw new Error("Database not configured");
+  const [row] = await db
+    .update(planPurchases)
+    .set({ status: "approved", mpPaymentId, amount })
+    .where(eq(planPurchases.id, id))
+    .returning();
+  return row;
+}
+
+export async function listPlanPurchases() {
+  const db = getDb();
+  if (!db) throw new Error("Database not configured");
+  return db.select().from(planPurchases).orderBy(desc(planPurchases.createdAt));
 }

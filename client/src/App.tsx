@@ -7,6 +7,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import Admin from "@/pages/Admin";
 import Inauguracion from "@/pages/Inauguracion";
 import NotFound from "@/pages/NotFound";
+import Planes from "@/pages/Planes";
 import { MotionConfig } from "framer-motion";
 import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
@@ -18,6 +19,7 @@ function Router() {
     <Switch>
       <Route path="/" component={Home} />
       <Route path="/inauguracion" component={Inauguracion} />
+      <Route path="/planes" component={Planes} />
       <Route path="/admin" component={Admin} />
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />

@@ -41,88 +41,14 @@ export const INSTAGRAM_URL = "https://www.instagram.com/plazafitnessvina";
 export const ADDRESS_LINE = "Calle Quillota 656";
 export const ADDRESS_CITY = "Viña del Mar";
 
-export type Audience = "general" | "student";
-export type PlanTier = "single" | "eight" | "twelve";
-
-export type Plan = {
-  id: string;
-  audience: Audience;
-  tier: PlanTier;
-  label: string;
-  price: string;
-  tagline: string;
-  note: string;
-  cadence: string;
-  featured?: boolean;
-  studentRequirement?: boolean;
-};
-
-export const plans: Plan[] = [
-  {
-    id: "general-single",
-    audience: "general",
-    tier: "single",
-    label: "Clase única",
-    price: "$8.000",
-    tagline: "Conoce el circuito",
-    note: "Una sesión para probar el ritmo, la guía técnica y el formato de Plaza Fitness.",
-    cadence: "Ideal para una primera experiencia.",
-  },
-  {
-    id: "general-8",
-    audience: "general",
-    tier: "eight",
-    label: "8 clases",
-    price: "$45.000",
-    tagline: "Construye constancia",
-    note: "Un formato pensado para convertir el entrenamiento en una práctica semanal sostenible.",
-    cadence: "Frecuencia sugerida: 2 veces por semana.",
-  },
-  {
-    id: "general-12",
-    audience: "general",
-    tier: "twelve",
-    label: "12 clases",
-    price: "$60.000",
-    tagline: "Más pulso, más progreso",
-    note: "Mayor presencia en la semana para profundizar técnica, capacidad y consistencia.",
-    cadence: "Frecuencia sugerida: 3 veces por semana.",
-    featured: true,
-  },
-  {
-    id: "student-single",
-    audience: "student",
-    tier: "single",
-    label: "Clase única",
-    price: "$6.000",
-    tagline: "Acceso estudiante",
-    note: "Una sesión con tarifa estudiante para conocer la dinámica del gimnasio.",
-    cadence: "Requiere certificado de alumno regular.",
-    studentRequirement: true,
-  },
-  {
-    id: "student-8",
-    audience: "student",
-    tier: "eight",
-    label: "8 clases",
-    price: "$36.000",
-    tagline: "Ritmo estudiante",
-    note: "Una alternativa diseñada para sostener movimiento, estudio y bienestar en paralelo.",
-    cadence: "Requiere certificado de alumno regular.",
-    studentRequirement: true,
-  },
-  {
-    id: "student-12",
-    audience: "student",
-    tier: "twelve",
-    label: "12 clases",
-    price: "$46.000",
-    tagline: "Sostén el hábito",
-    note: "Más presencia para acompañar tu condición física durante el semestre.",
-    cadence: "Requiere certificado de alumno regular.",
-    studentRequirement: true,
-  },
-];
+export {
+  plans,
+  findPlan,
+  planPriceToNumber,
+  type Audience,
+  type Plan,
+  type PlanTier,
+} from "@shared/plans";
 
 export const method = [
   {

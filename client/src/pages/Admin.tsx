@@ -19,7 +19,7 @@ import {
   EVENT_PRICE_CLP,
   calculateServiceCharge,
 } from "@shared/registration";
-import type { Registration } from "../../../drizzle/schema";
+import type { PlanPurchase, Registration } from "../../../drizzle/schema";
 
 type MpStatus =
   | { connected: false }
@@ -364,12 +364,76 @@ function ClientesTable({ rows }: { rows: Registration[] }) {
   );
 }
 
+function PlanesTable({ rows }: { rows: PlanPurchase[] }) {
+  if (rows.length === 0) {
+    return (
+      <p className="admin-dashboard__empty">Todavía no hay planes vendidos.</p>
+    );
+  }
+
+  return (
+    <div className="admin-dashboard__table-wrap">
+      <table className="admin-dashboard__table">
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>RUT</th>
+            <th>Email</th>
+            <th>WhatsApp</th>
+            <th>Plan</th>
+            <th>Estado</th>
+            <th>Fecha</th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map(row => (
+            <tr key={row.id}>
+              <td>{row.fullName}</td>
+              <td>{row.rut}</td>
+              <td>
+                <a href={`mailto:${row.email}`} className="admin-contact-link">
+                  <Mail size={14} /> {row.email}
+                </a>
+              </td>
+              <td>
+                <a
+                  href={waLink(row.whatsapp)}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="admin-contact-link"
+                >
+                  <MessageCircle size={14} /> {row.whatsapp}
+                </a>
+              </td>
+              <td>
+                {row.planLabel}
+                {row.audience === "student" ? " · estudiante" : ""}
+              </td>
+              <td>
+                <span
+                  className={`admin-dashboard__status admin-dashboard__status--${row.status}`}
+                >
+                  {statusLabel[row.status]}
+                </span>
+              </td>
+              <td>{new Date(row.createdAt).toLocaleDateString("es-CL")}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
 function Dashboard({ onLoggedOut }: { onLoggedOut: () => void }) {
   const [rows, setRows] = useState<Registration[]>([]);
+  const [planRows, setPlanRows] = useState<PlanPurchase[]>([]);
   const [loading, setLoading] = useState(true);
   const [actingId, setActingId] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [tab, setTab] = useState<"inscripciones" | "clientes">("inscripciones");
+  const [tab, setTab] = useState<"inscripciones" | "clientes" | "planes">(
+    "inscripciones"
+  );
 
   async function load() {
     setLoading(true);
@@ -388,8 +452,20 @@ function Dashboard({ onLoggedOut }: { onLoggedOut: () => void }) {
     setLoading(false);
   }
 
+  async function loadPlans() {
+    try {
+      const res = await fetch("/api/admin/plans");
+      if (!res.ok) return;
+      const data = await res.json();
+      if (Array.isArray(data.purchases)) setPlanRows(data.purchases);
+    } catch {
+      // El tab de planes queda vacío si falla — no bloquea el resto del panel.
+    }
+  }
+
   useEffect(() => {
     load();
+    loadPlans();
   }, []);
 
   async function act(id: number, action: "approve" | "reject") {
@@ -493,6 +569,13 @@ function Dashboard({ onLoggedOut }: { onLoggedOut: () => void }) {
         >
           Clientes
         </button>
+        <button
+          type="button"
+          className={tab === "planes" ? "is-active" : ""}
+          onClick={() => setTab("planes")}
+        >
+          Planes
+        </button>
       </div>
 
       <div className="admin-dashboard__panel">
@@ -500,6 +583,8 @@ function Dashboard({ onLoggedOut }: { onLoggedOut: () => void }) {
           <p className="admin-dashboard__empty">Cargando…</p>
         ) : tab === "clientes" ? (
           <ClientesTable rows={rows} />
+        ) : tab === "planes" ? (
+          <PlanesTable rows={planRows} />
         ) : rows.length === 0 ? (
           <p className="admin-dashboard__empty">
             Todavía no hay inscripciones.
