@@ -24,13 +24,10 @@ export const EVENT_DETAILS = {
   date: "29 de agosto",
   time: "20:00 hrs",
   address: "Calle Quillota 656, Viña del Mar",
-  price: "$3.500 p/p",
 } as const;
 
-/** Monto a cobrar por Mercado Pago, en pesos chilenos (sin decimales). */
-export const EVENT_PRICE_CLP = 3500;
-
-/** Cargo por servicio en pesos, a partir de puntos base (1000 = 10.00%). */
+/** Cargo por servicio en pesos, a partir de puntos base (1000 = 10.00%).
+ * Utilidad genérica — hoy la usan las compras de planes en /planes. */
 export function calculateServiceCharge(basePrice: number, bps: number): number {
   return Math.round((basePrice * bps) / 10000);
 }

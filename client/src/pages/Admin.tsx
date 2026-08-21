@@ -14,11 +14,8 @@ import {
 } from "lucide-react";
 import { BrandMark } from "@/components/common";
 import { formatCLP } from "@shared/format";
-import {
-  EVENT_CAPACITY,
-  EVENT_PRICE_CLP,
-  calculateServiceCharge,
-} from "@shared/registration";
+import { EVENT_CAPACITY, calculateServiceCharge } from "@shared/registration";
+import { findPlan, planPriceToNumber } from "@shared/plans";
 import type { PlanPurchase, Registration } from "../../../drizzle/schema";
 
 type MpStatus =
@@ -73,7 +70,7 @@ function MercadoPagoPanel() {
           <p className="admin-mp__sub">
             {status.connected
               ? `Conectado el ${new Date(status.connectedAt).toLocaleDateString("es-CL")} · cuenta ${status.mpUserId}${status.liveMode ? "" : " (modo prueba)"}`
-              : "Sin conectar — los pagos de la inscripción no funcionarán hasta conectar tu cuenta."}
+              : "Sin conectar — los pagos de /planes no funcionarán hasta conectar tu cuenta."}
           </p>
         </div>
       </div>
@@ -133,7 +130,9 @@ function ServiceChargePanel() {
 
   if (bps === null) return null;
 
-  const preview = calculateServiceCharge(EVENT_PRICE_CLP, bps);
+  const examplePlan = findPlan("general", "twelve");
+  const examplePrice = examplePlan ? planPriceToNumber(examplePlan) : 0;
+  const preview = calculateServiceCharge(examplePrice, bps);
 
   return (
     <div className="admin-mp">
@@ -142,9 +141,9 @@ function ServiceChargePanel() {
         <div>
           <p className="admin-mp__title">Cargo por servicio</p>
           <p className="admin-mp__sub">
-            Se suma al valor de la entrada al pagar. Hoy: {formatCLP(preview)}{" "}
-            sobre {formatCLP(EVENT_PRICE_CLP)} (total{" "}
-            {formatCLP(EVENT_PRICE_CLP + preview)}).
+            Se suma al valor del plan en /planes al pagar. Ejemplo con 12 clases
+            general: {formatCLP(preview)} sobre {formatCLP(examplePrice)} (total{" "}
+            {formatCLP(examplePrice + preview)}).
           </p>
         </div>
       </div>

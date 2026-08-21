@@ -1,10 +1,12 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import {
   EVENT_CAPACITY,
+  approveRegistration,
   countActiveRegistrations,
-  createRegistration,
+  createApprovedRegistration,
   findRegistrationByContact,
 } from "../server/db.js";
+import { sendInvitationEmail } from "../server/lib/resend.js";
 import { registrationSchema } from "../shared/registration.js";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
@@ -27,12 +29,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       parsed.data.whatsapp
     );
     if (existing) {
-      // Ya pagó: no se vuelve a registrar. Si sigue "pending" es un lead
-      // que llenó el formulario antes pero no completó el pago — se deja
-      // pasar sin duplicar fila, así retoma el pago desde donde quedó.
       if (existing.status === "approved") {
         res.status(200).json({ ok: true, alreadyRegistered: true });
         return;
+      }
+      // Fila "pending" heredada de cuando la inscripción todavía cobraba —
+      // se completa gratis ahora en vez de dejarla varada.
+      const row = await approveRegistration(existing.id);
+      try {
+        await sendInvitationEmail(row.email, row.fullName);
+      } catch (emailError) {
+        console.error("[register] invitation email failed", emailError);
       }
       res.status(200).json({ ok: true });
       return;
@@ -44,7 +51,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return;
     }
 
-    await createRegistration(parsed.data);
+    const row = await createApprovedRegistration(parsed.data);
+    try {
+      await sendInvitationEmail(row.email, row.fullName);
+    } catch (emailError) {
+      console.error("[register] invitation email failed", emailError);
+    }
     res.status(201).json({ ok: true });
   } catch (error) {
     console.error("[register] failed", error);

@@ -188,23 +188,15 @@ export async function createApprovedRegistration(data: InsertRegistration) {
   return row;
 }
 
-/** Sube a "approved" una fila que ya existía como "pending" (creada al
- * llenar el formulario), en vez de insertar una fila nueva duplicada. */
-export async function markRegistrationApprovedWithPayment(
-  id: number,
-  mpPaymentId: string,
-  amount: number
-) {
+/** Sube a "approved" una fila "pending" heredada de cuando /inauguracion
+ * todavía cobraba — la inscripción ya no tiene costo, así que no lleva
+ * campos de pago. */
+export async function approveRegistration(id: number) {
   const db = getDb();
   if (!db) throw new Error("Database not configured");
   const [row] = await db
     .update(registrations)
-    .set({
-      status: "approved",
-      invitationSentAt: new Date(),
-      mpPaymentId,
-      amount,
-    })
+    .set({ status: "approved", invitationSentAt: new Date() })
     .where(eq(registrations.id, id))
     .returning();
   return row;

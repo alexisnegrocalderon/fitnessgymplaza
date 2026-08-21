@@ -2,53 +2,29 @@ import { useEffect, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useForm } from "react-hook-form";
-import { Payment, initMercadoPago } from "@mercadopago/sdk-react";
 import {
   AlertTriangle,
   CalendarDays,
   CheckCircle2,
   MapPin,
   PartyPopper,
-  Ticket,
 } from "lucide-react";
 import { BrandMark } from "@/components/common";
 import { calm, spring } from "@/lib/motion";
-import { formatCLP } from "@shared/format";
 import {
   EVENT_DETAILS,
-  EVENT_PRICE_CLP,
   registrationSchema,
   type RegistrationInput,
 } from "@shared/registration";
 
-type PriceBreakdown = {
-  basePrice: number;
-  serviceCharge: number;
-  total: number;
-};
-
-type ViewState =
-  | "form"
-  | "payment"
-  | "success"
-  | "duplicate"
-  | "full"
-  | "mp_unavailable";
-
-/** Payload que entrega el Payment Brick en su onSubmit — se reenvía tal
- * cual a api/pay.ts, que a su vez lo pasa a la API de Mercado Pago. */
-type BrickFormData = Record<string, unknown>;
+type ViewState = "form" | "success" | "duplicate" | "full";
 
 export default function Inauguracion() {
   const reduced = useReducedMotion();
   const [view, setView] = useState<ViewState>("form");
-  const [submitting, setSubmitting] = useState(false);
   const [submittingContact, setSubmittingContact] = useState(false);
   const [checkingCapacity, setCheckingCapacity] = useState(true);
-  const [contact, setContact] = useState<RegistrationInput | null>(null);
-  const [publicKey, setPublicKey] = useState<string | null>(null);
-  const [pricing, setPricing] = useState<PriceBreakdown | null>(null);
-  const [paymentError, setPaymentError] = useState<string | null>(null);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const {
     register,
@@ -72,50 +48,10 @@ export default function Inauguracion() {
     };
   }, []);
 
-  useEffect(() => {
-    if (view !== "payment" || publicKey) return;
-    let cancelled = false;
-    fetch("/api/mercadopago-public-key")
-      .then(res => (res.ok ? res.json() : Promise.reject()))
-      .then(data => {
-        if (cancelled) return;
-        initMercadoPago(data.publicKey);
-        setPublicKey(data.publicKey);
-      })
-      .catch(() => {
-        if (!cancelled) setView("mp_unavailable");
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [view, publicKey]);
-
-  useEffect(() => {
-    if (view !== "payment" || pricing) return;
-    let cancelled = false;
-    fetch("/api/event-pricing")
-      .then(res => (res.ok ? res.json() : Promise.reject()))
-      .then(data => {
-        if (!cancelled) setPricing(data);
-      })
-      .catch(() => {
-        if (!cancelled)
-          setPricing({
-            basePrice: EVENT_PRICE_CLP,
-            serviceCharge: 0,
-            total: EVENT_PRICE_CLP,
-          });
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [view, pricing]);
-
   async function onContactSubmit(data: RegistrationInput) {
     setSubmittingContact(true);
+    setSubmitError(null);
     try {
-      // Guarda al contacto de inmediato (aunque no termine de pagar) para
-      // que aparezca en /admin como cliente/lead desde este momento.
       const res = await fetch("/api/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -133,51 +69,11 @@ export default function Inauguracion() {
         return;
       }
 
-      setContact(data);
-      setPaymentError(null);
-      setView("payment");
+      setView("success");
     } catch {
-      setPaymentError("No se pudo guardar tus datos. Intenta de nuevo.");
+      setSubmitError("No se pudo guardar tus datos. Intenta de nuevo.");
     } finally {
       setSubmittingContact(false);
-    }
-  }
-
-  async function onPaymentSubmit(formData: BrickFormData) {
-    if (!contact) return;
-    setSubmitting(true);
-    setPaymentError(null);
-    try {
-      const res = await fetch("/api/pay", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...contact, formData }),
-      });
-
-      if (res.status === 409) {
-        setView("full");
-        return;
-      }
-
-      const json = await res.json();
-      if (json.alreadyRegistered) {
-        setView("duplicate");
-        return;
-      }
-      if (json.ok) {
-        setView("success");
-        return;
-      }
-
-      setPaymentError(
-        json.status === "rejected"
-          ? "El pago fue rechazado. Verifica los datos de tu tarjeta o intenta con otro medio de pago."
-          : "El pago quedó en proceso de confirmación. Te avisaremos por correo apenas se confirme."
-      );
-    } catch {
-      setPaymentError("No se pudo procesar el pago. Intenta de nuevo.");
-    } finally {
-      setSubmitting(false);
     }
   }
 
@@ -238,9 +134,6 @@ export default function Inauguracion() {
           <span>
             <MapPin size={15} /> {EVENT_DETAILS.address}
           </span>
-          <span>
-            <Ticket size={15} /> {EVENT_DETAILS.price}
-          </span>
         </motion.div>
 
         <motion.div
@@ -295,9 +188,9 @@ export default function Inauguracion() {
                   />
                   {errors.whatsapp && <em>{errors.whatsapp.message}</em>}
                 </label>
-                {paymentError && (
+                {submitError && (
                   <p className="immersive-flow__payment-error">
-                    <AlertTriangle size={14} /> {paymentError}
+                    <AlertTriangle size={14} /> {submitError}
                   </p>
                 )}
                 <button
@@ -305,90 +198,13 @@ export default function Inauguracion() {
                   className="button button--cobalt"
                   disabled={submittingContact}
                 >
-                  {submittingContact ? "Guardando…" : "Continuar al pago"}
+                  {submittingContact ? "Guardando…" : "¡Nos vemos ahí!"}
                 </button>
                 <p className="immersive-flow__fineprint">
-                  Cupos limitados, valor {EVENT_DETAILS.price}. El siguiente
-                  paso es el pago — tu cupo queda confirmado apenas se apruebe.
-                  ¡Los esperamos!
+                  Cupos limitados. Tu inscripción queda confirmada al instante —
+                  ¡los esperamos!
                 </p>
               </motion.form>
-            ) : view === "payment" ? (
-              <motion.div
-                key="payment"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={calm}
-                className="immersive-flow__payment"
-              >
-                {pricing && (
-                  <div className="immersive-flow__breakdown">
-                    <div>
-                      <span>Valor entrada</span>
-                      <span>{formatCLP(pricing.basePrice)}</span>
-                    </div>
-                    {pricing.serviceCharge > 0 && (
-                      <div>
-                        <span>Cargo por servicio</span>
-                        <span>{formatCLP(pricing.serviceCharge)}</span>
-                      </div>
-                    )}
-                    <div className="immersive-flow__breakdown-total">
-                      <span>Total a pagar</span>
-                      <span>{formatCLP(pricing.total)}</span>
-                    </div>
-                  </div>
-                )}
-                {paymentError && (
-                  <p className="immersive-flow__payment-error">
-                    <AlertTriangle size={14} /> {paymentError}
-                  </p>
-                )}
-                {publicKey && pricing ? (
-                  <Payment
-                    initialization={{
-                      amount: pricing.total,
-                      payer: { email: contact?.email },
-                    }}
-                    customization={{
-                      paymentMethods: {
-                        creditCard: "all",
-                        debitCard: "all",
-                      },
-                    }}
-                    onSubmit={async ({ formData }) => {
-                      await onPaymentSubmit(
-                        formData as unknown as BrickFormData
-                      );
-                    }}
-                  />
-                ) : (
-                  <p className="immersive-flow__payment-loading">
-                    Cargando el formulario de pago…
-                  </p>
-                )}
-                {submitting && (
-                  <p className="immersive-flow__payment-loading">
-                    Procesando tu pago…
-                  </p>
-                )}
-              </motion.div>
-            ) : view === "mp_unavailable" ? (
-              <motion.div
-                key="mp_unavailable"
-                className="immersive-flow__result"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={calm}
-              >
-                <AlertTriangle size={32} />
-                <h2>Pagos no disponibles por ahora</h2>
-                <p>
-                  Estamos ajustando el sistema de pago. Escríbenos por WhatsApp
-                  y te ayudamos a confirmar tu cupo.
-                </p>
-              </motion.div>
             ) : view === "success" ? (
               <motion.div
                 key="success"
@@ -398,11 +214,10 @@ export default function Inauguracion() {
                 transition={calm}
               >
                 <CheckCircle2 size={32} />
-                <h2>¡Listo!</h2>
+                <h2>¡Tu inscripción quedó confirmada!</h2>
                 <p>
-                  Tu pago fue aprobado y tu cupo quedó confirmado. Te enviamos
-                  un correo con los detalles — gracias por celebrar con
-                  nosotros. ¡Los esperamos!
+                  Te enviamos un correo con los detalles — gracias por celebrar
+                  con nosotros. ¡Los esperamos!
                 </p>
               </motion.div>
             ) : view === "duplicate" ? (
