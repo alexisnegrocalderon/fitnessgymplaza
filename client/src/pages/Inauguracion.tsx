@@ -17,7 +17,7 @@ import {
   type RegistrationInput,
 } from "@shared/registration";
 
-type ViewState = "form" | "success" | "duplicate" | "full";
+type ViewState = "form" | "success" | "duplicate" | "resent" | "full";
 
 export default function Inauguracion() {
   const reduced = useReducedMotion();
@@ -25,6 +25,7 @@ export default function Inauguracion() {
   const [submittingContact, setSubmittingContact] = useState(false);
   const [checkingCapacity, setCheckingCapacity] = useState(true);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [deliveryIssue, setDeliveryIssue] = useState(false);
 
   const {
     register,
@@ -48,14 +49,14 @@ export default function Inauguracion() {
     };
   }, []);
 
-  async function onContactSubmit(data: RegistrationInput) {
+  async function onContactSubmit(data: RegistrationInput, resend = false) {
     setSubmittingContact(true);
     setSubmitError(null);
     try {
       const res = await fetch("/api/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+        body: JSON.stringify({ ...data, resend }),
       });
 
       if (res.status === 409) {
@@ -63,12 +64,23 @@ export default function Inauguracion() {
         return;
       }
 
-      const json = await res.json();
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        if (json.error === "email_delivery_failed") {
+          setDeliveryIssue(true);
+          setView("duplicate");
+          return;
+        }
+        setSubmitError("No pudimos completar la inscripción. Intenta nuevamente.");
+        return;
+      }
       if (json.alreadyRegistered) {
-        setView("duplicate");
+        setDeliveryIssue(false);
+        setView(json.emailResent ? "resent" : "duplicate");
         return;
       }
 
+      setDeliveryIssue(false);
       setView("success");
     } catch {
       setSubmitError("No se pudo guardar tus datos. Intenta de nuevo.");
@@ -154,7 +166,7 @@ export default function Inauguracion() {
             {checkingCapacity ? null : view === "form" ? (
               <motion.form
                 key="form"
-                onSubmit={handleSubmit(onContactSubmit)}
+                onSubmit={handleSubmit(data => onContactSubmit(data))}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
@@ -230,7 +242,31 @@ export default function Inauguracion() {
               >
                 <CheckCircle2 size={32} />
                 <h2>Ya estás inscrito</h2>
-                <p>Ya tenemos tu inscripción registrada con estos datos.</p>
+                <p>
+                  {deliveryIssue
+                    ? "Tu inscripción quedó guardada, pero no pudimos confirmar el correo. Puedes reenviar la invitación."
+                    : "Ya tenemos tu inscripción registrada con estos datos. Si no ves la invitación, puedes reenviarla."}
+                </p>
+                <button
+                  type="button"
+                  className="button button--cobalt"
+                  disabled={submittingContact}
+                  onClick={handleSubmit(data => onContactSubmit(data, true))}
+                >
+                  {submittingContact ? "Reenviando…" : "Reenviar invitación"}
+                </button>
+              </motion.div>
+            ) : view === "resent" ? (
+              <motion.div
+                key="resent"
+                className="immersive-flow__result"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={calm}
+              >
+                <CheckCircle2 size={32} />
+                <h2>Invitación reenviada</h2>
+                <p>Revisa también spam o promociones si no la ves en unos minutos.</p>
               </motion.div>
             ) : (
               <motion.div

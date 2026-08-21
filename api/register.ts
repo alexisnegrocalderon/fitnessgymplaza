@@ -16,6 +16,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   const parsed = registrationSchema.safeParse(req.body);
+  const resendRequested = req.body?.resend === true;
   if (!parsed.success) {
     res
       .status(400)
@@ -30,7 +31,24 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     );
     if (existing) {
       if (existing.status === "approved") {
-        res.status(200).json({ ok: true, alreadyRegistered: true });
+        if (!resendRequested) {
+          res.status(200).json({ ok: true, alreadyRegistered: true });
+          return;
+        }
+
+        try {
+          await sendInvitationEmail(existing.email, existing.fullName);
+        } catch (emailError) {
+          console.error("[register] invitation resend failed", emailError);
+          res.status(502).json({ error: "email_delivery_failed" });
+          return;
+        }
+
+        res.status(200).json({
+          ok: true,
+          alreadyRegistered: true,
+          emailResent: true,
+        });
         return;
       }
       // Fila "pending" heredada de cuando la inscripción todavía cobraba —
@@ -40,6 +58,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         await sendInvitationEmail(row.email, row.fullName);
       } catch (emailError) {
         console.error("[register] invitation email failed", emailError);
+        res.status(502).json({ error: "email_delivery_failed" });
+        return;
       }
       res.status(200).json({ ok: true });
       return;
@@ -56,6 +76,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       await sendInvitationEmail(row.email, row.fullName);
     } catch (emailError) {
       console.error("[register] invitation email failed", emailError);
+      res.status(502).json({ error: "email_delivery_failed" });
+      return;
     }
     res.status(201).json({ ok: true });
   } catch (error) {
