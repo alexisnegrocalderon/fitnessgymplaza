@@ -376,7 +376,6 @@ main > section[id] {
   display: flex;
   flex: 1;
   flex-direction: column;
-  justify-content: space-between;
   padding-top: 164px;
   padding-bottom: 38px;
 }
@@ -397,9 +396,15 @@ main > section[id] {
   height: 1px;
   background: var(--cobalt);
 }
-.hero-content__main {
-  max-width: 580px;
-  margin-top: clamp(42px, 7vh, 90px);
+.hero-content__heading {
+  max-width: 780px;
+  margin-top: clamp(28px, 5vh, 64px);
+}
+.hero-content__copy {
+  max-width: 480px;
+  /* Deja hueco a propósito: el logo del video se revela debajo del
+     titular y antes de esta caja. */
+  margin-top: clamp(72px, 16vh, 176px);
 }
 .hero-content__eyebrow {
   display: inline-flex;
@@ -443,7 +448,7 @@ main > section[id] {
 }
 .hero-content__lede {
   max-width: 390px;
-  margin: 30px 0 0 5vw;
+  margin: 0 0 0 5vw;
   color: rgba(255, 255, 255, 0.75);
   font-size: 15px;
   line-height: 1.75;
@@ -483,6 +488,7 @@ main > section[id] {
   display: flex;
   align-items: end;
   justify-content: space-between;
+  margin-top: auto;
 }
 .glass-card {
   border: 1px solid rgba(255, 255, 255, 0.16);
@@ -2148,9 +2154,12 @@ main > section[id] {
   .hero-content {
     padding-top: 392px;
   }
-  .hero-content__main {
+  .hero-content__heading {
     max-width: 100%;
     margin-top: 42px;
+  }
+  .hero-content__copy {
+    margin-top: 30px;
   }
   .hero-content h1 {
     max-width: 650px;
@@ -2215,8 +2224,15 @@ main > section[id] {
   .hero-content__topline-rule {
     width: 28px;
   }
-  .hero-content__main {
+  .hero-content__heading {
     max-width: 100%;
+    margin-top: 20px;
+  }
+  .hero-content__copy {
+    max-width: 100%;
+    /* Empuja la copia hacia el fondo (junto con .hero-content__bottomline,
+       que también lleva margin-top: auto) para dejar libre la franja donde
+       el video revela el logo entre el titular y este bloque. */
     margin-top: auto;
     padding: 18px 16px 8px 0;
     background: linear-gradient(
@@ -2236,7 +2252,7 @@ main > section[id] {
   }
   .hero-content__lede {
     max-width: 315px;
-    margin-top: 22px;
+    margin-top: 0;
     font-size: 13px;
     line-height: 1.65;
   }
@@ -2245,9 +2261,6 @@ main > section[id] {
     flex-direction: column;
     gap: 18px;
     margin-top: 24px;
-  }
-  .hero-content__bottomline {
-    margin-top: 30px;
   }
   .hero-scroll {
     font-size: 8px;

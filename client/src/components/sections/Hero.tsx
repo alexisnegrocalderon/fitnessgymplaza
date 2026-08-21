@@ -157,7 +157,7 @@ export default function Hero() {
           <span className="hero-content__topline-rule" />
           <span>{ADDRESS_LINE}</span>
         </motion.div>
-        <div className="hero-content__main">
+        <div className="hero-content__heading">
           <motion.div
             className="hero-content__eyebrow"
             initial={{ opacity: 0, y: 10 }}
@@ -172,6 +172,11 @@ export default function Hero() {
               <Words text={HEADLINE_ACCENT} />
             </em>
           </motion.h1>
+        </div>
+        {/* Espacio deliberadamente libre entre el titular y esta caja: es
+            donde el video revela el logo al final de su ciclo — el texto
+            no debe taparlo. */}
+        <div className="hero-content__copy">
           <motion.p
             className="hero-content__lede"
             initial={{ opacity: 0, y: 14 }}
