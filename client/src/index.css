@@ -1038,53 +1038,6 @@ main > section[id] {
   margin-top: 28px;
 }
 
-/* ---------- carrusel de planes (arrastre + momentum) ---------- */
-.plans-carousel {
-  position: relative;
-}
-/* pan-y deja el scroll vertical de la página al navegador y nos entrega
-   solo el gesto horizontal: en móvil las dos cosas conviven sin pelear. */
-.plans-carousel__viewport {
-  overflow: hidden;
-  touch-action: pan-y;
-  cursor: grab;
-}
-.plans-carousel__viewport:active {
-  cursor: grabbing;
-}
-.plans-carousel__viewport:focus-visible {
-  outline: 2px solid var(--cobalt);
-  outline-offset: 6px;
-}
-.plans-carousel__track {
-  display: flex;
-  align-items: stretch;
-  gap: 22px;
-  padding-inline: max(24px, calc((100vw - 1240px) / 2));
-}
-.plans-carousel__slide {
-  display: flex;
-  flex: 0 0 auto;
-}
-.plans-carousel__slide--accent {
-  align-items: stretch;
-}
-.plans-carousel__slide img {
-  user-select: none;
-  -webkit-user-drag: none;
-}
-.plans-carousel__rail {
-  width: min(1240px, calc(100% - 48px));
-  height: 2px;
-  margin: 34px auto 0;
-  background: var(--bone-line);
-  overflow: hidden;
-}
-.plans-carousel__rail-thumb {
-  display: block;
-  height: 100%;
-  background: var(--cobalt);
-}
 .plans-section__hint {
   color: rgba(14, 17, 16, 0.42);
   font-size: 10px;
@@ -1094,29 +1047,130 @@ main > section[id] {
   font-family: "Barlow Condensed", sans-serif;
 }
 
-.plan-card-h {
-  position: relative;
+/* ---------- selector segmentado: audiencia + clases ---------- */
+.plans-selector {
   display: flex;
   flex-direction: column;
-  flex: 0 0 auto;
-  width: min(420px, 78vw);
-  min-height: 490px;
-  padding: 24px 26px 25px;
-  background: rgba(14, 17, 16, 0.94);
+  align-items: flex-start;
+  gap: 14px;
+  margin: -28px 0 40px;
+}
+.segmented {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 4px;
+  background: var(--bone-deep);
+  border: 1px solid var(--bone-line);
+  border-radius: 999px;
+}
+.segmented__tab {
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: 11px 18px;
+  border: 0;
+  background: transparent;
+  border-radius: 999px;
+  color: rgba(14, 17, 16, 0.55);
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  overflow: hidden;
+}
+.segmented__tab.is-active {
+  color: #fff;
+}
+.segmented__pill {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: var(--graphite);
+  border-radius: 999px;
+  box-shadow: 0 8px 18px rgba(14, 17, 16, 0.22);
+}
+.segmented__content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.segmented__icon {
+  display: inline-flex;
+  color: currentColor;
+}
+.segmented__extra {
+  margin-left: 2px;
+  padding-left: 8px;
+  border-left: 1px solid rgba(255, 255, 255, 0.24);
+  color: var(--cobalt);
+  font-family: "Archivo Black", sans-serif;
+  font-size: 12px;
+}
+
+/* ---------- panel de plan activo ---------- */
+.plan-detail {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(260px, 360px) 1fr;
+  gap: 40px;
+  padding: 34px;
+  background: rgba(14, 17, 16, 0.96);
   color: #fff;
   box-shadow: 12px 12px 0 rgba(14, 17, 16, 0.14);
 }
-.plan-card-h--featured {
-  width: min(480px, 82vw);
+.plan-detail--featured {
   background: var(--graphite);
 }
-.plan-card-h--featured h3 {
-  font-size: clamp(28px, 3.4vw, 40px);
+.plan-detail__media {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
 }
-.plan-card__badge {
+.plan-detail__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top;
+  filter: saturate(0.82) contrast(1.08);
+}
+.plan-detail__media::after {
+  content: "";
   position: absolute;
-  top: 25px;
-  right: 25px;
+  inset: 0;
+  background: linear-gradient(0deg, rgba(14, 17, 16, 0.82), transparent 65%);
+}
+.plan-detail__media-copy {
+  position: absolute;
+  right: 18px;
+  bottom: 16px;
+  left: 18px;
+  z-index: 1;
+  display: grid;
+  gap: 8px;
+}
+.plan-detail__media-copy span {
+  color: var(--cobalt);
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 20px;
+}
+.plan-detail__media-copy strong {
+  font-family: "Archivo Black", sans-serif;
+  text-transform: uppercase;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 21px;
+  color: #fff;
+  line-height: 1.08;
+}
+.plan-detail__badge {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  z-index: 1;
   padding: 7px 9px;
   background: var(--cobalt);
   color: #fff;
@@ -1126,27 +1180,11 @@ main > section[id] {
   text-transform: uppercase;
   font-family: "Barlow Condensed", sans-serif;
 }
-.plan-card__top {
+.plan-detail__body {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  color: rgba(255, 255, 255, 0.56);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.16);
-  padding-bottom: 20px;
+  flex-direction: column;
 }
-.plan-card__top span {
-  color: var(--cobalt);
-  font-family: "Barlow Condensed", sans-serif;
-  font-size: 26px;
-}
-.plan-card__top svg {
-  color: rgba(255, 255, 255, 0.5);
-}
-.plan-card__body {
-  padding-top: 28px;
-  flex: 1;
-}
-.plan-card__kicker {
+.plan-detail__kicker {
   color: #ff8d84;
   font-size: 10px;
   font-weight: 800;
@@ -1154,106 +1192,78 @@ main > section[id] {
   text-transform: uppercase;
   font-family: "Barlow Condensed", sans-serif;
 }
-.plan-card-h h3 {
-  margin: 13px 0 20px;
+.plan-detail__body h3 {
+  margin: 13px 0 6px;
   font-family: "Archivo Black", sans-serif;
   text-transform: uppercase;
-  font-size: clamp(24px, 2.8vw, 34px);
+  font-size: clamp(28px, 3.4vw, 40px);
   font-weight: 400;
   letter-spacing: -0.005em;
-  line-height: 1.08;
+  line-height: 1.05;
 }
-.plan-card-h p {
-  max-width: 310px;
+.plan-detail__price {
+  display: block;
+  margin: 0 0 14px;
+  color: #fff;
+  font-family: "Archivo Black", sans-serif;
+  font-size: 30px;
+  font-weight: 400;
+}
+.plan-detail__body p {
+  max-width: 440px;
   color: rgba(255, 255, 255, 0.62);
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1.7;
 }
-.plan-card-h ul {
+.plan-detail__cadence {
+  display: block;
+  margin-top: 10px;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-family: "Barlow Condensed", sans-serif;
+}
+.plan-detail__body ul {
   display: grid;
   gap: 10px;
   margin: 24px 0 0;
   padding: 0;
   list-style: none;
   color: rgba(255, 255, 255, 0.78);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.04em;
 }
-.plan-card-h li {
+.plan-detail__body li {
   display: flex;
   align-items: center;
   gap: 8px;
 }
-.plan-card-h li svg {
+.plan-detail__body li svg {
   color: var(--cobalt);
 }
-.plan-card__link {
-  display: flex;
+.plan-detail__cta {
+  display: inline-flex;
+  align-self: flex-start;
   align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  margin-top: 22px;
-  padding-top: 18px;
-  border-top: 1px solid rgba(255, 255, 255, 0.16);
+  gap: 10px;
+  margin-top: 28px;
+  padding: 16px 22px;
+  border: 0;
+  background: var(--cobalt);
   color: #fff;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 800;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.11em;
   text-transform: uppercase;
   font-family: "Barlow Condensed", sans-serif;
+  cursor: pointer;
+  transition: background-color 0.2s var(--ease-out);
 }
-.plan-card__link svg {
-  color: var(--cobalt);
-}
-
-.plans-track-h__accent {
-  position: relative;
-  flex: 0 0 auto;
-  width: min(340px, 62vw);
-  overflow: hidden;
-  transform: rotate(-1.4deg);
-  box-shadow: 0 24px 50px rgba(14, 17, 16, 0.18);
-}
-.plans-track-h__accent img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: top;
-  filter: saturate(0.82) contrast(1.08);
-}
-.plans-track-h__accent::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(0deg, rgba(14, 17, 16, 0.82), transparent 65%);
-}
-.plans-grid__accent-copy {
-  position: absolute;
-  right: 18px;
-  bottom: 16px;
-  left: 18px;
-  z-index: 1;
-  display: grid;
-  gap: 8px;
-}
-.plans-grid__accent-copy span {
-  color: var(--cobalt);
-  font-family: "Barlow Condensed", sans-serif;
-  font-size: 20px;
-}
-.plans-grid__accent-copy strong {
-  font-family: "Archivo Black", sans-serif;
-  text-transform: uppercase;
-  font-style: normal;
-  font-weight: 400;
-  font-size: 21px;
-  color: #fff;
-  line-height: 1.08;
-}
-
-.plans-carousel__slide .plan-card-h {
-  height: 100%;
+.plan-detail__cta:hover {
+  background: #ef5144;
 }
 
 .plans-section__foot {
@@ -1266,91 +1276,6 @@ main > section[id] {
   border-top: 1px solid var(--bone-line);
   color: rgba(14, 17, 16, 0.6);
   font-size: 11px;
-}
-
-/* ---------- selector General / Estudiante ---------- */
-.athlete-selector-wrap {
-  margin: -28px 0 44px;
-}
-.athlete-selector {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 14px;
-}
-.athlete-selector__card {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  padding: 18px 20px;
-  background:
-    linear-gradient(115deg, rgba(217, 45, 32, 0.045), transparent 42%),
-    var(--bone-deep);
-  border: 1px solid var(--bone-line);
-  color: var(--graphite);
-  text-align: left;
-  transition:
-    background-color 0.2s var(--ease-out),
-    border-color 0.2s var(--ease-out),
-    color 0.2s var(--ease-out);
-}
-.athlete-selector__card svg:first-child {
-  flex: 0 0 auto;
-  color: rgba(14, 17, 16, 0.4);
-  transition: color 0.2s var(--ease-out);
-}
-.athlete-selector__card > div {
-  display: grid;
-  gap: 3px;
-  flex: 1;
-}
-.athlete-selector__card strong {
-  font-family: "Barlow Condensed", sans-serif;
-  font-size: 15px;
-  font-weight: 700;
-  letter-spacing: 0.01em;
-}
-.athlete-selector__card small {
-  color: rgba(14, 17, 16, 0.5);
-  font-size: 11px;
-  line-height: 1.4;
-}
-.athlete-selector__card > svg:last-child {
-  flex: 0 0 auto;
-  color: rgba(14, 17, 16, 0.3);
-}
-.athlete-selector__card.is-active {
-  background:
-    linear-gradient(120deg, rgba(217, 45, 32, 0.2), transparent 42%),
-    var(--graphite);
-  border-color: var(--graphite);
-  color: #fff;
-}
-.athlete-selector__card.is-active svg:first-child,
-.athlete-selector__card.is-active > svg:last-child {
-  color: var(--cobalt);
-}
-.athlete-selector__card.is-active small {
-  color: rgba(255, 255, 255, 0.6);
-}
-
-/* ---------- tarjeta de plan: precio + CTA como botón ---------- */
-.plan-card__price {
-  display: block;
-  margin: 2px 0 14px;
-  color: #fff;
-  font-family: "Archivo Black", sans-serif;
-  font-size: 22px;
-  font-weight: 400;
-}
-.plan-card__link {
-  width: 100%;
-  border: 0;
-  background: none;
-  font: inherit;
-  cursor: pointer;
-}
-.plan-card__link:hover {
-  color: var(--cobalt);
 }
 
 /* ---------- horarios ---------- */
@@ -2129,8 +2054,11 @@ main > section[id] {
   .schedule-accordion__body > p {
     margin-bottom: -8px;
   }
-  .athlete-selector {
+  .plan-detail {
     grid-template-columns: 1fr;
+  }
+  .plan-detail__media {
+    aspect-ratio: 16 / 9;
   }
   .enrollment-modal {
     padding: 32px 22px 26px;
@@ -2329,7 +2257,7 @@ main > section[id] {
   .plans-section__foot {
     padding-bottom: 80px;
   }
-  .athlete-selector-wrap {
+  .plans-selector {
     margin-top: 0;
   }
   .session-board__column,
@@ -2453,23 +2381,19 @@ main > section[id] {
   .plans-section__top h2 {
     margin-top: 20px;
   }
-  .plan-card-h {
-    min-height: 420px;
-    padding-inline: 21px;
+  .plan-detail {
+    padding: 22px;
+    gap: 24px;
   }
-  .plan-card-h--featured {
-    min-height: 460px;
+  .plan-detail__body h3 {
+    font-size: clamp(24px, 7.5vw, 32px);
   }
-  .plans-carousel__track {
-    gap: 14px;
-    padding-inline: 17px;
+  .segmented {
+    flex-wrap: wrap;
   }
-  .plans-carousel__rail {
-    width: calc(100% - 34px);
-    margin-top: 26px;
-  }
-  .plan-card-h h3 {
-    font-size: clamp(22px, 7.5vw, 30px);
+  .segmented__tab {
+    padding: 9px 14px;
+    font-size: 11px;
   }
   .plans-section__foot {
     align-items: flex-start;
@@ -2570,19 +2494,7 @@ main > section[id] {
   mix-blend-mode: multiply;
   pointer-events: none;
 }
-.athlete-selector__card::before {
-  content: "";
-  width: 18px;
-  height: 1px;
-  background: var(--cobalt);
-  opacity: 0.55;
-}
-.athlete-selector__card.is-active {
-  box-shadow:
-    inset 0 1px rgba(255, 255, 255, 0.09),
-    9px 9px 0 rgba(217, 45, 32, 0.12);
-}
-.plan-card-h {
+.plan-detail:not(.plan-detail--featured) {
   background:
     radial-gradient(
       circle at 100% 0%,
@@ -2591,6 +2503,8 @@ main > section[id] {
     ),
     linear-gradient(145deg, rgba(255, 255, 255, 0.055), transparent 22%),
     rgba(14, 17, 16, 0.96);
+}
+.plan-detail {
   box-shadow:
     inset 0 1px rgba(255, 255, 255, 0.09),
     12px 12px 0 rgba(14, 17, 16, 0.14);

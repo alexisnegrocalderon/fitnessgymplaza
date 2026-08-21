@@ -42,10 +42,12 @@ export const ADDRESS_LINE = "Calle Quillota 656";
 export const ADDRESS_CITY = "Viña del Mar";
 
 export type Audience = "general" | "student";
+export type PlanTier = "single" | "eight" | "twelve";
 
 export type Plan = {
   id: string;
   audience: Audience;
+  tier: PlanTier;
   label: string;
   price: string;
   tagline: string;
@@ -59,6 +61,7 @@ export const plans: Plan[] = [
   {
     id: "general-single",
     audience: "general",
+    tier: "single",
     label: "Clase única",
     price: "$8.000",
     tagline: "Conoce el circuito",
@@ -68,6 +71,7 @@ export const plans: Plan[] = [
   {
     id: "general-8",
     audience: "general",
+    tier: "eight",
     label: "Base 8",
     price: "$45.000",
     tagline: "Construye constancia",
@@ -77,6 +81,7 @@ export const plans: Plan[] = [
   {
     id: "general-12",
     audience: "general",
+    tier: "twelve",
     label: "Progresión 12",
     price: "$60.000",
     tagline: "Más pulso, más progreso",
@@ -87,6 +92,7 @@ export const plans: Plan[] = [
   {
     id: "student-single",
     audience: "student",
+    tier: "single",
     label: "Clase única",
     price: "$6.000",
     tagline: "Acceso estudiante",
@@ -97,6 +103,7 @@ export const plans: Plan[] = [
   {
     id: "student-8",
     audience: "student",
+    tier: "eight",
     label: "Base 8",
     price: "$36.000",
     tagline: "Ritmo estudiante",
@@ -107,6 +114,7 @@ export const plans: Plan[] = [
   {
     id: "student-12",
     audience: "student",
+    tier: "twelve",
     label: "Progresión 12",
     price: "$46.000",
     tagline: "Sostén el hábito",
