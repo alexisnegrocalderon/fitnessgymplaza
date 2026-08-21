@@ -1,8 +1,9 @@
 import { EVENT_DETAILS } from "../../shared/registration.js";
 import { SITE_URL, WHATSAPP_URL, mapsSearchUrl } from "../../shared/contact.js";
 import { scheduleGroups } from "../../shared/schedule.js";
+import { method } from "../../shared/method.js";
 
-const LOGO_URL = `${SITE_URL}/media/plaza-fitness-logo.png`;
+const HEADER_IMAGE_URL = `${SITE_URL}/media/plaza-fitness-mail-header.png`;
 const MAPS_URL = mapsSearchUrl(EVENT_DETAILS.address);
 
 /** Filas de la tabla de horarios — misma fuente que la sección Horarios
@@ -20,17 +21,39 @@ function scheduleRows(): string {
     .join("");
 }
 
-/** Dos botones de acción lado a lado — celdas con background-color
- * inline, el patrón estándar para "botones" en HTML de correo. */
+/** Fila de 4 pilares de marca — mismos badges numerados "01/02/03/04"
+ * que ya usa la sección Método del sitio, sin depender de íconos/SVG
+ * (mal soportados en Outlook). */
+function valuesRow(): string {
+  const items = method.slice(0, 4);
+  const cells = items
+    .map(
+      item => `
+                    <td width="25%" style="padding:0 6px;text-align:center;vertical-align:top;">
+                      <div style="width:34px;height:34px;margin:0 auto 8px;border-radius:999px;background:rgba(217,45,32,.16);border:1px solid rgba(217,45,32,.4);color:#ff8d84;font-family:'Barlow Condensed',Arial,sans-serif;font-size:12px;font-weight:800;line-height:32px;">${item.id}</div>
+                      <div style="font-size:11px;font-weight:700;color:rgba(234,231,223,.85);line-height:1.4;">${item.title}</div>
+                    </td>`
+    )
+    .join("");
+
+  return `
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 20px;">
+                <tr>${cells}</tr>
+              </table>`;
+}
+
+/** Dos botones de acción tipo pill — celdas con background-color/
+ * border-radius inline, el patrón estándar de "botones" en HTML de
+ * correo (nada de box-shadow/backdrop-filter, sin soporte confiable). */
 function actionButtons(): string {
   return `
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 8px;">
                 <tr>
                   <td width="50%" style="padding:0 6px 0 0;">
-                    <a href="${WHATSAPP_URL}" style="display:block;padding:13px 12px;border-radius:10px;background:#d92d20;color:#fff;font-size:13px;font-weight:700;text-align:center;text-decoration:none;">Escríbenos por WhatsApp</a>
+                    <a href="${WHATSAPP_URL}" style="display:block;padding:14px 12px;border-radius:999px;background:#d92d20;color:#fff;font-size:13px;font-weight:700;text-align:center;text-decoration:none;">Escríbenos por WhatsApp</a>
                   </td>
                   <td width="50%" style="padding:0 0 0 6px;">
-                    <a href="${MAPS_URL}" style="display:block;padding:13px 12px;border-radius:10px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);color:#fff;font-size:13px;font-weight:700;text-align:center;text-decoration:none;">Cómo llegar</a>
+                    <a href="${MAPS_URL}" style="display:block;padding:14px 12px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.24);color:#fff;font-size:13px;font-weight:700;text-align:center;text-decoration:none;">Cómo llegar</a>
                   </td>
                 </tr>
               </table>`;
@@ -45,12 +68,13 @@ function shell(kicker: string, body: string): string {
         <td align="center">
           <table role="presentation" width="100%" style="max-width:520px;background:#171b19;border:1px solid rgba(255,255,255,.1);border-radius:16px;overflow:hidden;">
             <tr>
-              <td style="padding:32px 36px 24px;text-align:center;border-bottom:1px solid rgba(255,255,255,.08);">
-                <img src="${LOGO_URL}" width="64" height="64" alt="Plaza Fitness" style="display:block;margin:0 auto;" />
-                <div style="margin-top:14px;font-family:'Arial Black',Arial,sans-serif;font-weight:900;letter-spacing:.02em;color:#fff;font-size:20px;text-transform:uppercase;">
-                  Plaza Fitness
-                </div>
-                <div style="margin-top:6px;font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#d92d20;">
+              <td>
+                <img src="${HEADER_IMAGE_URL}" width="520" height="110" alt="" style="display:block;width:100%;height:auto;" />
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:20px 36px 20px;text-align:center;border-bottom:1px solid rgba(255,255,255,.08);">
+                <div style="font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#d92d20;">
                   ${kicker}
                 </div>
               </td>
@@ -80,7 +104,7 @@ export function invitationEmailHtml(fullName: string): string {
 
   const body = `
             <tr>
-              <td style="padding:32px 36px 8px;color:#eae7df;">
+              <td style="padding:24px 36px 8px;color:#eae7df;">
                 <p style="margin:0 0 18px;font-size:15px;line-height:1.6;">Hola ${firstName},</p>
                 <p style="margin:0 0 18px;font-size:15px;line-height:1.6;">
                   Tu inscripción a la <strong>${EVENT_DETAILS.name}</strong> está confirmada.
@@ -96,6 +120,7 @@ export function invitationEmailHtml(fullName: string): string {
                     </td>
                   </tr>
                 </table>
+                ${valuesRow()}
                 ${actionButtons()}
                 <p style="margin:16px 0 4px;font-size:13px;line-height:1.6;color:rgba(234,231,223,.65);">
                   Muéstranos este correo al llegar. ¡Nos vemos pronto!
@@ -120,7 +145,7 @@ export function planConfirmationEmailHtml(
 
   const body = `
             <tr>
-              <td style="padding:32px 36px 8px;color:#eae7df;">
+              <td style="padding:24px 36px 8px;color:#eae7df;">
                 <p style="margin:0 0 18px;font-size:15px;line-height:1.6;">Hola ${firstName},</p>
                 <p style="margin:0 0 18px;font-size:15px;line-height:1.6;">
                   Tu pago fue aprobado y tu plan <strong>${planLabel}</strong> ya está activo.
@@ -144,6 +169,7 @@ export function planConfirmationEmailHtml(
                     </td>
                   </tr>
                 </table>
+                ${valuesRow()}
                 ${actionButtons()}
                 <p style="margin:16px 0 4px;font-size:13px;line-height:1.6;color:rgba(234,231,223,.65);">
                   Escríbenos por WhatsApp para coordinar tu primera clase. ¡Nos vemos pronto!
