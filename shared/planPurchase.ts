@@ -24,7 +24,7 @@ export const planPurchaseSchema = z.object({
     .email("Ingresa un email válido")
     .max(320),
   audience: z.enum(["general", "student"]),
-  tier: z.enum(["single", "eight", "twelve"]),
+  tier: z.enum(["single", "eight", "twelve", "pack3", "pack6"]),
 });
 
 export type PlanPurchaseInput = z.infer<typeof planPurchaseSchema>;

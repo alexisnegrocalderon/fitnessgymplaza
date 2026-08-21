@@ -93,7 +93,13 @@ export type EventSettings = typeof eventSettings.$inferSelect;
 export type InsertEventSettings = typeof eventSettings.$inferInsert;
 
 export const planAudience = pgEnum("plan_audience", ["general", "student"]);
-export const planTier = pgEnum("plan_tier", ["single", "eight", "twelve"]);
+export const planTier = pgEnum("plan_tier", [
+  "single",
+  "eight",
+  "twelve",
+  "pack3",
+  "pack6",
+]);
 
 /**
  * Compra de un plan de gimnasio desde /planes. Reutiliza el enum

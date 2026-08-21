@@ -17,7 +17,13 @@ import {
   planPurchaseSchema,
   type PlanPurchaseInput,
 } from "@shared/planPurchase";
-import { plans, type Audience, type Plan, type PlanTier } from "@shared/plans";
+import {
+  PLAN_TIERS,
+  plans,
+  type Audience,
+  type Plan,
+  type PlanTier,
+} from "@shared/plans";
 
 const STEP_ORDER = [
   "audience",
@@ -48,7 +54,7 @@ function readQueryPlan(): { audience: Audience; tier: PlanTier } | null {
   const audience = params.get("audience");
   const tier = params.get("tier");
   const validAudience = audience === "general" || audience === "student";
-  const validTier = tier === "single" || tier === "eight" || tier === "twelve";
+  const validTier = (PLAN_TIERS as readonly string[]).includes(tier ?? "");
   return validAudience && validTier
     ? { audience: audience as Audience, tier: tier as PlanTier }
     : null;
@@ -374,10 +380,10 @@ export default function Planes() {
                   className="immersive-flow__lede"
                   style={{ margin: "10px 0 22px" }}
                 >
-                  Elige el ritmo que más te acomode.
+                  Elige el ritmo que más te acomode — o ahorra con un pack.
                 </p>
                 <div className="immersive-flow__options">
-                  {(["single", "eight", "twelve"] as const).map(t => {
+                  {PLAN_TIERS.map(t => {
                     const optionPlan = plans.find(
                       p => p.audience === audience && p.tier === t
                     );

@@ -23,10 +23,20 @@ const AUDIENCE_ITEMS: { id: Audience; label: string; icon: ReactNode }[] = [
   { id: "student", label: "Estudiante", icon: <ClipboardCheck size={16} /> },
 ];
 
+const TIER_BADGE: Record<PlanTier, string> = {
+  single: "01",
+  eight: "08",
+  twelve: "12",
+  pack3: "P3",
+  pack6: "P6",
+};
+
 const TIER_ITEMS: { id: PlanTier; label: string }[] = [
   { id: "single", label: "Pase diario" },
   { id: "eight", label: "8 clases" },
   { id: "twelve", label: "12 clases" },
+  { id: "pack3", label: "Pack 3 meses" },
+  { id: "pack6", label: "Pack 6 meses" },
 ];
 
 /**
@@ -122,13 +132,7 @@ function PlanDetail({ plan }: { plan: Plan }) {
             loading="lazy"
           />
           <div className="plan-detail__media-copy">
-            <span>
-              {plan.tier === "single"
-                ? "01"
-                : plan.tier === "eight"
-                  ? "08"
-                  : "12"}
-            </span>
+            <span>{TIER_BADGE[plan.tier]}</span>
             <strong>El plan es moverte.</strong>
           </div>
           {plan.featured && (
