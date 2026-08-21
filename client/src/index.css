@@ -2829,6 +2829,83 @@ main > section[id] {
   opacity: 0.92;
 }
 
+/* En mobile el bloque debe caber en una pantalla sin scroll y verse
+ * proporcionado — no una réplica achicada del layout de escritorio. */
+@media (max-width: 560px) {
+  .immersive-flow {
+    align-items: flex-start;
+    padding: 28px 16px 32px;
+  }
+  .immersive-flow__brand {
+    margin-bottom: 8px;
+  }
+  .immersive-flow__brand .brand-mark--stamp {
+    width: 56px;
+    height: 56px;
+  }
+  .immersive-flow__eyebrow {
+    font-size: 10px;
+  }
+  .immersive-flow h1 {
+    margin-top: 10px;
+    font-size: clamp(22px, 7vw, 32px);
+    line-height: 1.08;
+  }
+  .immersive-flow__lede {
+    margin-top: 8px;
+    font-size: 13px;
+    line-height: 1.55;
+  }
+  .immersive-flow__meta {
+    margin-top: 12px;
+    gap: 6px;
+    font-size: 12px;
+  }
+  .immersive-flow__panel {
+    margin-top: 16px;
+    padding: 16px 16px 18px;
+    border-radius: 20px;
+  }
+  .immersive-flow__progress {
+    margin-bottom: 14px;
+  }
+  .immersive-flow__options {
+    gap: 8px;
+  }
+  .immersive-flow__option {
+    padding: 12px 14px;
+    gap: 12px;
+    border-radius: 14px;
+  }
+  .immersive-flow__option-icon {
+    width: 38px;
+    height: 38px;
+  }
+  .immersive-flow__option-body strong {
+    font-size: 14px;
+  }
+  .immersive-flow__option-body small {
+    font-size: 11px;
+  }
+  .immersive-flow__option-price {
+    font-size: 15px;
+  }
+  .immersive-flow__split-half {
+    padding: 14px 10px;
+    gap: 6px;
+  }
+  .immersive-flow__split-icon {
+    width: 32px;
+    height: 32px;
+  }
+  .immersive-flow__split-half strong {
+    font-size: 15px;
+  }
+  .immersive-flow__field input {
+    min-height: 42px;
+  }
+}
+
 /* ---------- admin ---------- */
 .admin-login {
   min-height: 100svh;
