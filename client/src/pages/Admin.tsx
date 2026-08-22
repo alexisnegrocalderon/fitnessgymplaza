@@ -1,14 +1,17 @@
 import { useEffect, useState } from "react";
 import {
+  AlertTriangle,
   CheckCircle2,
   Clock,
   CreditCard,
+  Download,
   LogOut,
   Mail,
   MessageCircle,
   Percent,
   Send,
   Ticket,
+  Trash2,
   UserCheck,
   Users,
   XCircle,
@@ -249,21 +252,63 @@ function TestEmailPanel() {
 
 type Session = "checking" | "out" | "in";
 
-/** Solo 200 + JSON válido cuenta como sesión activa — cualquier otra
- * respuesta (401, 500, HTML de error) debe caer a la pantalla de login. */
+/** Solo 200 + JSON válido cuenta como sesión activa; un 401 manda al
+ * login. El resto se distingue por causa, porque "no hay inscritos" y "no
+ * pude leer la base" se veían idénticos en el panel: cuando se cayó la
+ * credencial de la base, el panel mostró una lista vacía y pareció que
+ * los clientes se habían borrado. */
+type LoadFailure = "unauthorized" | "unreachable";
+
 async function fetchRegistrations(): Promise<
-  { ok: true; rows: Registration[] } | { ok: false; unauthorized: boolean }
+  { ok: true; rows: Registration[] } | { ok: false; reason: LoadFailure }
 > {
   try {
     const res = await fetch("/api/admin/registrations");
-    if (!res.ok) return { ok: false, unauthorized: res.status === 401 };
+    if (res.status === 401) return { ok: false, reason: "unauthorized" };
+    if (!res.ok) return { ok: false, reason: "unreachable" };
     const data = await res.json();
     if (!Array.isArray(data.registrations))
-      return { ok: false, unauthorized: false };
+      return { ok: false, reason: "unreachable" };
     return { ok: true, rows: data.registrations };
   } catch {
-    return { ok: false, unauthorized: false };
+    return { ok: false, reason: "unreachable" };
   }
+}
+
+/** Copia de respaldo a mano: el panel es hoy el único lugar donde viven
+ * las inscripciones, así que puede entregarlas como CSV sin depender de
+ * que la base siga en pie. */
+function downloadRegistrationsCsv(rows: Registration[]) {
+  const escape = (value: string) => `"${value.replace(/"/g, '""')}"`;
+  const header = [
+    "nombre",
+    "email",
+    "whatsapp",
+    "estado",
+    "invitacion_enviada",
+    "inscrito",
+  ];
+  const lines = rows.map(row =>
+    [
+      row.fullName,
+      row.email,
+      row.whatsapp,
+      row.status,
+      row.invitationSentAt ? new Date(row.invitationSentAt).toISOString() : "",
+      new Date(row.createdAt).toISOString(),
+    ]
+      .map(field => escape(String(field)))
+      .join(",")
+  );
+  const csv = [header.join(","), ...lines].join("\n");
+  const url = URL.createObjectURL(
+    new Blob([`\ufeff${csv}`], { type: "text/csv;charset=utf-8" })
+  );
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `inscripciones-${new Date().toISOString().slice(0, 10)}.csv`;
+  link.click();
+  URL.revokeObjectURL(url);
 }
 
 function LoginForm({ onLoggedIn }: { onLoggedIn: () => void }) {
@@ -369,7 +414,7 @@ function StatTile({
 }: {
   icon: React.ReactNode;
   label: string;
-  value: number;
+  value: number | string;
   accent?: boolean;
 }) {
   return (
@@ -386,7 +431,177 @@ function waLink(whatsapp: string): string {
   return `https://wa.me/${whatsapp.replace(/\D/g, "")}`;
 }
 
-function ClientesTable({ rows }: { rows: Registration[] }) {
+/** Lo que el panel está a punto de borrar. `requiresPassword` marca las
+ * filas con dinero asociado (pago de Mercado Pago o monto): ahí la doble
+ * confirmación no basta y se vuelve a pedir la clave del admin. */
+type DeleteTarget = {
+  kind: "registration" | "plan";
+  id: number;
+  name: string;
+  detail: string;
+  requiresPassword: boolean;
+};
+
+function DeleteDialog({
+  target,
+  onCancel,
+  onDeleted,
+  onUnauthorized,
+}: {
+  target: DeleteTarget;
+  onCancel: () => void;
+  onDeleted: () => void;
+  onUnauthorized: () => void;
+}) {
+  const [step, setStep] = useState<1 | 2>(1);
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
+
+  async function confirmDelete() {
+    if (target.requiresPassword && !password.trim()) {
+      setError("Ingresa la clave de admin para continuar.");
+      return;
+    }
+    setDeleting(true);
+    setError(null);
+    try {
+      const path =
+        target.kind === "plan"
+          ? `/api/admin/plans/${target.id}`
+          : `/api/admin/registrations/${target.id}`;
+      const res = await fetch(path, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ confirm: true, password }),
+      });
+      if (res.status === 401) {
+        onUnauthorized();
+        return;
+      }
+      const data = await res.json().catch(() => ({}));
+      if (res.status === 403 || data.error === "invalid_password") {
+        setError("La clave de admin no coincide.");
+        return;
+      }
+      if (!res.ok) {
+        setError("No se pudo eliminar. Intenta de nuevo.");
+        return;
+      }
+      onDeleted();
+    } catch {
+      setError("No se pudo eliminar. Intenta de nuevo.");
+    } finally {
+      setDeleting(false);
+    }
+  }
+
+  return (
+    <div
+      className="admin-confirm"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="admin-confirm-title"
+    >
+      <div className="admin-confirm__panel">
+        <span className="admin-confirm__icon">
+          <AlertTriangle size={20} />
+        </span>
+        {step === 1 ? (
+          <>
+            <h2 id="admin-confirm-title">¿Eliminar a {target.name}?</h2>
+            <p>
+              {target.detail} Se borra de forma permanente del panel y de la
+              base de datos.
+            </p>
+            <div className="admin-confirm__actions">
+              <button type="button" onClick={onCancel}>
+                Cancelar
+              </button>
+              <button
+                type="button"
+                className="admin-confirm__danger"
+                onClick={() => setStep(2)}
+              >
+                Continuar
+              </button>
+            </div>
+          </>
+        ) : (
+          <>
+            <h2 id="admin-confirm-title">Confirmación final</h2>
+            <p>
+              Esta acción no se puede deshacer.
+              {target.requiresPassword
+                ? " Tiene valores asociados, así que confirma con tu clave de admin."
+                : ""}
+            </p>
+            {target.requiresPassword && (
+              <label className="admin-confirm__field">
+                <span>Clave de admin</span>
+                <input
+                  type="password"
+                  autoFocus
+                  autoComplete="current-password"
+                  value={password}
+                  onChange={event => setPassword(event.target.value)}
+                  onKeyDown={event => {
+                    if (event.key === "Enter") confirmDelete();
+                  }}
+                />
+              </label>
+            )}
+            {error && <p className="admin-confirm__error">{error}</p>}
+            <div className="admin-confirm__actions">
+              <button type="button" onClick={onCancel} disabled={deleting}>
+                Cancelar
+              </button>
+              <button
+                type="button"
+                className="admin-confirm__danger"
+                onClick={confirmDelete}
+                disabled={deleting}
+              >
+                {deleting ? "Eliminando…" : "Eliminar definitivamente"}
+              </button>
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function registrationDeleteTarget(row: Registration): DeleteTarget {
+  const hasValue = Boolean(row.mpPaymentId) || (row.amount ?? 0) > 0;
+  return {
+    kind: "registration",
+    id: row.id,
+    name: row.fullName,
+    detail: hasValue
+      ? "Esta inscripción tiene un pago asociado."
+      : "Se elimina su inscripción a la Gran Inauguración.",
+    requiresPassword: hasValue,
+  };
+}
+
+function planDeleteTarget(row: PlanPurchase): DeleteTarget {
+  return {
+    kind: "plan",
+    id: row.id,
+    name: row.fullName,
+    detail: `Se elimina la compra del plan ${row.planLabel}, con su registro de pago.`,
+    requiresPassword: true,
+  };
+}
+
+function ClientesTable({
+  rows,
+  onDelete,
+}: {
+  rows: Registration[];
+  onDelete: (row: Registration) => void;
+}) {
   if (rows.length === 0) {
     return <p className="admin-dashboard__empty">Todavía no hay clientes.</p>;
   }
@@ -401,6 +616,7 @@ function ClientesTable({ rows }: { rows: Registration[] }) {
             <th>WhatsApp</th>
             <th>Estado</th>
             <th>Desde</th>
+            <th />
           </tr>
         </thead>
         <tbody>
@@ -430,6 +646,15 @@ function ClientesTable({ rows }: { rows: Registration[] }) {
                 </span>
               </td>
               <td>{new Date(row.createdAt).toLocaleDateString("es-CL")}</td>
+              <td className="admin-dashboard__actions">
+                <button
+                  type="button"
+                  onClick={() => onDelete(row)}
+                  title="Eliminar contacto"
+                >
+                  <Trash2 size={16} />
+                </button>
+              </td>
             </tr>
           ))}
         </tbody>
@@ -438,7 +663,13 @@ function ClientesTable({ rows }: { rows: Registration[] }) {
   );
 }
 
-function PlanesTable({ rows }: { rows: PlanPurchase[] }) {
+function PlanesTable({
+  rows,
+  onDelete,
+}: {
+  rows: PlanPurchase[];
+  onDelete: (row: PlanPurchase) => void;
+}) {
   if (rows.length === 0) {
     return (
       <p className="admin-dashboard__empty">Todavía no hay planes vendidos.</p>
@@ -457,6 +688,7 @@ function PlanesTable({ rows }: { rows: PlanPurchase[] }) {
             <th>Plan</th>
             <th>Estado</th>
             <th>Fecha</th>
+            <th />
           </tr>
         </thead>
         <tbody>
@@ -491,6 +723,15 @@ function PlanesTable({ rows }: { rows: PlanPurchase[] }) {
                 </span>
               </td>
               <td>{new Date(row.createdAt).toLocaleDateString("es-CL")}</td>
+              <td className="admin-dashboard__actions">
+                <button
+                  type="button"
+                  onClick={() => onDelete(row)}
+                  title="Eliminar compra"
+                >
+                  <Trash2 size={16} />
+                </button>
+              </td>
             </tr>
           ))}
         </tbody>
@@ -508,20 +749,26 @@ function Dashboard({ onLoggedOut }: { onLoggedOut: () => void }) {
   const [tab, setTab] = useState<"inscripciones" | "clientes" | "planes">(
     "inscripciones"
   );
+  const [deleteTarget, setDeleteTarget] = useState<DeleteTarget | null>(null);
+  const [unreachable, setUnreachable] = useState(false);
 
   async function load() {
     setLoading(true);
     const result = await fetchRegistrations();
     if (!result.ok) {
-      if (result.unauthorized) {
+      if (result.reason === "unauthorized") {
         onLoggedOut();
         return;
       }
-      setError("No se pudo cargar la lista. Intenta de nuevo.");
+      // Ojo: no se tocan las filas ya cargadas ni se muestra el estado
+      // vacío — no sabemos qué hay en la base, solo que no la alcanzamos.
+      setUnreachable(true);
+      setError(null);
       setLoading(false);
       return;
     }
     setRows(result.rows);
+    setUnreachable(false);
     setError(null);
     setLoading(false);
   }
@@ -581,6 +828,9 @@ function Dashboard({ onLoggedOut }: { onLoggedOut: () => void }) {
   const approved = rows.filter(r => r.status === "approved").length;
   const active = rows.filter(r => r.status !== "rejected").length;
   const remaining = Math.max(EVENT_CAPACITY - active, 0);
+  // Sin conexión no hay cifras que mostrar: un 0 aquí se lee como "no
+  // queda nadie inscrito", que es exactamente la conclusión equivocada.
+  const stat = (value: number) => (unreachable ? "—" : value);
 
   return (
     <div className="admin-dashboard">
@@ -614,18 +864,18 @@ function Dashboard({ onLoggedOut }: { onLoggedOut: () => void }) {
         <StatTile
           icon={<Clock size={18} />}
           label="Pendientes de aprobar"
-          value={pending}
+          value={stat(pending)}
           accent
         />
         <StatTile
           icon={<UserCheck size={18} />}
           label="Aprobados"
-          value={approved}
+          value={stat(approved)}
         />
         <StatTile
           icon={<Ticket size={18} />}
           label="Cupos restantes"
-          value={remaining}
+          value={stat(remaining)}
         />
       </div>
 
@@ -653,15 +903,47 @@ function Dashboard({ onLoggedOut }: { onLoggedOut: () => void }) {
         >
           Planes
         </button>
+        <button
+          type="button"
+          className="admin-tabs__export"
+          onClick={() => downloadRegistrationsCsv(rows)}
+          disabled={rows.length === 0}
+          title="Descargar las inscripciones como CSV"
+        >
+          <Download size={15} /> Exportar CSV
+        </button>
       </div>
 
       <div className="admin-dashboard__panel">
         {loading ? (
           <p className="admin-dashboard__empty">Cargando…</p>
+        ) : unreachable ? (
+          <div className="admin-dashboard__unreachable">
+            <AlertTriangle size={22} />
+            <h2>No se pudo conectar a la base de datos</h2>
+            <p>
+              El panel no está vacío: no pudo leer los datos. Nada se borró por
+              esto. Revisa que <code>DATABASE_URL</code> apunte a la base
+              correcta en Vercel y vuelve a intentar.
+            </p>
+            <button
+              type="button"
+              className="button button--cobalt"
+              onClick={load}
+            >
+              Reintentar
+            </button>
+          </div>
         ) : tab === "clientes" ? (
-          <ClientesTable rows={rows} />
+          <ClientesTable
+            rows={rows}
+            onDelete={row => setDeleteTarget(registrationDeleteTarget(row))}
+          />
         ) : tab === "planes" ? (
-          <PlanesTable rows={planRows} />
+          <PlanesTable
+            rows={planRows}
+            onDelete={row => setDeleteTarget(planDeleteTarget(row))}
+          />
         ) : rows.length === 0 ? (
           <p className="admin-dashboard__empty">
             Todavía no hay inscripciones.
@@ -741,6 +1023,16 @@ function Dashboard({ onLoggedOut }: { onLoggedOut: () => void }) {
                           </button>
                         </>
                       )}
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setDeleteTarget(registrationDeleteTarget(row))
+                        }
+                        disabled={actingId === row.id}
+                        title="Eliminar inscripción"
+                      >
+                        <Trash2 size={16} />
+                      </button>
                     </td>
                   </tr>
                 ))}
@@ -749,6 +1041,19 @@ function Dashboard({ onLoggedOut }: { onLoggedOut: () => void }) {
           </div>
         )}
       </div>
+
+      {deleteTarget && (
+        <DeleteDialog
+          target={deleteTarget}
+          onCancel={() => setDeleteTarget(null)}
+          onUnauthorized={onLoggedOut}
+          onDeleted={() => {
+            setDeleteTarget(null);
+            load();
+            loadPlans();
+          }}
+        />
+      )}
     </div>
   );
 }
