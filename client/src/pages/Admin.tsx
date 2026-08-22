@@ -4,6 +4,7 @@ import {
   CheckCircle2,
   Clock,
   CreditCard,
+  Download,
   LogOut,
   Mail,
   MessageCircle,
@@ -251,21 +252,63 @@ function TestEmailPanel() {
 
 type Session = "checking" | "out" | "in";
 
-/** Solo 200 + JSON válido cuenta como sesión activa — cualquier otra
- * respuesta (401, 500, HTML de error) debe caer a la pantalla de login. */
+/** Solo 200 + JSON válido cuenta como sesión activa; un 401 manda al
+ * login. El resto se distingue por causa, porque "no hay inscritos" y "no
+ * pude leer la base" se veían idénticos en el panel: cuando se cayó la
+ * credencial de la base, el panel mostró una lista vacía y pareció que
+ * los clientes se habían borrado. */
+type LoadFailure = "unauthorized" | "unreachable";
+
 async function fetchRegistrations(): Promise<
-  { ok: true; rows: Registration[] } | { ok: false; unauthorized: boolean }
+  { ok: true; rows: Registration[] } | { ok: false; reason: LoadFailure }
 > {
   try {
     const res = await fetch("/api/admin/registrations");
-    if (!res.ok) return { ok: false, unauthorized: res.status === 401 };
+    if (res.status === 401) return { ok: false, reason: "unauthorized" };
+    if (!res.ok) return { ok: false, reason: "unreachable" };
     const data = await res.json();
     if (!Array.isArray(data.registrations))
-      return { ok: false, unauthorized: false };
+      return { ok: false, reason: "unreachable" };
     return { ok: true, rows: data.registrations };
   } catch {
-    return { ok: false, unauthorized: false };
+    return { ok: false, reason: "unreachable" };
   }
+}
+
+/** Copia de respaldo a mano: el panel es hoy el único lugar donde viven
+ * las inscripciones, así que puede entregarlas como CSV sin depender de
+ * que la base siga en pie. */
+function downloadRegistrationsCsv(rows: Registration[]) {
+  const escape = (value: string) => `"${value.replace(/"/g, '""')}"`;
+  const header = [
+    "nombre",
+    "email",
+    "whatsapp",
+    "estado",
+    "invitacion_enviada",
+    "inscrito",
+  ];
+  const lines = rows.map(row =>
+    [
+      row.fullName,
+      row.email,
+      row.whatsapp,
+      row.status,
+      row.invitationSentAt ? new Date(row.invitationSentAt).toISOString() : "",
+      new Date(row.createdAt).toISOString(),
+    ]
+      .map(field => escape(String(field)))
+      .join(",")
+  );
+  const csv = [header.join(","), ...lines].join("\n");
+  const url = URL.createObjectURL(
+    new Blob([`\ufeff${csv}`], { type: "text/csv;charset=utf-8" })
+  );
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `inscripciones-${new Date().toISOString().slice(0, 10)}.csv`;
+  link.click();
+  URL.revokeObjectURL(url);
 }
 
 function LoginForm({ onLoggedIn }: { onLoggedIn: () => void }) {
@@ -371,7 +414,7 @@ function StatTile({
 }: {
   icon: React.ReactNode;
   label: string;
-  value: number;
+  value: number | string;
   accent?: boolean;
 }) {
   return (
@@ -707,20 +750,25 @@ function Dashboard({ onLoggedOut }: { onLoggedOut: () => void }) {
     "inscripciones"
   );
   const [deleteTarget, setDeleteTarget] = useState<DeleteTarget | null>(null);
+  const [unreachable, setUnreachable] = useState(false);
 
   async function load() {
     setLoading(true);
     const result = await fetchRegistrations();
     if (!result.ok) {
-      if (result.unauthorized) {
+      if (result.reason === "unauthorized") {
         onLoggedOut();
         return;
       }
-      setError("No se pudo cargar la lista. Intenta de nuevo.");
+      // Ojo: no se tocan las filas ya cargadas ni se muestra el estado
+      // vacío — no sabemos qué hay en la base, solo que no la alcanzamos.
+      setUnreachable(true);
+      setError(null);
       setLoading(false);
       return;
     }
     setRows(result.rows);
+    setUnreachable(false);
     setError(null);
     setLoading(false);
   }
@@ -780,6 +828,9 @@ function Dashboard({ onLoggedOut }: { onLoggedOut: () => void }) {
   const approved = rows.filter(r => r.status === "approved").length;
   const active = rows.filter(r => r.status !== "rejected").length;
   const remaining = Math.max(EVENT_CAPACITY - active, 0);
+  // Sin conexión no hay cifras que mostrar: un 0 aquí se lee como "no
+  // queda nadie inscrito", que es exactamente la conclusión equivocada.
+  const stat = (value: number) => (unreachable ? "—" : value);
 
   return (
     <div className="admin-dashboard">
@@ -813,18 +864,18 @@ function Dashboard({ onLoggedOut }: { onLoggedOut: () => void }) {
         <StatTile
           icon={<Clock size={18} />}
           label="Pendientes de aprobar"
-          value={pending}
+          value={stat(pending)}
           accent
         />
         <StatTile
           icon={<UserCheck size={18} />}
           label="Aprobados"
-          value={approved}
+          value={stat(approved)}
         />
         <StatTile
           icon={<Ticket size={18} />}
           label="Cupos restantes"
-          value={remaining}
+          value={stat(remaining)}
         />
       </div>
 
@@ -852,11 +903,37 @@ function Dashboard({ onLoggedOut }: { onLoggedOut: () => void }) {
         >
           Planes
         </button>
+        <button
+          type="button"
+          className="admin-tabs__export"
+          onClick={() => downloadRegistrationsCsv(rows)}
+          disabled={rows.length === 0}
+          title="Descargar las inscripciones como CSV"
+        >
+          <Download size={15} /> Exportar CSV
+        </button>
       </div>
 
       <div className="admin-dashboard__panel">
         {loading ? (
           <p className="admin-dashboard__empty">Cargando…</p>
+        ) : unreachable ? (
+          <div className="admin-dashboard__unreachable">
+            <AlertTriangle size={22} />
+            <h2>No se pudo conectar a la base de datos</h2>
+            <p>
+              El panel no está vacío: no pudo leer los datos. Nada se borró por
+              esto. Revisa que <code>DATABASE_URL</code> apunte a la base
+              correcta en Vercel y vuelve a intentar.
+            </p>
+            <button
+              type="button"
+              className="button button--cobalt"
+              onClick={load}
+            >
+              Reintentar
+            </button>
+          </div>
         ) : tab === "clientes" ? (
           <ClientesTable
             rows={rows}
