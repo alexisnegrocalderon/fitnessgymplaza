@@ -19,12 +19,43 @@ export { EVENT_CAPACITY };
 
 let _db: ReturnType<typeof drizzle> | null = null;
 
+/** La integración Neon↔Vercel no siempre publica la cadena de conexión
+ * como DATABASE_URL: según cómo se cree el store, llega como POSTGRES_URL
+ * o DATABASE_URL_UNPOOLED. Mirar un solo nombre dejaba la app sin base
+ * aunque la variable estuviera puesta, así que se aceptan todos. */
+const CONNECTION_STRING_KEYS = [
+  "DATABASE_URL",
+  "POSTGRES_URL",
+  "DATABASE_URL_UNPOOLED",
+  "POSTGRES_URL_NON_POOLING",
+] as const;
+
+function resolveConnectionString(): string | undefined {
+  for (const key of CONNECTION_STRING_KEYS) {
+    const value = process.env[key]?.trim();
+    if (value) return value;
+  }
+  return undefined;
+}
+
 // Lazily create the drizzle instance so local tooling can run without a DB.
 export function getDb() {
-  if (!_db && process.env.DATABASE_URL) {
-    _db = drizzle(neon(process.env.DATABASE_URL));
+  if (!_db) {
+    const connectionString = resolveConnectionString();
+    if (connectionString) _db = drizzle(neon(connectionString));
   }
   return _db;
+}
+
+/** El "Database not configured" a secas no decía nada accionable. Este
+ * nombra las variables que sí llegaron al runtime (solo los nombres,
+ * nunca los valores) para que el log diga de una si falta la variable o
+ * si viene con otro nombre. */
+function databaseNotConfigured(): Error {
+  const seen = CONNECTION_STRING_KEYS.filter(key => process.env[key]?.trim());
+  return new Error(
+    `Database not configured: ninguna cadena de conexión disponible. Variables buscadas: ${CONNECTION_STRING_KEYS.join(", ")}. Presentes: ${seen.length ? seen.join(", ") : "ninguna"}.`
+  );
 }
 
 export async function upsertUser(user: InsertUser): Promise<void> {
@@ -93,7 +124,7 @@ export async function getUserByOpenId(openId: string) {
 /** pending + approved cuentan contra el cupo; rejected libera el lugar. */
 export async function countActiveRegistrations(): Promise<number> {
   const db = getDb();
-  if (!db) throw new Error("Database not configured");
+  if (!db) throw databaseNotConfigured();
   const [{ count }] = await db
     .select({ count: sql<number>`count(*)::int` })
     .from(registrations)
@@ -106,7 +137,7 @@ export async function countActiveRegistrations(): Promise<number> {
  * misma casa comparten teléfono y la segunda quedaba fuera del evento. */
 export async function findRegistrationByEmail(email: string) {
   const db = getDb();
-  if (!db) throw new Error("Database not configured");
+  if (!db) throw databaseNotConfigured();
   const result = await db
     .select()
     .from(registrations)
@@ -127,7 +158,7 @@ export async function updateRegistrationContact(
   data: Pick<InsertRegistration, "fullName" | "whatsapp">
 ) {
   const db = getDb();
-  if (!db) throw new Error("Database not configured");
+  if (!db) throw databaseNotConfigured();
   const [row] = await db
     .update(registrations)
     .set({ fullName: data.fullName, whatsapp: data.whatsapp })
@@ -140,7 +171,7 @@ export async function updateRegistrationContact(
  * así el panel distingue "aprobado" de "invitación efectivamente enviada". */
 export async function markInvitationSent(id: number) {
   const db = getDb();
-  if (!db) throw new Error("Database not configured");
+  if (!db) throw databaseNotConfigured();
   const [row] = await db
     .update(registrations)
     .set({ invitationSentAt: new Date() })
@@ -151,20 +182,20 @@ export async function markInvitationSent(id: number) {
 
 export async function createRegistration(data: InsertRegistration) {
   const db = getDb();
-  if (!db) throw new Error("Database not configured");
+  if (!db) throw databaseNotConfigured();
   const [row] = await db.insert(registrations).values(data).returning();
   return row;
 }
 
 export async function listRegistrations() {
   const db = getDb();
-  if (!db) throw new Error("Database not configured");
+  if (!db) throw databaseNotConfigured();
   return db.select().from(registrations).orderBy(desc(registrations.createdAt));
 }
 
 export async function getRegistrationById(id: number) {
   const db = getDb();
-  if (!db) throw new Error("Database not configured");
+  if (!db) throw databaseNotConfigured();
   const result = await db
     .select()
     .from(registrations)
@@ -175,7 +206,7 @@ export async function getRegistrationById(id: number) {
 
 export async function markRegistrationApproved(id: number) {
   const db = getDb();
-  if (!db) throw new Error("Database not configured");
+  if (!db) throw databaseNotConfigured();
   const [row] = await db
     .update(registrations)
     .set({ status: "approved" })
@@ -186,7 +217,7 @@ export async function markRegistrationApproved(id: number) {
 
 export async function markRegistrationRejected(id: number) {
   const db = getDb();
-  if (!db) throw new Error("Database not configured");
+  if (!db) throw databaseNotConfigured();
   const [row] = await db
     .update(registrations)
     .set({ status: "rejected" })
@@ -199,7 +230,7 @@ export async function markRegistrationRejected(id: number) {
  * confirmación (y con la clave del admin si la fila tiene pagos). */
 export async function deleteRegistration(id: number) {
   const db = getDb();
-  if (!db) throw new Error("Database not configured");
+  if (!db) throw databaseNotConfigured();
   const [row] = await db
     .delete(registrations)
     .where(eq(registrations.id, id))
@@ -209,7 +240,7 @@ export async function deleteRegistration(id: number) {
 
 export async function createApprovedRegistration(data: InsertRegistration) {
   const db = getDb();
-  if (!db) throw new Error("Database not configured");
+  if (!db) throw databaseNotConfigured();
   const [row] = await db
     .insert(registrations)
     .values({ ...data, status: "approved" })
@@ -222,7 +253,7 @@ export async function createApprovedRegistration(data: InsertRegistration) {
  * campos de pago. */
 export async function approveRegistration(id: number) {
   const db = getDb();
-  if (!db) throw new Error("Database not configured");
+  if (!db) throw databaseNotConfigured();
   const [row] = await db
     .update(registrations)
     .set({ status: "approved" })
@@ -237,7 +268,7 @@ export async function approveRegistration(id: number) {
 
 export async function getMpConnection() {
   const db = getDb();
-  if (!db) throw new Error("Database not configured");
+  if (!db) throw databaseNotConfigured();
   const result = await db.select().from(mpConnections).limit(1);
   return result[0];
 }
@@ -247,7 +278,7 @@ export async function saveMpConnection(
   data: Omit<InsertMpConnection, "id" | "connectedAt" | "updatedAt">
 ) {
   const db = getDb();
-  if (!db) throw new Error("Database not configured");
+  if (!db) throw databaseNotConfigured();
   const existing = await getMpConnection();
   if (existing) {
     const [row] = await db
@@ -266,7 +297,7 @@ export async function updateMpConnectionTokens(
   data: Pick<InsertMpConnection, "accessToken" | "refreshToken" | "expiresAt">
 ) {
   const db = getDb();
-  if (!db) throw new Error("Database not configured");
+  if (!db) throw databaseNotConfigured();
   const [row] = await db
     .update(mpConnections)
     .set({ ...data, updatedAt: new Date() })
@@ -282,7 +313,7 @@ export async function updateMpConnectionTokens(
 /** Crea la fila por defecto la primera vez que se pide (10% = 1000 bps). */
 export async function getEventSettings() {
   const db = getDb();
-  if (!db) throw new Error("Database not configured");
+  if (!db) throw databaseNotConfigured();
   const existing = await db.select().from(eventSettings).limit(1);
   if (existing[0]) return existing[0];
   const [row] = await db.insert(eventSettings).values({}).returning();
@@ -291,7 +322,7 @@ export async function getEventSettings() {
 
 export async function updateServiceChargeBps(bps: number) {
   const db = getDb();
-  if (!db) throw new Error("Database not configured");
+  if (!db) throw databaseNotConfigured();
   const current = await getEventSettings();
   const [row] = await db
     .update(eventSettings)
@@ -310,7 +341,7 @@ export async function findPlanPurchaseByContact(
   whatsapp: string
 ) {
   const db = getDb();
-  if (!db) throw new Error("Database not configured");
+  if (!db) throw databaseNotConfigured();
   const result = await db
     .select()
     .from(planPurchases)
@@ -338,14 +369,14 @@ export async function findPlanPurchaseByContact(
 
 export async function createPlanPurchase(data: InsertPlanPurchase) {
   const db = getDb();
-  if (!db) throw new Error("Database not configured");
+  if (!db) throw databaseNotConfigured();
   const [row] = await db.insert(planPurchases).values(data).returning();
   return row;
 }
 
 export async function createApprovedPlanPurchase(data: InsertPlanPurchase) {
   const db = getDb();
-  if (!db) throw new Error("Database not configured");
+  if (!db) throw databaseNotConfigured();
   const [row] = await db
     .insert(planPurchases)
     .values({ ...data, status: "approved" })
@@ -359,7 +390,7 @@ export async function markPlanPurchaseApprovedWithPayment(
   amount: number
 ) {
   const db = getDb();
-  if (!db) throw new Error("Database not configured");
+  if (!db) throw databaseNotConfigured();
   const [row] = await db
     .update(planPurchases)
     .set({ status: "approved", mpPaymentId, amount })
@@ -370,7 +401,7 @@ export async function markPlanPurchaseApprovedWithPayment(
 
 export async function getPlanPurchaseById(id: number) {
   const db = getDb();
-  if (!db) throw new Error("Database not configured");
+  if (!db) throw databaseNotConfigured();
   const result = await db
     .select()
     .from(planPurchases)
@@ -383,7 +414,7 @@ export async function getPlanPurchaseById(id: number) {
  * asociado, así que el panel siempre pide la clave del admin. */
 export async function deletePlanPurchase(id: number) {
   const db = getDb();
-  if (!db) throw new Error("Database not configured");
+  if (!db) throw databaseNotConfigured();
   const [row] = await db
     .delete(planPurchases)
     .where(eq(planPurchases.id, id))
@@ -393,6 +424,6 @@ export async function deletePlanPurchase(id: number) {
 
 export async function listPlanPurchases() {
   const db = getDb();
-  if (!db) throw new Error("Database not configured");
+  if (!db) throw databaseNotConfigured();
   return db.select().from(planPurchases).orderBy(desc(planPurchases.createdAt));
 }
