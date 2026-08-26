@@ -3,8 +3,8 @@
 export const method = [
   {
     id: "01",
-    title: "Profesores en cada estación",
-    text: "Acompañamiento presente para enseñar cada ejercicio y mantener la intención de la sesión.",
+    title: "3 profesores en sala",
+    text: "Supervisión continua durante la rutina para cuidar tu técnica, postura, nivel y progreso.",
   },
   {
     id: "02",

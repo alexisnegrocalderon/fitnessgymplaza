@@ -14,7 +14,7 @@ import {
 
 const BASE_CHECKS = [
   "Entrenamiento funcional guiado",
-  "Profesores presentes por estación",
+  "3 profesores atentos en sala",
   "Horarios para elegir según tu rutina",
 ];
 

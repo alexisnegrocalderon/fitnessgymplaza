@@ -183,8 +183,9 @@ export default function Hero() {
             animate={{ opacity: 1, y: 0 }}
             transition={reduced ? calm : { ...spring.reveal, delay: 0.34 }}
           >
-            Clases dinámicas con profesores en cada estación para cuidar tu
-            técnica, adaptar el desafío y convertir el movimiento en salud real.
+            Clases dinámicas con 3 profesores en sala durante la rutina, atentos
+            a tu técnica, postura, nivel y progreso para convertir el movimiento
+            en salud real.
           </motion.p>
           <motion.div
             className="hero-content__actions"
