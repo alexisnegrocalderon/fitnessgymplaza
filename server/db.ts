@@ -1192,6 +1192,17 @@ export async function getSessionById(id: number) {
   return result[0];
 }
 
+/** Todas las sesiones de un día (para la vista de día del panel admin). */
+export async function listSessionsForDate(date: string) {
+  const db = getDb();
+  if (!db) throw databaseNotConfigured();
+  return db
+    .select()
+    .from(classSessions)
+    .where(eq(classSessions.date, date))
+    .orderBy(asc(classSessions.startsAt));
+}
+
 /** Agenda para el alumno: sesiones programadas entre hoy y `days` días,
  * junto con su propia reserva (si tiene una) en cada una. */
 export async function listUpcomingSessionsForMember(

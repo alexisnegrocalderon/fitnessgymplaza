@@ -3,6 +3,7 @@ import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { MercadoPagoConfig, Payment } from "mercadopago";
 import {
   createApprovedPlanPurchase,
+  createMembershipFromApprovedPurchase,
   findPlanPurchaseByContact,
   getEventSettings,
   markPlanPurchaseApprovedWithPayment,
@@ -12,7 +13,7 @@ import {
   calculateApplicationFee,
   getValidAccessToken,
 } from "../server/lib/mercadopago.js";
-import { calculateServiceCharge } from "../shared/registration.js";
+import { calculateGrossUpServiceCharge } from "../shared/registration.js";
 import { planPurchaseSchema } from "../shared/planPurchase.js";
 import { findPlan, planPriceToNumber } from "../shared/plans.js";
 
@@ -60,9 +61,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     const basePrice = planPriceToNumber(plan);
     const settings = await getEventSettings();
-    const serviceCharge = calculateServiceCharge(
+    const serviceCharge = calculateGrossUpServiceCharge(
       basePrice,
-      settings.serviceChargeBps
+      settings.mpFeeRateBps
     );
     const totalAmount = basePrice + serviceCharge;
 
@@ -117,6 +118,31 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           mpPaymentId: String(payment.id),
           amount: totalAmount,
         });
+
+    // Otorga los créditos reales: crea (o vincula) la cuenta de alumno y
+    // arma su membresía a partir de esta compra recién aprobada. Es lo que
+    // hace posible reservar clases en /app — sin esto, "approved" en
+    // plan_purchases sería solo un registro contable sin efecto real.
+    try {
+      await createMembershipFromApprovedPurchase({
+        id: row.id,
+        email: row.email,
+        fullName: row.fullName,
+        whatsapp: row.whatsapp,
+        rut: row.rut,
+        audience: row.audience,
+        tier: row.tier,
+      });
+    } catch (membershipError) {
+      // El pago YA se cobró y quedó aprobado — no se puede simplemente
+      // fallar la respuesta acá. Se deja bien fuerte en el log para que
+      // el equipo lo detecte y otorgue los créditos a mano si hace falta.
+      console.error(
+        "[plan-pay] CRÍTICO: pago aprobado pero no se pudo crear la membresía",
+        { purchaseId: row.id, email: row.email },
+        membershipError
+      );
+    }
 
     try {
       await sendPlanConfirmationEmail(

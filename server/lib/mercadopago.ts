@@ -4,6 +4,7 @@ import {
   saveMpConnection,
   updateMpConnectionTokens,
 } from "../db.js";
+import { APPLICATION_FEE_RATE } from "../../shared/registration.js";
 
 const OAUTH_TOKEN_URL = "https://api.mercadopago.com/oauth/token";
 const AUTHORIZE_URL = "https://auth.mercadopago.com/authorization";
@@ -17,9 +18,10 @@ const REFRESH_MARGIN_MS = 1000 * 60 * 60 * 24 * 7;
  * automáticamente a la cuenta dueña de la aplicación (Client ID/Secret,
  * cuenta ANC) — no a la cuenta conectada (Plaza Fitness). Requiere que el
  * pago se cree con el access_token del vendedor conectado por OAuth, que
- * es justamente lo que hace getValidAccessToken().
+ * es justamente lo que hace getValidAccessToken(). La tasa
+ * (APPLICATION_FEE_RATE) vive en shared/registration.ts porque el cálculo
+ * de "gross-up" del cargo por servicio también la necesita.
  */
-const APPLICATION_FEE_RATE = 0.015;
 
 /** Monto de comisión en la misma unidad que `amount` (CLP, sin decimales). */
 export function calculateApplicationFee(amount: number): number {

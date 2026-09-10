@@ -40,6 +40,7 @@ vi.mock("../server/db.js", () => ({
     state.purchase.status = "rejected" as never;
     return state.purchase;
   }),
+  createMembershipFromApprovedPurchase: vi.fn(async () => ({ id: 1 })),
 }));
 
 vi.mock("../server/lib/mercadopago.js", async () => {
@@ -65,6 +66,7 @@ vi.mock("mercadopago", () => ({
 
 import handler from "../api/mercadopago/webhook.js";
 import {
+  createMembershipFromApprovedPurchase,
   getPlanPurchaseByMpPaymentId,
   markPlanPurchaseApprovedWithPayment,
   markPlanPurchaseRejected,
@@ -182,6 +184,7 @@ describe("webhook de Mercado Pago", () => {
       "555",
       47_400
     );
+    expect(createMembershipFromApprovedPurchase).toHaveBeenCalledOnce();
     expect(sendPlanConfirmationEmail).toHaveBeenCalledOnce();
     expect(recorded.statusCode).toBe(200);
     expect(recorded.body).toEqual({ ok: true });

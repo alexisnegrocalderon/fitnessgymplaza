@@ -1,6 +1,7 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { MercadoPagoConfig, Payment } from "mercadopago";
 import {
+  createMembershipFromApprovedPurchase,
   findPendingPlanPurchaseByEmail,
   getPlanPurchaseByMpPaymentId,
   markPlanPurchaseApprovedWithPayment,
@@ -113,6 +114,25 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         String(payment.id),
         amount
       );
+
+      try {
+        await createMembershipFromApprovedPurchase({
+          id: row.id,
+          email: row.email,
+          fullName: row.fullName,
+          whatsapp: row.whatsapp,
+          rut: row.rut,
+          audience: row.audience,
+          tier: row.tier,
+        });
+      } catch (membershipError) {
+        console.error(
+          "[mercadopago-webhook] CRÍTICO: pago aprobado pero no se pudo crear la membresía",
+          { purchaseId: row.id, email: row.email },
+          membershipError
+        );
+      }
+
       try {
         const plan = findPlan(row.audience, row.tier);
         await sendPlanConfirmationEmail(

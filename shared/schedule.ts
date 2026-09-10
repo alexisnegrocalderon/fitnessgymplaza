@@ -45,3 +45,25 @@ export const scheduleGroups = [
     slots: ["09:30–10:30", "10:30–11:30"],
   },
 ];
+
+/** Etiqueta legible de una sesión concreta para emails y confirmaciones —
+ * ej. "martes 16 de septiembre, 18:00" (+ "con {coach}" si se conoce). */
+export function classLabelFor(startsAt: Date, coachName?: string): string {
+  const weekdayName = new Intl.DateTimeFormat("es-CL", {
+    timeZone: "America/Santiago",
+    weekday: "long",
+  }).format(startsAt);
+  const dayMonth = new Intl.DateTimeFormat("es-CL", {
+    timeZone: "America/Santiago",
+    day: "numeric",
+    month: "long",
+  }).format(startsAt);
+  const time = new Intl.DateTimeFormat("es-CL", {
+    timeZone: "America/Santiago",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  }).format(startsAt);
+  const base = `${weekdayName} ${dayMonth}, ${time}`;
+  return coachName ? `${base} con ${coachName}` : base;
+}

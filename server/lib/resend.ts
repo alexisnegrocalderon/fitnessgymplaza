@@ -1,8 +1,12 @@
 import { Resend } from "resend";
 import { EVENT_DETAILS } from "../../shared/registration.js";
 import {
+  bookingConfirmedEmailHtml,
   invitationEmailHtml,
+  magicLinkEmailHtml,
   planConfirmationEmailHtml,
+  sessionCancelledEmailHtml,
+  waitlistPromotedEmailHtml,
 } from "./emailTemplate.js";
 
 async function sendEmail(to: string, subject: string, html: string) {
@@ -40,5 +44,53 @@ export async function sendPlanConfirmationEmail(
     to,
     `Tu plan ${planLabel} en Plaza Fitness está confirmado`,
     planConfirmationEmailHtml(fullName, planLabel, price)
+  );
+}
+
+export async function sendMagicLinkEmail(
+  to: string,
+  fullName: string,
+  magicLinkUrl: string
+) {
+  await sendEmail(
+    to,
+    "Tu acceso a Plaza Fitness",
+    magicLinkEmailHtml(fullName, magicLinkUrl)
+  );
+}
+
+export async function sendBookingConfirmedEmail(
+  to: string,
+  fullName: string,
+  classLabel: string
+) {
+  await sendEmail(
+    to,
+    "Clase reservada — Plaza Fitness",
+    bookingConfirmedEmailHtml(fullName, classLabel)
+  );
+}
+
+export async function sendWaitlistPromotedEmail(
+  to: string,
+  fullName: string,
+  classLabel: string
+) {
+  await sendEmail(
+    to,
+    "¡Entraste desde la lista de espera! — Plaza Fitness",
+    waitlistPromotedEmailHtml(fullName, classLabel)
+  );
+}
+
+export async function sendSessionCancelledEmail(
+  to: string,
+  fullName: string,
+  classLabel: string
+) {
+  await sendEmail(
+    to,
+    "Clase cancelada — Plaza Fitness",
+    sessionCancelledEmailHtml(fullName, classLabel)
   );
 }
