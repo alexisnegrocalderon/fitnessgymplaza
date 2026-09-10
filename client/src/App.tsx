@@ -6,6 +6,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import Admin from "@/pages/Admin";
 import Inauguracion from "@/pages/Inauguracion";
+import MemberApp from "@/pages/MemberApp";
 import NotFound from "@/pages/NotFound";
 import Planes from "@/pages/Planes";
 import { MotionConfig } from "framer-motion";
@@ -20,6 +21,7 @@ function Router() {
       <Route path="/" component={Home} />
       <Route path="/inauguracion" component={Inauguracion} />
       <Route path="/planes" component={Planes} />
+      <Route path="/app" component={MemberApp} />
       <Route path="/admin" component={Admin} />
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />

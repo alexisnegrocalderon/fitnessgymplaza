@@ -3651,6 +3651,274 @@ main > section[id] {
   gap: 4px;
 }
 
+/* -------------------------------------------------------------------------
+ * /app — cuenta de alumno y reserva de cupos (Fase 1). Mobile-first: el
+ * alumno reserva desde el celular, de pie, con una mano.
+ * ------------------------------------------------------------------------- */
+.app-loading {
+  min-height: 100svh;
+  background: var(--graphite);
+}
+.app-login {
+  min-height: 100svh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background:
+    radial-gradient(
+      ellipse 60% 50% at 50% 0%,
+      rgba(217, 45, 32, 0.1),
+      transparent 70%
+    ),
+    var(--graphite);
+}
+.app-login__panel {
+  display: grid;
+  gap: 14px;
+  width: min(100%, 400px);
+  padding: 32px 28px 28px;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--graphite-soft);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+}
+.app-login__mark {
+  width: 44px;
+  height: 44px;
+  margin-bottom: 4px;
+}
+.app-login__panel h1 {
+  margin: 0;
+  color: #fff;
+  font-family: "Archivo Black", sans-serif;
+  text-transform: uppercase;
+  font-size: 20px;
+}
+.app-login__sub {
+  margin: 0 0 4px;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 13px;
+  line-height: 1.5;
+}
+.app-login__panel form {
+  display: grid;
+  gap: 10px;
+}
+.app-login__panel label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.55);
+}
+.app-login__panel input {
+  width: 100%;
+  min-height: 46px;
+  margin-top: 6px;
+  padding: 0 14px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  color: #fff;
+  font-size: 16px; /* evita zoom automático en iOS */
+}
+.app-login__panel input:focus-visible {
+  outline: none;
+  border-color: var(--cobalt);
+}
+.app-login__panel button {
+  min-height: 46px;
+}
+.app-login__error {
+  margin: 0;
+  color: #ff8d84;
+  font-size: 12px;
+}
+.app-login__hint {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 4px 0 0;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.45);
+}
+.app-login__hint a {
+  color: #ff8d84;
+}
+
+.app-dashboard {
+  min-height: 100svh;
+  padding: 20px 16px 48px;
+  background: var(--graphite);
+  color: #fff;
+  max-width: 560px;
+  margin: 0 auto;
+}
+.app-dashboard__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+.app-dashboard__brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.app-dashboard__mark {
+  width: 32px;
+  height: 32px;
+}
+.app-dashboard__header h1 {
+  margin: 0;
+  color: #fff;
+  font-family: "Archivo Black", sans-serif;
+  text-transform: uppercase;
+  font-size: 18px;
+}
+.app-dashboard__logout {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 10px;
+  background: transparent;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.app-plan-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 18px;
+  border-radius: 14px;
+  border: 1px solid rgba(217, 45, 32, 0.35);
+  background: rgba(217, 45, 32, 0.08);
+  margin-bottom: 16px;
+}
+.app-plan-card--empty {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+}
+.app-plan-card__tier {
+  margin: 0 0 4px;
+  font-weight: 800;
+  font-size: 15px;
+}
+.app-plan-card__sub {
+  margin: 0;
+  font-size: 12px;
+  color: rgba(234, 231, 223, 0.65);
+}
+.app-plan-card__credits {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(234, 231, 223, 0.7);
+}
+.app-plan-card__credits-number {
+  font-size: 26px;
+  font-weight: 800;
+  color: #fff;
+  line-height: 1;
+}
+
+.app-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.app-tabs button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+  justify-content: center;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.03);
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 13px;
+  font-weight: 700;
+}
+.app-tabs button.is-active {
+  color: #fff;
+  background: rgba(217, 45, 32, 0.14);
+  border-color: rgba(217, 45, 32, 0.4);
+}
+
+.app-dashboard__panel {
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--graphite-soft);
+  padding: 16px;
+}
+.app-empty {
+  color: rgba(234, 231, 223, 0.55);
+  font-size: 13px;
+  text-align: center;
+  padding: 20px 0;
+}
+.app-notice {
+  margin: 0 0 12px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(217, 45, 32, 0.12);
+  border: 1px solid rgba(217, 45, 32, 0.3);
+  color: #ff8d84;
+  font-size: 12px;
+}
+.app-agenda__day + .app-agenda__day {
+  margin-top: 16px;
+}
+.app-agenda__date {
+  margin: 0 0 8px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 141, 132, 0.9);
+}
+.app-class-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 12px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+.app-class-row:first-child {
+  border-top: none;
+}
+.app-class-row__time {
+  margin: 0 0 2px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+}
+.app-class-row__spots {
+  margin: 0;
+  font-size: 12px;
+  color: rgba(234, 231, 223, 0.6);
+}
+.app-class-row__closed {
+  font-size: 11px;
+  color: rgba(234, 231, 223, 0.45);
+  white-space: nowrap;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
