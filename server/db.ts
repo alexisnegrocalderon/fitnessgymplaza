@@ -399,6 +399,50 @@ export async function markPlanPurchaseApprovedWithPayment(
   return row;
 }
 
+/** Busca por `mpPaymentId` — usada por el webhook para no procesar dos
+ * veces la misma notificación (Mercado Pago puede reenviarla). */
+export async function getPlanPurchaseByMpPaymentId(mpPaymentId: string) {
+  const db = getDb();
+  if (!db) throw databaseNotConfigured();
+  const result = await db
+    .select()
+    .from(planPurchases)
+    .where(eq(planPurchases.mpPaymentId, mpPaymentId))
+    .limit(1);
+  return result[0];
+}
+
+/** La compra "pending" más reciente de un email — es a esta a la que el
+ * webhook sube el estado cuando Mercado Pago confirma el pago después de
+ * la respuesta síncrona (ej. pago en efectivo o que demora en acreditar). */
+export async function findPendingPlanPurchaseByEmail(email: string) {
+  const db = getDb();
+  if (!db) throw databaseNotConfigured();
+  const result = await db
+    .select()
+    .from(planPurchases)
+    .where(
+      and(
+        eq(planPurchases.status, "pending"),
+        eq(planPurchases.email, email.toLowerCase())
+      )
+    )
+    .orderBy(desc(planPurchases.createdAt))
+    .limit(1);
+  return result[0];
+}
+
+export async function markPlanPurchaseRejected(id: number) {
+  const db = getDb();
+  if (!db) throw databaseNotConfigured();
+  const [row] = await db
+    .update(planPurchases)
+    .set({ status: "rejected" })
+    .where(eq(planPurchases.id, id))
+    .returning();
+  return row;
+}
+
 export async function getPlanPurchaseById(id: number) {
   const db = getDb();
   if (!db) throw databaseNotConfigured();

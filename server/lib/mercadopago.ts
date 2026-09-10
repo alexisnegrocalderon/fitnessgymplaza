@@ -1,3 +1,4 @@
+import { createHmac, timingSafeEqual } from "node:crypto";
 import {
   getMpConnection,
   saveMpConnection,
@@ -133,4 +134,48 @@ export async function getValidAccessToken(): Promise<string> {
     return refreshConnection(connection.id, connection.refreshToken);
   }
   return connection.accessToken;
+}
+
+/**
+ * Valida la firma `x-signature` de una notificación webhook de Mercado
+ * Pago, siguiendo el algoritmo oficial: se arma un "manifest" con el id del
+ * recurso (tal como llega en el query string), el `x-request-id` y el
+ * timestamp, y se compara su HMAC-SHA256 (con el secreto del webhook)
+ * contra el valor `v1` que Mercado Pago envía en el header.
+ *
+ * Sin esto, cualquiera podría llamar al endpoint del webhook con un
+ * `data.id` inventado y forzar que se revise (y potencialmente apruebe)
+ * una compra ajena — por eso se exige `MP_WEBHOOK_SECRET` configurado.
+ *
+ * @see https://www.mercadopago.com/developers/en/docs/your-integrations/notifications/webhooks
+ */
+export function verifyWebhookSignature(params: {
+  xSignature: string | undefined;
+  xRequestId: string | undefined;
+  dataIdFromQuery: string | undefined;
+}): boolean {
+  const { xSignature, xRequestId, dataIdFromQuery } = params;
+  if (!xSignature || !xRequestId || !dataIdFromQuery) return false;
+
+  const parts = new Map<string, string>();
+  for (const piece of xSignature.split(",")) {
+    const [key, value] = piece.split("=").map(s => s?.trim());
+    if (key && value) parts.set(key, value);
+  }
+  const ts = parts.get("ts");
+  const v1 = parts.get("v1");
+  if (!ts || !v1) return false;
+
+  // Mercado Pago indica que si el id trae letras hay que pasarlas a
+  // minúscula antes de armar el manifest.
+  const dataId = dataIdFromQuery.toLowerCase();
+  const manifest = `id:${dataId};request-id:${xRequestId};ts:${ts};`;
+
+  const secret = requireEnv("MP_WEBHOOK_SECRET");
+  const expected = createHmac("sha256", secret).update(manifest).digest("hex");
+
+  const expectedBuf = Buffer.from(expected, "hex");
+  const receivedBuf = Buffer.from(v1, "hex");
+  if (expectedBuf.length !== receivedBuf.length) return false;
+  return timingSafeEqual(expectedBuf, receivedBuf);
 }

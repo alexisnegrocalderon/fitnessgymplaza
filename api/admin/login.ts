@@ -47,18 +47,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   if (email !== adminEmail || password !== adminPassword) {
-    res.status(401).json({
-      error: "invalid_credentials",
-      // Diagnóstico temporal, sin exponer los valores reales: solo dice
-      // qué campo no coincide y si el largo es distinto (indicio típico
-      // de un espacio de más). Se retira una vez resuelto.
-      debug: {
-        emailMatches: email === adminEmail,
-        passwordMatches: password === adminPassword,
-        emailLengthDiff: email.length - adminEmail.length,
-        passwordLengthDiff: password.length - adminPassword.length,
-      },
-    });
+    res.status(401).json({ error: "invalid_credentials" });
     return;
   }
 

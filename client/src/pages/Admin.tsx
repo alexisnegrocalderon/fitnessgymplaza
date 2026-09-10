@@ -334,21 +334,13 @@ function LoginForm({ onLoggedIn }: { onLoggedIn: () => void }) {
         }
         const data = await res.json().catch(() => null);
         const code = data?.error ?? `http_${res.status}`;
-        const debug = data?.debug as
-          | {
-              emailMatches: boolean;
-              passwordMatches: boolean;
-              emailLengthDiff: number;
-              passwordLengthDiff: number;
-            }
-          | undefined;
         // No asumir que todo lo que no sea 200 es "credenciales malas": un
         // 500 (p. ej. admin_not_configured, si ADMIN_EMAIL/ADMIN_PASSWORD no
         // llegan al runtime) es un problema distinto y hay que verlo tal
         // cual para no confundirlo con una contraseña incorrecta.
         setError(
-          code === "invalid_credentials" && debug
-            ? `Credenciales incorrectas. [debug] email coincide: ${debug.emailMatches} (diff largo: ${debug.emailLengthDiff}) · contraseña coincide: ${debug.passwordMatches} (diff largo: ${debug.passwordLengthDiff})`
+          code === "invalid_credentials"
+            ? "Credenciales incorrectas."
             : `Error: ${code} (HTTP ${res.status})`
         );
         return;
