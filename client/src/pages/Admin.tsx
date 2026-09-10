@@ -17,6 +17,8 @@ import {
   XCircle,
 } from "lucide-react";
 import { BrandMark } from "@/components/common";
+import AlumnosPanel from "@/components/admin/AlumnosPanel";
+import ClasesPanel from "@/components/admin/ClasesPanel";
 import { formatCLP } from "@shared/format";
 import {
   EVENT_CAPACITY,
@@ -758,9 +760,9 @@ function Dashboard({ onLoggedOut }: { onLoggedOut: () => void }) {
   const [loading, setLoading] = useState(true);
   const [actingId, setActingId] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [tab, setTab] = useState<"inscripciones" | "clientes" | "planes">(
-    "inscripciones"
-  );
+  const [tab, setTab] = useState<
+    "inscripciones" | "clientes" | "planes" | "clases" | "alumnos"
+  >("inscripciones");
   const [deleteTarget, setDeleteTarget] = useState<DeleteTarget | null>(null);
   const [unreachable, setUnreachable] = useState(false);
 
@@ -917,6 +919,20 @@ function Dashboard({ onLoggedOut }: { onLoggedOut: () => void }) {
         </button>
         <button
           type="button"
+          className={tab === "clases" ? "is-active" : ""}
+          onClick={() => setTab("clases")}
+        >
+          Clases
+        </button>
+        <button
+          type="button"
+          className={tab === "alumnos" ? "is-active" : ""}
+          onClick={() => setTab("alumnos")}
+        >
+          Alumnos
+        </button>
+        <button
+          type="button"
           className="admin-tabs__export"
           onClick={() => downloadRegistrationsCsv(rows)}
           disabled={rows.length === 0}
@@ -956,6 +972,10 @@ function Dashboard({ onLoggedOut }: { onLoggedOut: () => void }) {
             rows={planRows}
             onDelete={row => setDeleteTarget(planDeleteTarget(row))}
           />
+        ) : tab === "clases" ? (
+          <ClasesPanel />
+        ) : tab === "alumnos" ? (
+          <AlumnosPanel />
         ) : rows.length === 0 ? (
           <p className="admin-dashboard__empty">
             Todavía no hay inscripciones.
