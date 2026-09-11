@@ -167,3 +167,86 @@ export function planConfirmationEmailHtml(
 
   return shell("Plan confirmado", body);
 }
+
+/** Bloque simple de mensaje + botón opcional — para los correos operativos
+ * de la Fase 1 (magic link, confirmaciones de reserva) que no necesitan la
+ * tarjeta de datos ni la tabla de horarios de los dos anteriores. */
+function simpleMessageBody(
+  greetingName: string,
+  paragraphs: string[],
+  cta?: { label: string; url: string }
+): string {
+  const firstName = greetingName.trim().split(/\s+/)[0] || greetingName;
+  const paragraphHtml = paragraphs
+    .map(
+      p => `<p style="margin:0 0 18px;font-size:15px;line-height:1.6;">${p}</p>`
+    )
+    .join("");
+  const ctaHtml = cta
+    ? `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 8px;">
+                  <tr>
+                    <td>
+                      <a href="${cta.url}" style="display:block;padding:14px 12px;border-radius:999px;background:#d92d20;color:#fff;font-size:13px;font-weight:700;text-align:center;text-decoration:none;">${cta.label}</a>
+                    </td>
+                  </tr>
+                </table>`
+    : "";
+
+  return `
+            <tr>
+              <td style="padding:24px 36px 8px;color:#eae7df;">
+                <p style="margin:0 0 18px;font-size:15px;line-height:1.6;">Hola ${firstName},</p>
+                ${paragraphHtml}
+                ${ctaHtml}
+              </td>
+            </tr>`;
+}
+
+/** Magic link de acceso a /app — vence a los 15 minutos, un solo uso. */
+export function magicLinkEmailHtml(
+  fullName: string,
+  magicLinkUrl: string
+): string {
+  const body = simpleMessageBody(
+    fullName,
+    [
+      "Usa este enlace para entrar a tu cuenta de Plaza Fitness y reservar tus clases.",
+      "El enlace vence en 15 minutos y solo se puede usar una vez — si no lo pediste tú, ignora este correo.",
+    ],
+    { label: "Entrar a mi cuenta", url: magicLinkUrl }
+  );
+  return shell("Tu acceso a Plaza Fitness", body);
+}
+
+export function bookingConfirmedEmailHtml(
+  fullName: string,
+  classLabel: string
+): string {
+  const body = simpleMessageBody(fullName, [
+    `Tu cupo para <strong>${classLabel}</strong> quedó confirmado.`,
+    "Puedes cancelarlo desde tu cuenta hasta 2 horas antes si no vas a poder ir, para no perder el crédito.",
+  ]);
+  return shell("Clase reservada", body);
+}
+
+export function waitlistPromotedEmailHtml(
+  fullName: string,
+  classLabel: string
+): string {
+  const body = simpleMessageBody(fullName, [
+    `Se liberó un cupo en <strong>${classLabel}</strong> y pasaste de la lista de espera a reservado.`,
+    "Puedes cancelarlo desde tu cuenta hasta 2 horas antes si no vas a poder ir.",
+  ]);
+  return shell("¡Entraste desde la lista de espera!", body);
+}
+
+export function sessionCancelledEmailHtml(
+  fullName: string,
+  classLabel: string
+): string {
+  const body = simpleMessageBody(fullName, [
+    `La clase <strong>${classLabel}</strong> fue cancelada por el gimnasio.`,
+    "Tu crédito fue devuelto automáticamente — puedes reservar otro horario cuando quieras.",
+  ]);
+  return shell("Clase cancelada", body);
+}

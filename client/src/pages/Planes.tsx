@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { BrandMark } from "@/components/common";
 import { calm, spring } from "@/lib/motion";
+import { buildWhatsappLink } from "@shared/contact";
 import { formatCLP } from "@shared/format";
 import { formatRut, isValidRut } from "@shared/rut";
 import {
@@ -665,9 +666,27 @@ export default function Planes() {
                 <AlertTriangle size={32} />
                 <h2>Pagos no disponibles por ahora</h2>
                 <p>
-                  Estamos ajustando el sistema de pago. Escríbenos por WhatsApp
-                  y te ayudamos a activar tu plan.
+                  Estamos ajustando el sistema de pago. Ya guardamos tus datos —
+                  envíanos el plan elegido por WhatsApp y lo activamos
+                  manualmente contigo.
                 </p>
+                <a
+                  href={buildWhatsappLink(
+                    [
+                      "Hola Plaza Fitness, quiero contratar mi plan:",
+                      `Plan: ${plan?.label ?? tier} (${audience === "student" ? "Estudiante" : "General"})`,
+                      `Nombre: ${fullName}`,
+                      `RUT: ${rut}`,
+                      `WhatsApp: ${whatsapp}`,
+                      `Email: ${email}`,
+                    ].join("\n")
+                  )}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="button button--cobalt"
+                >
+                  Finalizar mi plan por WhatsApp
+                </a>
               </motion.div>
             ) : phase === "success" ? (
               <motion.div

@@ -17,8 +17,13 @@ import {
   XCircle,
 } from "lucide-react";
 import { BrandMark } from "@/components/common";
+import AlumnosPanel from "@/components/admin/AlumnosPanel";
+import ClasesPanel from "@/components/admin/ClasesPanel";
 import { formatCLP } from "@shared/format";
-import { EVENT_CAPACITY, calculateServiceCharge } from "@shared/registration";
+import {
+  EVENT_CAPACITY,
+  calculateGrossUpServiceCharge,
+} from "@shared/registration";
 import { findPlan, planPriceToNumber } from "@shared/plans";
 import type { PlanPurchase, Registration } from "../../../drizzle/schema";
 
@@ -89,8 +94,14 @@ function MercadoPagoPanel() {
   );
 }
 
+/** El cargo por servicio ya no es un porcentaje plano: se calcula con
+ * "gross-up" (shared/registration.ts) para que a Plaza Fitness le llegue
+ * el 100% del precio de lista, neto de la comisión de Mercado Pago y del
+ * 1,5% de la plataforma. Lo que se edita acá es `mpFeeRateBps`: la tasa de
+ * Mercado Pago ASUMIDA para ese cálculo — no hay un valor medido todavía
+ * porque los cobros de Plaza Fitness han sido presenciales hasta ahora. */
 function ServiceChargePanel() {
-  const [bps, setBps] = useState<number | null>(null);
+  const [mpFeeRateBps, setMpFeeRateBps] = useState<number | null>(null);
   const [draft, setDraft] = useState("");
   const [saving, setSaving] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
@@ -100,16 +111,16 @@ function ServiceChargePanel() {
       .then(res => (res.ok ? res.json() : null))
       .then(data => {
         if (!data) return;
-        setBps(data.serviceChargeBps);
-        setDraft((data.serviceChargeBps / 100).toString());
+        setMpFeeRateBps(data.mpFeeRateBps);
+        setDraft((data.mpFeeRateBps / 100).toString());
       })
       .catch(() => {});
   }, []);
 
   async function save() {
     const percent = Number(draft.replace(",", "."));
-    if (!Number.isFinite(percent) || percent < 0 || percent > 50) {
-      setNotice("Ingresa un porcentaje válido entre 0 y 50.");
+    if (!Number.isFinite(percent) || percent < 0 || percent > 30) {
+      setNotice("Ingresa un porcentaje válido entre 0 y 30.");
       return;
     }
     const nextBps = Math.round(percent * 100);
@@ -119,12 +130,12 @@ function ServiceChargePanel() {
       const res = await fetch("/api/admin/settings", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ serviceChargeBps: nextBps }),
+        body: JSON.stringify({ mpFeeRateBps: nextBps }),
       });
       if (!res.ok) throw new Error("failed");
       const data = await res.json();
-      setBps(data.serviceChargeBps);
-      setNotice("Cargo por servicio actualizado.");
+      setMpFeeRateBps(data.mpFeeRateBps);
+      setNotice("Tasa de Mercado Pago actualizada.");
     } catch {
       setNotice("No se pudo guardar. Intenta de nuevo.");
     } finally {
@@ -132,22 +143,27 @@ function ServiceChargePanel() {
     }
   }
 
-  if (bps === null) return null;
+  if (mpFeeRateBps === null) return null;
 
   const examplePlan = findPlan("general", "twelve");
   const examplePrice = examplePlan ? planPriceToNumber(examplePlan) : 0;
-  const preview = calculateServiceCharge(examplePrice, bps);
+  const preview = calculateGrossUpServiceCharge(examplePrice, mpFeeRateBps);
 
   return (
     <div className="admin-mp">
       <div className="admin-mp__info">
         <Percent size={18} />
         <div>
-          <p className="admin-mp__title">Cargo por servicio</p>
+          <p className="admin-mp__title">
+            Cargo por servicio (100% neto para el gimnasio)
+          </p>
           <p className="admin-mp__sub">
-            Se suma al valor del plan en /planes al pagar. Ejemplo con 12 clases
-            general: {formatCLP(preview)} sobre {formatCLP(examplePrice)} (total{" "}
-            {formatCLP(examplePrice + preview)}).
+            Se calcula para que te llegue el precio completo del plan,
+            descontando la comisión de Mercado Pago y el 1,5% de la plataforma.
+            Ejemplo con 12 clases general: se cobra {formatCLP(preview)} extra
+            sobre {formatCLP(examplePrice)} (total{" "}
+            {formatCLP(examplePrice + preview)}), y a Plaza Fitness le llegan
+            los {formatCLP(examplePrice)} completos.
           </p>
         </div>
       </div>
@@ -155,11 +171,11 @@ function ServiceChargePanel() {
         <input
           type="number"
           min={0}
-          max={50}
-          step={0.5}
+          max={30}
+          step={0.1}
           value={draft}
           onChange={e => setDraft(e.target.value)}
-          aria-label="Porcentaje de cargo por servicio"
+          aria-label="Tasa de Mercado Pago asumida"
         />
         <span>%</span>
         <button
@@ -171,6 +187,12 @@ function ServiceChargePanel() {
           {saving ? "Guardando…" : "Guardar"}
         </button>
       </div>
+      <p className="admin-mp__sub" style={{ marginTop: 8 }}>
+        Esta es la tasa de Mercado Pago que se ASUME para el cálculo — todavía
+        no hay pagos online reales para medirla. Ajústala cuando tengas las
+        primeras liquidaciones de Mercado Pago para comparar contra lo
+        calculado.
+      </p>
       {notice && <p className="admin-mp__notice">{notice}</p>}
     </div>
   );
@@ -334,21 +356,13 @@ function LoginForm({ onLoggedIn }: { onLoggedIn: () => void }) {
         }
         const data = await res.json().catch(() => null);
         const code = data?.error ?? `http_${res.status}`;
-        const debug = data?.debug as
-          | {
-              emailMatches: boolean;
-              passwordMatches: boolean;
-              emailLengthDiff: number;
-              passwordLengthDiff: number;
-            }
-          | undefined;
         // No asumir que todo lo que no sea 200 es "credenciales malas": un
         // 500 (p. ej. admin_not_configured, si ADMIN_EMAIL/ADMIN_PASSWORD no
         // llegan al runtime) es un problema distinto y hay que verlo tal
         // cual para no confundirlo con una contraseña incorrecta.
         setError(
-          code === "invalid_credentials" && debug
-            ? `Credenciales incorrectas. [debug] email coincide: ${debug.emailMatches} (diff largo: ${debug.emailLengthDiff}) · contraseña coincide: ${debug.passwordMatches} (diff largo: ${debug.passwordLengthDiff})`
+          code === "invalid_credentials"
+            ? "Credenciales incorrectas."
             : `Error: ${code} (HTTP ${res.status})`
         );
         return;
@@ -746,9 +760,9 @@ function Dashboard({ onLoggedOut }: { onLoggedOut: () => void }) {
   const [loading, setLoading] = useState(true);
   const [actingId, setActingId] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [tab, setTab] = useState<"inscripciones" | "clientes" | "planes">(
-    "inscripciones"
-  );
+  const [tab, setTab] = useState<
+    "inscripciones" | "clientes" | "planes" | "clases" | "alumnos"
+  >("inscripciones");
   const [deleteTarget, setDeleteTarget] = useState<DeleteTarget | null>(null);
   const [unreachable, setUnreachable] = useState(false);
 
@@ -905,6 +919,20 @@ function Dashboard({ onLoggedOut }: { onLoggedOut: () => void }) {
         </button>
         <button
           type="button"
+          className={tab === "clases" ? "is-active" : ""}
+          onClick={() => setTab("clases")}
+        >
+          Clases
+        </button>
+        <button
+          type="button"
+          className={tab === "alumnos" ? "is-active" : ""}
+          onClick={() => setTab("alumnos")}
+        >
+          Alumnos
+        </button>
+        <button
+          type="button"
           className="admin-tabs__export"
           onClick={() => downloadRegistrationsCsv(rows)}
           disabled={rows.length === 0}
@@ -944,6 +972,10 @@ function Dashboard({ onLoggedOut }: { onLoggedOut: () => void }) {
             rows={planRows}
             onDelete={row => setDeleteTarget(planDeleteTarget(row))}
           />
+        ) : tab === "clases" ? (
+          <ClasesPanel />
+        ) : tab === "alumnos" ? (
+          <AlumnosPanel />
         ) : rows.length === 0 ? (
           <p className="admin-dashboard__empty">
             Todavía no hay inscripciones.

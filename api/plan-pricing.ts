@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { getEventSettings } from "../server/db.js";
-import { calculateServiceCharge } from "../shared/registration.js";
+import { calculateGrossUpServiceCharge } from "../shared/registration.js";
 import {
   findPlan,
   planPriceToNumber,
@@ -22,9 +22,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
     const settings = await getEventSettings();
     const basePrice = planPriceToNumber(plan);
-    const serviceCharge = calculateServiceCharge(
+    const serviceCharge = calculateGrossUpServiceCharge(
       basePrice,
-      settings.serviceChargeBps
+      settings.mpFeeRateBps
     );
     res.status(200).json({
       basePrice,
